@@ -134,45 +134,82 @@ export function isLineupLocked(
   return now.getTime() >= ms;
 }
 
-/** Next match per club team (by tipOff, else by date). Past-only → null row. */
+function madridToday(now = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Madrid",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+}
+
+function pickUpcomingFixture(
+  fixtures: ClubFixture[],
+  now = new Date(),
+): ClubFixture | null {
+  const nowMs = now.getTime();
+  const today = madridToday(now);
+
+  const upcoming = [...fixtures]
+    .map((f) => {
+      const tip = tipOffMs(f);
+      const dk = dateKey(f);
+      let sort = tip;
+      if (sort == null && dk) {
+        // Date-only: end-of-day Madrid for display order only (not a lock tip-off).
+        sort = Date.parse(`${dk}T23:59:59+02:00`);
+      }
+      return { f, sort, tip, dk };
+    })
+    .filter((x) => {
+      if (x.tip != null) return x.tip >= nowMs;
+      if (x.dk) return x.dk >= today;
+      return false;
+    })
+    .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
+
+  return upcoming[0]?.f ?? null;
+}
+
+function toNextMatch(
+  team: ClubTeamFixtures,
+  best: ClubFixture | null,
+): NextMatch {
+  return {
+    fcbqTeamId: team.fcbqTeamId,
+    teamId: team.teamId,
+    shortName: team.shortName,
+    opponent: best?.opponent ?? null,
+    tipOff: best?.tipOff ?? null,
+    date:
+      best?.date ??
+      dateKey(
+        best ?? { date: null, tipOff: null, home: null, opponent: null },
+      ),
+    home: best?.home ?? null,
+    matchCallUuid: best?.matchCallUuid ?? null,
+  };
+}
+
+/** Next match per club team (by tipOff, else by date). Past-only → null opponent. */
 export function nextMatchesForClub(
   now = new Date(),
   file = loadFixtures(),
 ): NextMatch[] {
-  const nowMs = now.getTime();
-  const today = now.toISOString().slice(0, 10);
+  return (file.teams ?? []).map((team) =>
+    toNextMatch(team, pickUpcomingFixture(team.fixtures ?? [], now)),
+  );
+}
 
-  return (file.teams ?? []).map((team) => {
-    const upcoming = [...(team.fixtures ?? [])]
-      .map((f) => {
-        const tip = tipOffMs(f);
-        const dk = dateKey(f);
-        let sort = tip;
-        if (sort == null && dk) {
-          // Date-only: treat as end-of-day Madrid for "upcoming" display order only.
-          sort = Date.parse(`${dk}T23:59:59+02:00`);
-        }
-        return { f, sort, tip, dk };
-      })
-      .filter((x) => {
-        if (x.tip != null) return x.tip >= nowMs;
-        if (x.dk) return x.dk >= today;
-        return false;
-      })
-      .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
-
-    const best = upcoming[0]?.f;
-    return {
-      fcbqTeamId: team.fcbqTeamId,
-      teamId: team.teamId,
-      shortName: team.shortName,
-      opponent: best?.opponent ?? null,
-      tipOff: best?.tipOff ?? null,
-      date: best?.date ?? dateKey(best ?? { date: null, tipOff: null, home: null, opponent: null }),
-      home: best?.home ?? null,
-      matchCallUuid: best?.matchCallUuid ?? null,
-    };
-  });
+/** Next match for one fantasy club side (`masc-a` / dual-team variant teamId). */
+export function nextMatchForTeamId(
+  teamId: TeamId,
+  now = new Date(),
+  file = loadFixtures(),
+): NextMatch | null {
+  const team = (file.teams ?? []).find((t) => t.teamId === teamId);
+  if (!team) return null;
+  return toNextMatch(team, pickUpcomingFixture(team.fixtures ?? [], now));
 }
 
 export function formatLockMessageCa(lockAt: string): string {

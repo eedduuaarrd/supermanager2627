@@ -274,22 +274,14 @@ function JornadaContent() {
         </Link>
       )}
 
-      {/* 4. Propers partits — 4 club teams */}
-      {!createOpen && (
+      {/* 4. Propers partits — 4 club teams (FCBQ calendar) */}
+      {!createOpen && nextMatches.length > 0 && (
         <section className="hub-fade-delay space-y-3">
           <p className="text-[11px] uppercase tracking-[0.18em] text-mute">
             Propers partits
           </p>
           <ul className="space-y-2">
-            {(nextMatches.length
-              ? nextMatches
-              : [
-                  { shortName: "Teixidó A", opponent: null, tipOff: null, date: null, home: null },
-                  { shortName: "Lo Sifonet B", opponent: null, tipOff: null, date: null, home: null },
-                  { shortName: "Cudos A", opponent: null, tipOff: null, date: null, home: null },
-                  { shortName: "Farratges B", opponent: null, tipOff: null, date: null, home: null },
-                ]
-            ).map((m) => {
+            {nextMatches.map((m) => {
               const venue = homeAwayLabel(m.home);
               return (
                 <li
@@ -303,7 +295,7 @@ function JornadaContent() {
                     <p className="truncate text-xs text-mute">
                       {m.opponent
                         ? `${venue ? `${venue} · ` : ""}vs ${m.opponent}`
-                        : "Calendari pendent"}
+                        : "Sense proper partit al calendari FCBQ"}
                     </p>
                   </div>
                   <p className="shrink-0 text-xs tabular-nums text-mute">

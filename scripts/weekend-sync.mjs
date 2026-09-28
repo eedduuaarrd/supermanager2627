@@ -123,8 +123,12 @@ function refreshFixtures(round) {
   const fetchArgs = [];
   if (fromApiIdx >= 0) {
     fetchArgs.push("--from-api", args[fromApiIdx + 1]);
-  } else if (process.env.FCBQ_COOKIE || args.includes("--live")) {
-    fetchArgs.push("--live");
+  } else if (args.includes("--from-calendar")) {
+    const i = args.indexOf("--from-calendar");
+    fetchArgs.push("--from-calendar", args[i + 1]);
+  } else if (process.env.FCBQ_COOKIE || args.includes("--live") || args.includes("--calendar")) {
+    // Prefer FCBQ team calendars (upcoming + tip-off Hora) over msstats games[].
+    fetchArgs.push("--calendar");
   }
   try {
     runNode("scripts/fetch-fcbq-fixtures.mjs", fetchArgs);

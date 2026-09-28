@@ -2,6 +2,7 @@ import { PlayerAvatar } from "@/components/player-avatar";
 import { PriceLabel } from "@/components/price-label";
 import { Badge } from "@/components/ui/badge";
 import { teamLabel } from "@/data/roster";
+import { nextMatchForTeamId } from "@/lib/fixtures";
 import { MARKET_PRICE_FOOTNOTE_CA } from "@/lib/market-price";
 import { buildPlayerDetail, gameJornada } from "@/lib/player-stats";
 import { VAL_FORMULA_FOOTNOTE_CA } from "@/lib/val";
@@ -21,6 +22,36 @@ function shooting(made?: number | null, att?: number | null) {
   return `${made}/${att}`;
 }
 
+function formatNextWhen(tipOff: string | null, date: string | null): string {
+  if (tipOff) {
+    try {
+      return new Intl.DateTimeFormat("ca-ES", {
+        timeZone: "Europe/Madrid",
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date(tipOff));
+    } catch {
+      /* fall through */
+    }
+  }
+  if (date) {
+    try {
+      return new Intl.DateTimeFormat("ca-ES", {
+        timeZone: "Europe/Madrid",
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+      }).format(new Date(`${date}T12:00:00`));
+    } catch {
+      return date;
+    }
+  }
+  return "Data pendent";
+}
+
 export default async function JugadorPage({
   params,
 }: {
@@ -31,6 +62,8 @@ export default async function JugadorPage({
   if (!detail) notFound();
 
   const { player, games, summary, meta } = detail;
+  // Dual-team fantasy ids use this variant's teamId → that side's FCBQ schedule.
+  const nextMatch = nextMatchForTeamId(player.teamId);
 
   return (
     <div className="space-y-5 pb-4">
@@ -70,6 +103,34 @@ export default async function JugadorPage({
           </p>
         </div>
       </section>
+
+      {nextMatch && (
+        <section className="border-b border-line/60 pb-3">
+          <p className="text-[10px] uppercase tracking-[0.14em] text-mute">
+            Proper partit · {nextMatch.shortName}
+          </p>
+          {nextMatch.opponent ? (
+            <div className="mt-1 flex items-baseline justify-between gap-3">
+              <p className="min-w-0 truncate text-sm text-bone">
+                {nextMatch.home === true
+                  ? "local"
+                  : nextMatch.home === false
+                    ? "visitant"
+                    : null}
+                {nextMatch.home != null ? " · " : ""}
+                vs {nextMatch.opponent}
+              </p>
+              <p className="shrink-0 text-xs tabular-nums text-mute">
+                {formatNextWhen(nextMatch.tipOff, nextMatch.date)}
+              </p>
+            </div>
+          ) : (
+            <p className="mt-1 text-sm text-mute">
+              Sense proper partit al calendari FCBQ
+            </p>
+          )}
+        </section>
+      )}
 
       <section className="grid grid-cols-3 gap-2 border border-line bg-panel/70 px-3 py-3">
         <div>
