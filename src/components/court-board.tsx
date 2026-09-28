@@ -5,6 +5,7 @@ import { formatPrice, LINEUP_SIZE } from "@/data/roster";
 import type { Player } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Crown, Plus } from "lucide-react";
+import Link from "next/link";
 import type { CSSProperties } from "react";
 
 type SlotDef = {
@@ -276,36 +277,43 @@ function FilledChip({
   player,
   isCaptain,
   isSelected,
+  confirmed,
   onSelect,
 }: {
   player: Player;
   isCaptain: boolean;
   isSelected: boolean;
+  confirmed?: boolean;
   onSelect?: (id: string | null) => void;
 }) {
+  const href = `/jugador/${player.id}`;
   return (
-    <button
-      type="button"
-      disabled={!onSelect}
-      onClick={() => {
-        if (!onSelect) return;
-        onSelect(isSelected ? null : player.id);
-      }}
+    <div
       className={cn(
         "court-chip group relative flex h-14 w-14 flex-col items-center justify-center sm:h-16 sm:w-16",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grana-bright",
-        "disabled:cursor-default",
         isCaptain && "court-chip--captain",
         isSelected && "court-chip--selected",
       )}
-      aria-label={
-        isSelected
-          ? `${player.name}, seleccionat`
-          : `Seleccionar ${player.name}`
-      }
-      aria-pressed={isSelected}
     >
-      <div className="relative h-14 w-14 sm:h-16 sm:w-16">
+      <button
+        type="button"
+        disabled={confirmed || !onSelect}
+        onClick={() => {
+          if (!onSelect) return;
+          onSelect(isSelected ? null : player.id);
+        }}
+        className={cn(
+          "relative h-14 w-14 sm:h-16 sm:w-16",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grana-bright",
+          "disabled:cursor-default",
+        )}
+        aria-label={
+          isSelected
+            ? `${player.name}, seleccionat`
+            : `Seleccionar ${player.name}`
+        }
+        aria-pressed={isSelected}
+      >
         <PlayerAvatar
           name={player.name}
           photoUrl={player.photoUrl}
@@ -324,9 +332,12 @@ function FilledChip({
             <Crown className="size-3" />
           </span>
         )}
-      </div>
-
-      <div className="pointer-events-none absolute left-1/2 top-[calc(100%+0.25rem)] w-[5.25rem] -translate-x-1/2 text-center">
+      </button>
+      <Link
+        href={href}
+        className="absolute left-1/2 top-[calc(100%+0.25rem)] z-10 w-[5.25rem] -translate-x-1/2 text-center"
+        aria-label={`Fitxa de ${player.name}`}
+      >
         <p className="truncate text-[10px] font-semibold leading-tight text-bone drop-shadow sm:text-[11px]">
           {shortName(player.name)}
         </p>
@@ -335,7 +346,7 @@ function FilledChip({
           <span className="mx-0.5 text-white/25">·</span>
           {formatPrice(player.price).replace(/\s/g, "")}
         </p>
-      </div>
-    </button>
+      </Link>
+    </div>
   );
 }

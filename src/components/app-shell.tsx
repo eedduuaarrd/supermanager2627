@@ -21,6 +21,7 @@ const NAV = [
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isEquip = pathname === "/equip" || pathname.startsWith("/equip/");
+  const isJugador = pathname.startsWith("/jugador/");
 
   return (
     <div className="flex h-dvh min-h-0 flex-col overflow-hidden">
@@ -50,7 +51,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         <ul className="mx-auto grid h-14 max-w-lg grid-cols-4">
           {NAV.map(({ href, label, icon: Icon }) => {
             const active =
-              pathname === href || pathname.startsWith(`${href}/`);
+              pathname === href ||
+              pathname.startsWith(`${href}/`) ||
+              (href === "/equip" && isJugador);
             return (
               <li key={href}>
                 <Link
