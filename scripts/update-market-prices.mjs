@@ -87,10 +87,11 @@ for (const id of ids) {
 const out = {
   updatedAt: updatedAt.slice(0, 10),
   formula:
-    "theoretical = max(0, avgVal) × 1000; newPrice = clamp(±15%) then round 500",
+    "theoretical = max(0, avgVal) × 1000; clamp ±15%; round 500; floor MIN_PRICE 500",
   notes: [
     "Club-scale broker pricing for Supermanager Balaguer.",
     "Dual-team fantasy ids are priced separately.",
+    "Never list 0 € — floor is MIN_PRICE (500 €).",
     "Roster overlays these quotes at runtime (applyMarketPrices).",
     "Refresh: node scripts/update-market-prices.mjs",
     "Seed (ignore prev): node scripts/update-market-prices.mjs --seed",

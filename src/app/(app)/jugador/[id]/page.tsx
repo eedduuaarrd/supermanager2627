@@ -2,10 +2,14 @@ import { PlayerAvatar } from "@/components/player-avatar";
 import { PriceLabel } from "@/components/price-label";
 import { Badge } from "@/components/ui/badge";
 import { teamLabel } from "@/data/roster";
-import { nextMatchForTeamId } from "@/lib/fixtures";
+import {
+  formatMatchupLine,
+  nextMatchForTeamId,
+  opponentForGame,
+} from "@/lib/fixtures";
 import { MARKET_PRICE_FOOTNOTE_CA } from "@/lib/market-price";
 import { buildPlayerDetail, gameJornada } from "@/lib/player-stats";
-import { VAL_FORMULA_FOOTNOTE_CA } from "@/lib/val";
+import { computeVal, missedFt, VAL_FORMULA_FOOTNOTE_CA } from "@/lib/val";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -52,6 +56,31 @@ function formatNextWhen(tipOff: string | null, date: string | null): string {
   return "Data pendent";
 }
 
+function StatCell({
+  label,
+  value,
+  emphasize,
+}: {
+  label: string;
+  value: string;
+  emphasize?: boolean;
+}) {
+  return (
+    <div>
+      <dt className="text-[9px] uppercase tracking-wider text-mute">{label}</dt>
+      <dd
+        className={
+          emphasize
+            ? "mt-0.5 text-sm font-semibold tabular-nums text-grana-bright"
+            : "mt-0.5 text-sm tabular-nums text-bone"
+        }
+      >
+        {value}
+      </dd>
+    </div>
+  );
+}
+
 export default async function JugadorPage({
   params,
 }: {
@@ -64,6 +93,15 @@ export default async function JugadorPage({
   const { player, games, summary, meta } = detail;
   // Dual-team fantasy ids use this variant's teamId → that side's FCBQ schedule.
   const nextMatch = nextMatchForTeamId(player.teamId);
+  const nextLine =
+    nextMatch?.matchup ||
+    (nextMatch
+      ? formatMatchupLine(
+          nextMatch.fullName || nextMatch.shortName,
+          nextMatch.opponent,
+          nextMatch.home,
+        )
+      : null);
 
   return (
     <div className="space-y-5 pb-4">
@@ -74,23 +112,23 @@ export default async function JugadorPage({
         <ArrowLeft className="size-3.5" /> Tornar a l&apos;equip
       </Link>
 
-      <section className="flex items-start gap-4">
+      <section className="flex items-start gap-3.5">
         <PlayerAvatar
           name={player.name}
           photoUrl={player.photoUrl}
           size="lg"
-          className="!h-20 !w-20 rounded-full ring-2 ring-bone/25"
+          className="!h-20 !w-20 shrink-0 rounded-full ring-2 ring-bone/25"
         />
         <div className="min-w-0 flex-1">
-          <h1 className="font-display text-2xl leading-tight tracking-wide text-bone sm:text-3xl">
+          <h1 className="font-display text-2xl leading-tight tracking-wide break-words text-bone sm:text-3xl">
             {player.name}
           </h1>
           <div className="mt-2 flex flex-wrap gap-1.5">
             <Badge
               variant="outline"
-              className="border-white/15 text-[10px] uppercase tracking-wide text-mute"
+              className="max-w-full border-white/15 text-[10px] uppercase tracking-wide text-mute"
             >
-              {teamLabel(player.teamId)}
+              <span className="truncate">{teamLabel(player.teamId)}</span>
             </Badge>
           </div>
           <p className="mt-2 text-sm text-mute">
@@ -109,13 +147,10 @@ export default async function JugadorPage({
           <p className="text-[10px] uppercase tracking-[0.14em] text-mute">
             Proper partit · {nextMatch.fullName || nextMatch.shortName}
           </p>
-          {nextMatch.matchup || nextMatch.opponent ? (
-            <div className="mt-1 flex items-baseline justify-between gap-3">
-              <p className="min-w-0 truncate text-sm text-bone">
-                {nextMatch.matchup ||
-                  (nextMatch.home === false
-                    ? `${nextMatch.opponent} vs ${nextMatch.fullName || nextMatch.shortName}`
-                    : `${nextMatch.fullName || nextMatch.shortName} vs ${nextMatch.opponent}`)}
+          {nextLine ? (
+            <div className="mt-1.5 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
+              <p className="min-w-0 text-sm leading-snug break-words text-bone">
+                {nextLine}
               </p>
               <p className="shrink-0 text-xs tabular-nums text-mute">
                 {formatNextWhen(nextMatch.tipOff, nextMatch.date)}
@@ -184,111 +219,69 @@ export default async function JugadorPage({
           </div>
         ) : (
           <ul className="divide-y divide-line border border-line">
-            {games.map((g, i) => (
-              <li key={`${g.teamId}-${i}`} className="bg-panel/40 px-3 py-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-bone">
-                      {g.opponent
-                        ? `vs ${g.opponent}`
-                        : gameJornada(g)
-                          ? `Jornada ${gameJornada(g)}`
-                          : "Partit FCBQ"}
-                    </p>
-                    <p className="mt-0.5 text-[11px] text-mute">
-                      {teamLabel(g.teamId)}
-                      {g.date ? ` · ${g.date}` : ""}
-                      {gameJornada(g) != null && g.opponent
-                        ? ` · J${gameJornada(g)}`
-                        : ""}
-                    </p>
+            {games.map((g, i) => {
+              const opponent = opponentForGame(g);
+              const jornada = gameJornada(g);
+              const tlMiss = missedFt(g.tli, g.tlc);
+              const val =
+                g.val ??
+                computeVal({
+                  pts: g.pts,
+                  pf: g.pf,
+                  ftm: g.tlc,
+                  fta: g.tli,
+                  pm: g.pm,
+                });
+              return (
+                <li key={`${g.teamId}-${i}`} className="bg-panel/40 px-3 py-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold leading-snug break-words text-bone">
+                        {opponent
+                          ? `vs ${opponent}`
+                          : jornada
+                            ? `Jornada ${jornada}`
+                            : "Partit FCBQ"}
+                      </p>
+                      <p className="mt-0.5 text-[11px] text-mute">
+                        {teamLabel(g.teamId)}
+                        {g.date ? ` · ${g.date}` : ""}
+                        {jornada != null ? ` · J${jornada}` : ""}
+                      </p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="font-display text-xl tabular-nums text-grana-bright">
+                        {val != null ? `VAL ${fmt(val, 0)}` : "—"}
+                      </p>
+                    </div>
                   </div>
-                  <div className="shrink-0 text-right">
-                    <p className="font-display text-xl tabular-nums text-grana-bright">
-                      {g.val != null ? `VAL ${fmt(g.val, 0)}` : "—"}
-                    </p>
-                  </div>
-                </div>
-                <dl className="mt-3 grid grid-cols-4 gap-2 text-center sm:grid-cols-6">
-                  <div>
-                    <dt className="text-[9px] uppercase tracking-wider text-mute">
-                      MIN
-                    </dt>
-                    <dd className="mt-0.5 text-sm tabular-nums text-bone">
-                      {fmt(g.min, 1)}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-[9px] uppercase tracking-wider text-mute">
-                      PTS
-                    </dt>
-                    <dd className="mt-0.5 text-sm tabular-nums text-bone">
-                      {fmt(g.pts)}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-[9px] uppercase tracking-wider text-mute">
-                      FP
-                    </dt>
-                    <dd className="mt-0.5 text-sm tabular-nums text-bone">
-                      {fmt(g.pf)}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-[9px] uppercase tracking-wider text-mute">
-                      T2
-                    </dt>
-                    <dd className="mt-0.5 text-sm tabular-nums text-bone">
-                      {shooting(g.t2c, g.t2i)}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-[9px] uppercase tracking-wider text-mute">
-                      T3
-                    </dt>
-                    <dd className="mt-0.5 text-sm tabular-nums text-bone">
-                      {shooting(g.t3c, g.t3i)}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-[9px] uppercase tracking-wider text-mute">
-                      TL
-                    </dt>
-                    <dd className="mt-0.5 text-sm tabular-nums text-bone">
-                      {shooting(g.tlc, g.tli)}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-[9px] uppercase tracking-wider text-mute">
-                      ±
-                    </dt>
-                    <dd className="mt-0.5 text-sm tabular-nums text-bone">
-                      {fmt(g.pm)}
-                    </dd>
-                  </div>
-                  {(g.reb != null || g.ast != null) && (
-                    <>
-                      <div>
-                        <dt className="text-[9px] uppercase tracking-wider text-mute">
-                          REB
-                        </dt>
-                        <dd className="mt-0.5 text-sm tabular-nums text-bone">
-                          {fmt(g.reb)}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-[9px] uppercase tracking-wider text-mute">
-                          AST
-                        </dt>
-                        <dd className="mt-0.5 text-sm tabular-nums text-bone">
-                          {fmt(g.ast)}
-                        </dd>
-                      </div>
-                    </>
-                  )}
-                </dl>
-              </li>
-            ))}
+                  {/* VAL formula row: PTS − PF − missed FT + PM */}
+                  <dl className="mt-3 grid grid-cols-5 gap-1.5 border border-line/70 bg-ink/30 px-2 py-2 text-center">
+                    <StatCell label="PTS" value={fmt(g.pts)} />
+                    <StatCell label="PF" value={fmt(g.pf)} />
+                    <StatCell label="TL↓" value={fmt(tlMiss)} />
+                    <StatCell label="±" value={fmt(g.pm)} />
+                    <StatCell
+                      label="VAL"
+                      value={val != null ? fmt(val, 0) : "—"}
+                      emphasize
+                    />
+                  </dl>
+                  <dl className="mt-2 grid grid-cols-4 gap-2 text-center sm:grid-cols-6">
+                    <StatCell label="MIN" value={fmt(g.min, 1)} />
+                    <StatCell label="T2" value={shooting(g.t2c, g.t2i)} />
+                    <StatCell label="T3" value={shooting(g.t3c, g.t3i)} />
+                    <StatCell label="TL" value={shooting(g.tlc, g.tli)} />
+                    {(g.reb != null || g.ast != null) && (
+                      <>
+                        <StatCell label="REB" value={fmt(g.reb)} />
+                        <StatCell label="AST" value={fmt(g.ast)} />
+                      </>
+                    )}
+                  </dl>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

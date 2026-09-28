@@ -288,9 +288,9 @@ function JornadaContent() {
               return (
                 <li
                   key={m.shortName}
-                  className="flex items-baseline justify-between gap-3 border-b border-line/60 pb-2 last:border-0"
+                  className="flex flex-col gap-1 border-b border-line/60 pb-2 last:border-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3"
                 >
-                  <p className="min-w-0 truncate text-sm font-medium text-bone">
+                  <p className="min-w-0 text-sm font-medium leading-snug break-words text-bone">
                     {line ?? "Sense proper partit al calendari FCBQ"}
                   </p>
                   <p className="shrink-0 text-xs tabular-nums text-mute">
