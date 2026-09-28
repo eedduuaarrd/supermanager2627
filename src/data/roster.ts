@@ -498,3 +498,45 @@ export function formatPrice(value: number): string {
 export function teamLabel(teamId: TeamId): string {
   return TEAMS[teamId].label;
 }
+
+/** Title-case a single token; preserves accents via ca locale. */
+function titleCaseToken(token: string): string {
+  const lower = token.toLocaleLowerCase("ca");
+  if (!lower) return token;
+  return lower.charAt(0).toLocaleUpperCase("ca") + lower.slice(1);
+}
+
+/**
+ * Given name (nom) for compact court labels.
+ * FCBQ / Catalan is usually "Nom Cognoms…"; also handles "Cognom, Nom".
+ * Does not invent accents — keeps roster casing when already mixed-case.
+ */
+export function displayFirstName(fullName: string): string {
+  const raw = fullName.trim();
+  if (!raw) return "?";
+
+  let given: string | undefined;
+  if (raw.includes(",")) {
+    const afterComma = raw.slice(raw.indexOf(",") + 1).trim();
+    given = afterComma.split(/\s+/).filter(Boolean)[0];
+    if (!given) {
+      given = raw.split(",")[0]?.trim().split(/\s+/).filter(Boolean)[0];
+    }
+  } else {
+    given = raw.split(/\s+/).filter(Boolean)[0];
+  }
+
+  if (!given) return "?";
+
+  const allCaps =
+    given === given.toLocaleUpperCase("ca") &&
+    given !== given.toLocaleLowerCase("ca");
+  const display = allCaps ? titleCaseToken(given) : given;
+
+  return display.length > 9 ? `${display.slice(0, 8)}…` : display;
+}
+
+/** Court-chip label alias — first name only. */
+export function shortName(fullName: string): string {
+  return displayFirstName(fullName);
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { PlayerAvatar } from "@/components/player-avatar";
-import { formatPrice, LINEUP_SIZE } from "@/data/roster";
+import { displayFirstName, formatPrice, LINEUP_SIZE } from "@/data/roster";
 import type { Player } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Crown, Plus } from "lucide-react";
@@ -29,14 +29,6 @@ const SLOTS: SlotDef[] = [
   { key: "s6", left: "30%", top: "78%" },
   { key: "s7", left: "70%", top: "78%" },
 ];
-
-function shortName(name: string) {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return "?";
-  if (parts.length === 1) return parts[0].slice(0, 10);
-  const last = parts[parts.length - 1];
-  return last.length > 9 ? `${last.slice(0, 8)}…` : last;
-}
 
 /** Dense playerIds map to slots in order; trailing slots stay empty. */
 function assignSlots(players: Player[]): (Player | null)[] {
@@ -337,7 +329,7 @@ function FilledChip({
         aria-label={`Fitxa de ${player.name}`}
       >
         <p className="truncate text-[10px] font-semibold leading-snug text-bone drop-shadow sm:text-[11px]">
-          {shortName(player.name)}
+          {displayFirstName(player.name)}
         </p>
         <p className="mt-0.5 text-[9px] tabular-nums text-bone/65 sm:text-[10px]">
           VAL {player.avgVal}
