@@ -266,23 +266,18 @@ export function nextMatchForTeamId(
   return toNextMatch(team, pickUpcomingFixture(team.fixtures ?? [], now));
 }
 
-/**
- * Opponent for a played box-score row. Stats scrape often leaves opponent null —
- * fill from the club calendar by jornada, else by date.
- */
-export function opponentForGame(
-  game: {
-    opponent?: string | null;
-    teamId?: TeamId | string | null;
-    round?: number | null;
-    jornada?: number | null;
-    date?: string | null;
-  },
+type GameFixtureHints = {
+  opponent?: string | null;
+  teamId?: TeamId | string | null;
+  round?: number | null;
+  jornada?: number | null;
+  date?: string | null;
+};
+
+function fixtureForGame(
+  game: GameFixtureHints,
   file = loadFixtures(),
-): string | null {
-  if (typeof game.opponent === "string" && game.opponent.trim()) {
-    return game.opponent.trim();
-  }
+): ClubFixture | null {
   if (!game.teamId) return null;
   const team = (file.teams ?? []).find((t) => t.teamId === game.teamId);
   if (!team) return null;
@@ -294,22 +289,50 @@ export function opponentForGame(
         ? game.jornada
         : null;
   if (jornada != null) {
-    const byJ = fixtures.find(
-      (f) => f.jornada === jornada && typeof f.opponent === "string",
-    );
-    if (byJ?.opponent?.trim()) return byJ.opponent.trim();
+    const byJ = fixtures.find((f) => f.jornada === jornada);
+    if (byJ) return byJ;
   }
   const dk =
     typeof game.date === "string" && /^\d{4}-\d{2}-\d{2}/.test(game.date)
       ? game.date.slice(0, 10)
       : null;
   if (dk) {
-    const byDate = fixtures.find(
-      (f) => dateKey(f) === dk && typeof f.opponent === "string",
-    );
-    if (byDate?.opponent?.trim()) return byDate.opponent.trim();
+    return fixtures.find((f) => dateKey(f) === dk) ?? null;
   }
   return null;
+}
+
+/**
+ * Opponent for a played box-score row. Stats scrape often leaves opponent null —
+ * fill from the club calendar by jornada, else by date.
+ */
+export function opponentForGame(
+  game: GameFixtureHints,
+  file = loadFixtures(),
+): string | null {
+  if (typeof game.opponent === "string" && game.opponent.trim()) {
+    return game.opponent.trim();
+  }
+  const fix = fixtureForGame(game, file);
+  return fix?.opponent?.trim() || null;
+}
+
+/** Calendar date for a box-score row when the scrape omitted it. */
+export function dateForGame(
+  game: GameFixtureHints,
+  file = loadFixtures(),
+): string | null {
+  if (typeof game.date === "string" && /^\d{4}-\d{2}-\d{2}/.test(game.date)) {
+    return game.date.slice(0, 10);
+  }
+  return dateKey(
+    fixtureForGame(game, file) ?? {
+      date: null,
+      tipOff: null,
+      home: null,
+      opponent: null,
+    },
+  );
 }
 
 export function formatLockMessageCa(lockAt: string): string {

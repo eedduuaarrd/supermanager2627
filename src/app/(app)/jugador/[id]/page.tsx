@@ -3,6 +3,7 @@ import { PriceLabel } from "@/components/price-label";
 import { Badge } from "@/components/ui/badge";
 import { teamLabel } from "@/data/roster";
 import {
+  dateForGame,
   formatMatchupLine,
   nextMatchForTeamId,
   opponentForGame,
@@ -221,6 +222,7 @@ export default async function JugadorPage({
           <ul className="divide-y divide-line border border-line">
             {games.map((g, i) => {
               const opponent = opponentForGame(g);
+              const gameDate = dateForGame(g);
               const jornada = gameJornada(g);
               const tlMiss = missedFt(g.tli, g.tlc);
               const val =
@@ -245,7 +247,7 @@ export default async function JugadorPage({
                       </p>
                       <p className="mt-0.5 text-[11px] text-mute">
                         {teamLabel(g.teamId)}
-                        {g.date ? ` · ${g.date}` : ""}
+                        {gameDate ? ` · ${gameDate}` : ""}
                         {jornada != null ? ` · J${jornada}` : ""}
                       </p>
                     </div>
