@@ -92,7 +92,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
-    photoUrl: null,
+    photoUrl: "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_0_54c7a3b9-226b-40ed-bb83-8cb8a5062797.jpeg",
   },
   {
     id: "eduard-bernat",
