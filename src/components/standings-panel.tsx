@@ -155,8 +155,8 @@ export function StandingsPanel({
           </p>
           <p className="mt-2 text-sm text-mute">
             Tanca la jornada amb les estadístiques FCBQ d&apos;aquella setmana
-            (VAL o +/-), bloqueja les alineacions i obre la següent. No simula
-            partits inventats.
+            (VAL = PTS − faltes − TL fallats + ±), bloqueja les alineacions i
+            obre la següent. No simula partits inventats.
           </p>
           <Button
             type="button"

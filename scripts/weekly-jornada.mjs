@@ -4,7 +4,7 @@
  *
  * 1) Refresh FCBQ plantilla stats into player-stats.json (merge, no invented games)
  * 2) Assign untagged game rows (round/jornada null) → current fantasy round
- * 3) Close + score current jornada from those stats (VAL else PM; captain ×2; DNP = 0)
+ * 3) Close + score current jornada from those stats (Balaguer VAL; captain ×2; DNP = 0)
  * 4) Open next jornada
  *
  * Usage (on the VPS, app running):
@@ -25,6 +25,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
+import { computeVal } from "./compute-val.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
@@ -124,11 +125,15 @@ function assignUntaggedGames(round) {
 function fantasyPoints(game) {
   if (!game) return { points: 0, source: "DNP", minutes: 0 };
   const minutes = typeof game.min === "number" ? game.min : 0;
-  if (typeof game.val === "number")
-    return { points: game.val, source: "VAL", minutes };
-  if (typeof game.pm === "number")
-    return { points: game.pm, source: "PM", minutes };
-  return { points: 0, source: "DNP", minutes };
+  const points = computeVal({
+    pts: game.pts,
+    pf: game.pf,
+    ftm: game.tlc,
+    fta: game.tli,
+    pm: game.pm,
+  });
+  if (points == null) return { points: 0, source: "DNP", minutes };
+  return { points, source: "VAL", minutes };
 }
 
 function gameForRound(stats, playerId, round) {

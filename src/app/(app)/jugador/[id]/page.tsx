@@ -2,6 +2,7 @@ import { PlayerAvatar } from "@/components/player-avatar";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice, teamLabel } from "@/data/roster";
 import { buildPlayerDetail, gameJornada } from "@/lib/player-stats";
+import { VAL_FORMULA_FOOTNOTE_CA } from "@/lib/val";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -77,7 +78,7 @@ export default async function JugadorPage({
         </div>
         <div>
           <p className="text-[10px] uppercase tracking-[0.14em] text-mute">
-            {summary.usesPmFallback ? "Mitj. VAL/±" : "Mitj. VAL"}
+            Mitj. VAL
           </p>
           <p className="mt-1 font-display text-2xl tabular-nums text-grana-bright">
             {summary.avgVal == null ? "—" : fmt(summary.avgVal, 1)}
@@ -92,6 +93,9 @@ export default async function JugadorPage({
           </p>
         </div>
       </section>
+      <p className="text-[11px] leading-relaxed text-mute">
+        {VAL_FORMULA_FOOTNOTE_CA}
+      </p>
 
       <section>
         <header className="mb-2 flex items-end justify-between gap-2">
@@ -136,20 +140,11 @@ export default async function JugadorPage({
                   </div>
                   <div className="shrink-0 text-right">
                     <p className="font-display text-xl tabular-nums text-grana-bright">
-                      {g.val != null
-                        ? `VAL ${fmt(g.val, 0)}`
-                        : g.pm != null
-                          ? `+/- ${fmt(g.pm, 0)}`
-                          : "—"}
+                      {g.val != null ? `VAL ${fmt(g.val, 0)}` : "—"}
                     </p>
-                    {g.val == null && g.pm != null && (
-                      <p className="text-[9px] uppercase tracking-wider text-mute">
-                        VAL no publicat
-                      </p>
-                    )}
                   </div>
                 </div>
-                <dl className="mt-3 grid grid-cols-4 gap-2 text-center sm:grid-cols-5">
+                <dl className="mt-3 grid grid-cols-4 gap-2 text-center sm:grid-cols-6">
                   <div>
                     <dt className="text-[9px] uppercase tracking-wider text-mute">
                       MIN
@@ -168,6 +163,14 @@ export default async function JugadorPage({
                   </div>
                   <div>
                     <dt className="text-[9px] uppercase tracking-wider text-mute">
+                      FP
+                    </dt>
+                    <dd className="mt-0.5 text-sm tabular-nums text-bone">
+                      {fmt(g.pf)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[9px] uppercase tracking-wider text-mute">
                       T2
                     </dt>
                     <dd className="mt-0.5 text-sm tabular-nums text-bone">
@@ -182,12 +185,20 @@ export default async function JugadorPage({
                       {shooting(g.t3c, g.t3i)}
                     </dd>
                   </div>
-                  <div className="col-span-2 sm:col-span-1">
+                  <div>
                     <dt className="text-[9px] uppercase tracking-wider text-mute">
                       TL
                     </dt>
                     <dd className="mt-0.5 text-sm tabular-nums text-bone">
                       {shooting(g.tlc, g.tli)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[9px] uppercase tracking-wider text-mute">
+                      ±
+                    </dt>
+                    <dd className="mt-0.5 text-sm tabular-nums text-bone">
+                      {fmt(g.pm)}
                     </dd>
                   </div>
                   {(g.reb != null || g.ast != null) && (

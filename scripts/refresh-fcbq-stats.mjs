@@ -12,6 +12,7 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { computeVal } from "./compute-val.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
@@ -72,7 +73,7 @@ function fantasyId(base, teamSlug) {
 }
 
 function fingerprint(g) {
-  return [g.teamId, g.pts, g.min, g.pm, g.val, g.t2c, g.t3c, g.tlc].join("|");
+  return [g.teamId, g.pts, g.min, g.pm, g.pf, g.t2c, g.t3c, g.tlc, g.tli].join("|");
 }
 
 function loadExisting() {
@@ -108,6 +109,18 @@ function buildFromRosters(rosters, existing) {
       entry.number = p.number ?? entry.number ?? null;
 
       if (pj === 1) {
+        const pts = stats.PTS ?? null;
+        const pf = stats.FC ?? null; // FCBQ personal fouls
+        const tlc = stats.TLC ?? null;
+        const tli = stats.TLI ?? null;
+        const pm = stats.PM ?? null;
+        const fantasyVal = computeVal({
+          pts,
+          pf,
+          ftm: tlc,
+          fta: tli,
+          pm,
+        });
         const candidate = {
           date: null,
           round: null,
@@ -117,19 +130,19 @@ function buildFromRosters(rosters, existing) {
           fcbqTeamId: t.id,
           competition: t.competition ?? null,
           min: stats.MIN ?? null,
-          pts: stats.PTS ?? null,
+          pts,
           t2c: stats.T2C ?? null,
           t2i: stats.T2I ?? null,
           t3c: stats.T3C ?? null,
           t3i: stats.T3I ?? null,
-          tlc: stats.TLC ?? null,
-          tli: stats.TLI ?? null,
-          val: stats.VAL ?? null,
-          pm: stats.PM ?? null,
+          tlc,
+          tli,
+          pf,
+          // Stored fantasy VAL (Balaguer formula), not FCBQ Plantilla VAL column.
+          val: fantasyVal,
+          pm,
           note:
-            stats.VAL == null
-              ? "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
-              : "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit).",
+            "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
         };
         const sameTeam = entry.games.filter((g) => g.teamId === teamId);
         const fp = fingerprint(candidate);
@@ -148,6 +161,7 @@ function buildFromRosters(rosters, existing) {
           match.t3i = candidate.t3i;
           match.tlc = candidate.tlc;
           match.tli = candidate.tli;
+          match.pf = candidate.pf;
           match.val = candidate.val;
           match.pm = candidate.pm;
           match.note = candidate.note;
@@ -187,6 +201,7 @@ function buildFromRosters(rosters, existing) {
       "Person × team = distinct fantasy id (no cross-team dedupe).",
       "Each game.round/jornada maps to fantasy jornada when assigned.",
       "Do not invent future games; append only when FCBQ publishes new stats.",
+      "Fantasy VAL = PTS − FC (pf) − max(0, TLI−TLC) + PM; FCBQ Plantilla VAL ignored.",
       "Refresh: node scripts/refresh-fcbq-stats.mjs [--from path]",
       "Weekly ops: node scripts/weekly-jornada.mjs",
     ],

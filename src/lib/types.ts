@@ -8,7 +8,7 @@ export interface Player {
   name: string;
   number: number | null;
   price: number;
-  /** Mitjana de valoració (VAL FCBQ o estimada). */
+  /** Mitjana de valoració (VAL fantasy Balaguer). */
   avgVal: number;
   source: PlayerSource;
   /** Primary (and only) FCBQ senior team for this fantasy id. */
@@ -37,7 +37,7 @@ export interface RoundScore {
   points: number;
   minutes: number;
   winBonus: boolean;
-  /** VAL | PM when scored from FCBQ; omitted for legacy rows. */
+  /** VAL when scored from Balaguer formula; omitted for legacy rows. */
   statSource?: "VAL" | "PM";
   dnp?: boolean;
   note?: string;

@@ -3,6 +3,7 @@
 import { useManager } from "@/components/manager-provider";
 import { TeamManager } from "@/components/team-manager";
 import { Button } from "@/components/ui/button";
+import { VAL_FORMULA_FOOTNOTE_CA } from "@/lib/val";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -47,6 +48,7 @@ export default function ComptePage() {
           <li>Pressupost 100.000 € per equip</li>
           <li>Capità ×2 als punts de jornada</li>
           <li>Cada setmana, jornada nova amb els partits del club</li>
+          <li>{VAL_FORMULA_FOOTNOTE_CA}</li>
         </ul>
       </section>
 

@@ -1,6 +1,7 @@
 import playerStatsJson from "@/data/player-stats.json";
 import { getPlayer, resolvePlayerId, TEAMS } from "@/data/roster";
 import type { TeamId } from "@/lib/types";
+import { computeVal } from "@/lib/val";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -22,11 +23,18 @@ export interface PlayerGameStat {
   t2i?: number | null;
   t3c?: number | null;
   t3i?: number | null;
+  /** Free throws made (FCBQ TLC). */
   tlc?: number | null;
+  /** Free throws attempted (FCBQ TLI). */
   tli?: number | null;
-  /** FCBQ VAL when published; often null on Plantilla. */
+  /** Personal fouls (FCBQ FC). */
+  pf?: number | null;
+  /**
+   * Fantasy VAL = PTS − PF − missed FT + PM (stored from computeVal).
+   * Not the unpublished FCBQ Plantilla VAL column.
+   */
   val: number | null;
-  /** FCBQ +/- (PM) — used for fantasy when VAL is missing. */
+  /** FCBQ +/- (PM / onCourtPlusMinus). */
   pm?: number | null;
   note?: string;
 }
@@ -90,25 +98,30 @@ export function gameJornada(game: PlayerGameStat): number | null {
 }
 
 /**
- * Fantasy points from one FCBQ box score: VAL if published, else PM (+/-).
- * Returns DNP (0) when the player has no game / no usable stat that week.
+ * Fantasy points from one box score via Balaguer VAL formula
+ * (PTS − PF − missed FT + PM). Recalculates from stored fields.
+ * Returns DNP (0) when the player has no game / no usable components.
  */
 export function fantasyStatFromGame(game: PlayerGameStat | null | undefined): {
   points: number;
-  source: "VAL" | "PM" | "DNP";
+  source: "VAL" | "DNP";
   minutes: number;
 } {
   if (!game) {
     return { points: 0, source: "DNP", minutes: 0 };
   }
   const minutes = typeof game.min === "number" ? game.min : 0;
-  if (typeof game.val === "number") {
-    return { points: game.val, source: "VAL", minutes };
+  const points = computeVal({
+    pts: game.pts,
+    pf: game.pf,
+    ftm: game.tlc,
+    fta: game.tli,
+    pm: game.pm,
+  });
+  if (points == null) {
+    return { points: 0, source: "DNP", minutes };
   }
-  if (typeof game.pm === "number") {
-    return { points: game.pm, source: "PM", minutes };
-  }
-  return { points: 0, source: "DNP", minutes };
+  return { points, source: "VAL", minutes };
 }
 
 /** That week's game for a fantasy id (person×team) — dual-team variants stay separate. */
@@ -120,7 +133,7 @@ export function getPlayerGameForRound(
   return games.find((g) => gameJornada(g) === round) ?? null;
 }
 
-/** Season summary from real game rows only — never invent zeros. Uses VAL, else PM. */
+/** Season summary from real game rows only — never invent zeros. Uses Balaguer VAL. */
 export function summarizeGames(games: PlayerGameStat[]) {
   if (games.length === 0) {
     return {
@@ -131,6 +144,8 @@ export function summarizeGames(games: PlayerGameStat[]) {
       totalVal: null as number | null,
       totalPts: null as number | null,
       usesPmFallback: false,
+      pfCoverage: 0,
+      ftCoverage: 0,
     };
   }
 
@@ -138,11 +153,12 @@ export function summarizeGames(games: PlayerGameStat[]) {
     .map((g) => fantasyStatFromGame(g))
     .filter((x) => x.source !== "DNP")
     .map((x) => x.points);
-  const usesPmFallback = games.some(
-    (g) => g.val == null && typeof g.pm === "number",
-  );
   const pts = games.map((g) => g.pts).filter((v): v is number => v != null);
   const mins = games.map((g) => g.min).filter((v): v is number => v != null);
+  const pfCoverage = games.filter((g) => typeof g.pf === "number").length;
+  const ftCoverage = games.filter(
+    (g) => typeof g.tlc === "number" && typeof g.tli === "number",
+  ).length;
 
   const avg = (arr: number[]) =>
     arr.length
@@ -158,7 +174,9 @@ export function summarizeGames(games: PlayerGameStat[]) {
       ? fantasyVals.reduce((a, b) => a + b, 0)
       : null,
     totalPts: pts.length ? pts.reduce((a, b) => a + b, 0) : null,
-    usesPmFallback,
+    usesPmFallback: false,
+    pfCoverage,
+    ftCoverage,
   };
 }
 

@@ -228,7 +228,7 @@ function scoreLineupFromFcbq(
 }
 
 /**
- * Close current jornada using that week's FCBQ box scores (VAL else PM).
+ * Close current jornada using that week's FCBQ box scores (Balaguer VAL).
  * Locks lineups; does not invent games — DNP → 0.
  * Optionally opens the next jornada when `advance` is true.
  */

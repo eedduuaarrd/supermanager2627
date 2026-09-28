@@ -12,6 +12,7 @@
     "Person × team = distinct fantasy id (no cross-team dedupe).",
     "Each game.round/jornada maps to fantasy jornada when assigned.",
     "Do not invent future games; append only when FCBQ publishes new stats.",
+    "Fantasy VAL = PTS − FC (pf) − max(0, TLI−TLC) + PM; FCBQ Plantilla VAL ignored.",
     "Refresh: node scripts/refresh-fcbq-stats.mjs [--from path]",
     "Weekly ops: node scripts/weekly-jornada.mjs"
   ],
@@ -37,10 +38,11 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 0,
-          "val": null,
+          "val": 7,
           "pm": 4,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 3
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -67,10 +69,11 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 0,
-          "val": null,
+          "val": -5,
           "pm": -2,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 3
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -97,10 +100,11 @@
           "t3i": 0,
           "tlc": 1,
           "tli": 4,
-          "val": null,
+          "val": 8,
           "pm": 4,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 2
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -127,10 +131,11 @@
           "t3i": 2,
           "tlc": 2,
           "tli": 4,
-          "val": null,
+          "val": 1,
           "pm": -3,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 2
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -157,10 +162,11 @@
           "t3i": 1,
           "tlc": 4,
           "tli": 5,
-          "val": null,
+          "val": -8,
           "pm": -15,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -187,10 +193,11 @@
           "t3i": 3,
           "tlc": 2,
           "tli": 2,
-          "val": null,
+          "val": 9,
           "pm": -3,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 3
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -217,10 +224,11 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 2,
-          "val": null,
+          "val": -5,
           "pm": 1,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 4
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -247,10 +255,11 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 1,
-          "val": null,
+          "val": -12,
           "pm": -15,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 2
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -277,10 +286,11 @@
           "t3i": 2,
           "tlc": 2,
           "tli": 3,
-          "val": null,
+          "val": -1,
           "pm": -6,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 4
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -307,10 +317,11 @@
           "t3i": 2,
           "tlc": 0,
           "tli": 0,
-          "val": null,
+          "val": -5,
           "pm": -2,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 5
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -337,10 +348,11 @@
           "t3i": 3,
           "tlc": 2,
           "tli": 3,
-          "val": null,
+          "val": 22,
           "pm": 19,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 4
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -367,10 +379,11 @@
           "t3i": 2,
           "tlc": 2,
           "tli": 2,
-          "val": null,
+          "val": 27,
           "pm": 18,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 4
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -397,10 +410,11 @@
           "t3i": 4,
           "tlc": 4,
           "tli": 6,
-          "val": null,
+          "val": 34,
           "pm": 24,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 3
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -427,10 +441,11 @@
           "t3i": 0,
           "tlc": 1,
           "tli": 2,
-          "val": null,
+          "val": -11,
           "pm": -13,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 2
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -457,10 +472,11 @@
           "t3i": 3,
           "tlc": 0,
           "tli": 0,
-          "val": null,
+          "val": 17,
           "pm": 13,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 2
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -487,10 +503,11 @@
           "t3i": 0,
           "tlc": 1,
           "tli": 2,
-          "val": null,
+          "val": -12,
           "pm": -12,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 0
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -517,10 +534,11 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 0,
-          "val": null,
+          "val": -17,
           "pm": -17,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 0
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -547,10 +565,11 @@
           "t3i": 0,
           "tlc": 1,
           "tli": 2,
-          "val": null,
+          "val": -16,
           "pm": -15,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -577,10 +596,11 @@
           "t3i": 2,
           "tlc": 2,
           "tli": 4,
-          "val": null,
+          "val": 20,
           "pm": 15,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -607,10 +627,11 @@
           "t3i": 2,
           "tlc": 3,
           "tli": 5,
-          "val": null,
+          "val": 16,
           "pm": 7,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 4
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -637,10 +658,11 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 0,
-          "val": null,
+          "val": 1,
           "pm": 1,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 2
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -667,10 +689,11 @@
           "t3i": 0,
           "tlc": 7,
           "tli": 12,
-          "val": null,
+          "val": 20,
           "pm": -1,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 3
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -697,10 +720,11 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 0,
-          "val": null,
+          "val": 10,
           "pm": 12,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 4
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -727,10 +751,11 @@
           "t3i": 0,
           "tlc": 5,
           "tli": 5,
-          "val": null,
+          "val": 4,
           "pm": 0,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -757,10 +782,11 @@
           "t3i": 0,
           "tlc": 1,
           "tli": 2,
-          "val": null,
+          "val": -10,
           "pm": -9,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -787,10 +813,11 @@
           "t3i": 0,
           "tlc": 2,
           "tli": 2,
-          "val": null,
+          "val": -2,
           "pm": -3,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -817,10 +844,11 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 0,
-          "val": null,
+          "val": -7,
           "pm": -6,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -847,10 +875,11 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 4,
-          "val": null,
+          "val": 7,
           "pm": 11,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 0
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -877,10 +906,11 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 0,
-          "val": null,
+          "val": -3,
           "pm": -2,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
-          "jornada": 1
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "jornada": 1,
+          "pf": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
