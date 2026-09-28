@@ -20,6 +20,8 @@ export interface Player {
   teamIds: TeamId[];
   /** Points per game from latest FCBQ sample, if any. */
   pts?: number;
+  /** Absolute or site-relative photo URL; null → initials placeholder. */
+  photoUrl: string | null;
   note?: string;
 }
 
@@ -63,4 +65,12 @@ export interface GameState {
   history: RoundResult[];
   league: LeagueMember[];
   version: number;
+}
+
+export interface SessionUser {
+  id: string;
+  email: string;
+  displayName: string;
+  teamName: string;
+  isAdmin: boolean;
 }

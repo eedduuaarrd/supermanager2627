@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PlayerAvatar } from "@/components/player-avatar";
 import { formatPrice, POSITION_LABEL, teamLabel } from "@/data/roster";
 import type { Player } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -29,21 +30,17 @@ export function PlayerRow({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 border-b border-white/8 px-3 py-3 transition-colors",
-        selected && "bg-grana/15",
-        isCaptain && "bg-gold/10",
+        "flex items-center gap-3 border-b border-line px-3 py-3 transition-colors",
+        selected && "bg-grana/10",
+        isCaptain && "bg-white/[0.04]",
       )}
     >
-      <div className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-md bg-navy-deep text-gold">
-        <span className="font-display text-lg leading-none tracking-wide">
-          {player.number ?? "—"}
-        </span>
-      </div>
+      <PlayerAvatar name={player.name} photoUrl={player.photoUrl} />
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-1.5">
-          <p className="truncate font-semibold text-cream">{player.name}</p>
+          <p className="truncate text-sm font-semibold text-bone">{player.name}</p>
           {isCaptain && (
-            <Badge className="bg-gold text-navy-deep hover:bg-gold">
+            <Badge className="bg-grana text-bone hover:bg-grana">
               <Crown className="size-3" /> Capità
             </Badge>
           )}
@@ -51,18 +48,13 @@ export function PlayerRow({
             <Badge
               key={tid}
               variant="outline"
-              className="border-grana/50 text-grana-bright"
+              className="border-white/15 text-[10px] uppercase tracking-wide text-mute"
             >
               {teamLabel(tid)}
             </Badge>
           ))}
-          {player.source === "placeholder" && (
-            <Badge variant="outline" className="border-amber-400/40 text-amber-200">
-              Placeholder
-            </Badge>
-          )}
         </div>
-        <p className="mt-0.5 text-xs text-cream/55">
+        <p className="mt-0.5 text-xs text-mute">
           {POSITION_LABEL[player.position]}
           {player.pts != null ? ` · ${player.pts} pts` : ""} · VAL {player.avgVal} ·{" "}
           {formatPrice(player.price)}
@@ -75,8 +67,8 @@ export function PlayerRow({
             size="sm"
             variant="ghost"
             className={cn(
-              "text-cream/70 hover:bg-gold/20 hover:text-gold",
-              isCaptain && "text-gold",
+              "text-mute hover:bg-white/10 hover:text-bone",
+              isCaptain && "text-grana-bright",
             )}
             onClick={onCaptain}
             aria-label="Marcar com a capità"
@@ -90,7 +82,7 @@ export function PlayerRow({
             size="sm"
             disabled={disabled}
             onClick={onAction}
-            className="bg-grana text-cream hover:bg-grana-bright"
+            className="bg-grana text-bone hover:bg-grana-bright"
           >
             <Plus className="size-4" />
           </Button>
@@ -101,7 +93,7 @@ export function PlayerRow({
             size="sm"
             variant="ghost"
             onClick={onAction}
-            className="text-cream/60 hover:bg-white/10 hover:text-cream"
+            className="text-mute hover:bg-white/10 hover:text-bone"
           >
             <X className="size-4" />
           </Button>

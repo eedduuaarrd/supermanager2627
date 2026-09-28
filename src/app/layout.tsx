@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Manrope } from "next/font/google";
+import { IBM_Plex_Sans, Oswald } from "next/font/google";
 import "./globals.css";
 
-const display = Bebas_Neue({
-  weight: "400",
+const display = Oswald({
   subsets: ["latin"],
   variable: "--font-display",
 });
 
-const sans = Manrope({
+const sans = IBM_Plex_Sans({
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
   variable: "--font-sans",
 });
@@ -16,7 +16,7 @@ const sans = Manrope({
 export const metadata: Metadata = {
   title: "Supermanager Balaguer",
   description:
-    "Fantasy bàsquet del sènior del Club Bàsquet Balaguer. Tria alineació, capità i competeix a la lliga amics.",
+    "Gestor fantasy dels sèniors del Club Bàsquet Balaguer. Alineació, capità i classificacions de jornada i general.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -25,7 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ca"
       className={`${display.variable} ${sans.variable} h-full antialiased`}
     >
-      <body className="court-bg min-h-full flex flex-col font-sans text-cream">
+      <body className="arena-bg min-h-full flex flex-col font-sans text-bone">
         {children}
       </body>
     </html>

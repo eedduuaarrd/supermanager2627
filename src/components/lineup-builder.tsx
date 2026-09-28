@@ -7,7 +7,6 @@ import {
   LINEUP_SIZE,
   LINEUP_SLOTS,
   POSITION_LABEL,
-  ROSTER,
   TEAM_ORDER,
   TEAMS,
 } from "@/data/roster";
@@ -18,112 +17,119 @@ import {
   remainingBudget,
   validateLineup,
 } from "@/lib/game";
-import type { GameState, Position, TeamId } from "@/lib/types";
+import type { Lineup, Player, Position, TeamId } from "@/lib/types";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PlayerRow } from "@/components/player-row";
 
 interface LineupBuilderProps {
-  state: GameState;
-  onChange: (next: GameState) => void;
+  roster: Player[];
+  budget: number;
+  lineup: Lineup;
+  currentRound: number;
+  onChange: (lineup: Lineup) => void;
   onConfirm: () => void;
   confirming?: boolean;
+  saving?: boolean;
   error?: string | null;
 }
 
 export function LineupBuilder({
-  state,
+  roster,
+  budget,
+  lineup,
+  currentRound,
   onChange,
   onConfirm,
   confirming,
+  saving,
   error,
 }: LineupBuilderProps) {
   const [filter, setFilter] = useState<Position | "all">("all");
   const [teamFilter, setTeamFilter] = useState<TeamId | "all">("all");
-  const remaining = remainingBudget(state.budget, state.lineup.playerIds);
-  const counts = countByPosition(state.lineup.playerIds);
-  const validation = validateLineup(state.lineup, state.budget);
-  const projected = projectedPoints(state.lineup);
+  const remaining = remainingBudget(budget, lineup.playerIds);
+  const counts = countByPosition(lineup.playerIds);
+  const validation = validateLineup(lineup, budget);
+  const projected = projectedPoints(lineup);
   const spentPct = Math.min(
     100,
-    Math.round(((state.budget - remaining) / state.budget) * 100),
+    Math.round(((budget - remaining) / budget) * 100),
   );
 
   const market = useMemo(() => {
-    return ROSTER.filter((p) => {
-      if (state.lineup.playerIds.includes(p.id)) return false;
-      if (filter !== "all" && p.position !== filter) return false;
-      if (teamFilter !== "all" && !p.teamIds.includes(teamFilter)) return false;
-      return true;
-    }).sort((a, b) => b.price - a.price);
-  }, [filter, teamFilter, state.lineup.playerIds]);
+    return roster
+      .filter((p) => {
+        if (lineup.playerIds.includes(p.id)) return false;
+        if (filter !== "all" && p.position !== filter) return false;
+        if (teamFilter !== "all" && !p.teamIds.includes(teamFilter)) return false;
+        return true;
+      })
+      .sort((a, b) => b.price - a.price);
+  }, [filter, teamFilter, lineup.playerIds, roster]);
 
-  const selectedPlayers = state.lineup.playerIds
-    .map((id) => ROSTER.find((p) => p.id === id))
+  const selectedPlayers = lineup.playerIds
+    .map((id) => roster.find((p) => p.id === id))
     .filter(Boolean);
 
   function togglePlayer(id: string) {
-    const exists = state.lineup.playerIds.includes(id);
+    if (lineup.confirmed) return;
+    const exists = lineup.playerIds.includes(id);
     let playerIds: string[];
-    let captainId = state.lineup.captainId;
+    let captainId = lineup.captainId;
 
     if (exists) {
-      playerIds = state.lineup.playerIds.filter((x) => x !== id);
+      playerIds = lineup.playerIds.filter((x) => x !== id);
       if (captainId === id) captainId = null;
     } else {
-      if (state.lineup.playerIds.length >= LINEUP_SIZE) return;
-      const player = ROSTER.find((p) => p.id === id);
+      if (lineup.playerIds.length >= LINEUP_SIZE) return;
+      const player = roster.find((p) => p.id === id);
       if (!player) return;
       if (counts[player.position] >= LINEUP_SLOTS[player.position]) return;
       if (remaining < player.price) return;
-      playerIds = [...state.lineup.playerIds, id];
+      playerIds = [...lineup.playerIds, id];
     }
 
     onChange({
-      ...state,
-      lineup: {
-        ...state.lineup,
-        playerIds,
-        captainId,
-        confirmed: false,
-        confirmedAt: null,
-      },
+      ...lineup,
+      playerIds,
+      captainId,
+      confirmed: false,
+      confirmedAt: null,
     });
   }
 
   function setCaptain(id: string) {
+    if (lineup.confirmed) return;
     onChange({
-      ...state,
-      lineup: {
-        ...state.lineup,
-        captainId: id,
-        confirmed: false,
-        confirmedAt: null,
-      },
+      ...lineup,
+      captainId: id,
+      confirmed: false,
+      confirmedAt: null,
     });
   }
 
   return (
     <div className="space-y-4">
-      <section className="rounded-2xl border border-white/10 bg-navy/70 p-4 backdrop-blur">
+      <section className="border border-line bg-panel/90 p-4">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-gold/80">
-              Mercat · Jornada {state.currentRound}
+            <p className="text-xs uppercase tracking-[0.22em] text-mute">
+              Mercat · Jornada {currentRound}
+              {saving ? " · Desant…" : ""}
             </p>
-            <p className="mt-1 font-display text-3xl text-cream">
+            <p className="mt-1 font-display text-3xl text-bone">
               {formatPrice(Math.max(0, remaining))}
             </p>
-            <p className="text-sm text-cream/55">pressupost restant</p>
+            <p className="text-sm text-mute">pressupost restant</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-cream/50">Proj. jornada</p>
-            <p className="font-display text-2xl text-gold">{projected}</p>
+            <p className="text-xs text-mute">Proj. jornada</p>
+            <p className="font-display text-2xl text-grana-bright">{projected}</p>
           </div>
         </div>
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
+        <div className="mt-3 h-1.5 overflow-hidden bg-white/10">
           <div
-            className="h-full rounded-full bg-gold transition-all duration-500"
+            className="h-full bg-grana transition-all duration-500"
             style={{ width: `${spentPct}%` }}
           />
         </div>
@@ -134,8 +140,8 @@ export function LineupBuilder({
               variant="outline"
               className={
                 counts[pos] === LINEUP_SLOTS[pos]
-                  ? "border-gold/50 text-gold"
-                  : "border-white/20 text-cream/70"
+                  ? "border-grana/60 text-grana-bright"
+                  : "border-line text-mute"
               }
             >
               {POSITION_LABEL[pos]} {counts[pos]}/{LINEUP_SLOTS[pos]}
@@ -144,31 +150,30 @@ export function LineupBuilder({
           <Badge
             variant="outline"
             className={
-              state.lineup.playerIds.length === LINEUP_SIZE
-                ? "border-gold/50 text-gold"
-                : "border-white/20 text-cream/70"
+              lineup.playerIds.length === LINEUP_SIZE
+                ? "border-grana/60 text-grana-bright"
+                : "border-line text-mute"
             }
           >
-            {state.lineup.playerIds.length}/{LINEUP_SIZE} jugadors
+            {lineup.playerIds.length}/{LINEUP_SIZE} jugadors
           </Badge>
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-2xl border border-white/10 bg-navy/60">
-        <header className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-          <h2 className="font-display text-xl tracking-wide text-cream">
-            La teva alineació
+      <section className="overflow-hidden border border-line bg-panel/80">
+        <header className="flex items-center justify-between border-b border-line px-4 py-3">
+          <h2 className="font-display text-xl tracking-wide text-bone">
+            Alineació
           </h2>
-          {state.lineup.confirmed && (
-            <Badge className="bg-emerald-600 text-white">Confirmada</Badge>
+          {lineup.confirmed && (
+            <Badge className="bg-emerald-700 text-white">Confirmada</Badge>
           )}
         </header>
         {selectedPlayers.length === 0 ? (
           <div className="px-4 py-10 text-center">
-            <p className="font-medium text-cream">Encara no tens jugadors</p>
-            <p className="mt-1 text-sm text-cream/55">
-              Afegeix 2 bases, 3 alers i 3 pivots des del mercat. El capità suma el
-              doble.
+            <p className="font-medium text-bone">Sense jugadors</p>
+            <p className="mt-1 text-sm text-mute">
+              Afegeix 2 bases, 3 alers i 3 pivots. El capità suma el doble.
             </p>
           </div>
         ) : (
@@ -179,10 +184,12 @@ export function LineupBuilder({
                   key={player.id}
                   player={player}
                   selected
-                  isCaptain={state.lineup.captainId === player.id}
-                  action="remove"
+                  isCaptain={lineup.captainId === player.id}
+                  action={lineup.confirmed ? "none" : "remove"}
                   onAction={() => togglePlayer(player.id)}
-                  onCaptain={() => setCaptain(player.id)}
+                  onCaptain={
+                    lineup.confirmed ? undefined : () => setCaptain(player.id)
+                  }
                 />
               ) : null,
             )}
@@ -191,7 +198,7 @@ export function LineupBuilder({
       </section>
 
       {!validation.ok && selectedPlayers.length > 0 && (
-        <div className="flex gap-2 rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-3 text-sm text-amber-100">
+        <div className="flex gap-2 border border-amber-500/30 bg-amber-500/10 px-3 py-3 text-sm text-amber-100">
           <AlertCircle className="mt-0.5 size-4 shrink-0" />
           <ul className="space-y-1">
             {validation.issues.map((issue) => (
@@ -202,7 +209,7 @@ export function LineupBuilder({
       )}
 
       {error && (
-        <div className="flex gap-2 rounded-xl border border-red-400/40 bg-red-500/15 px-3 py-3 text-sm text-red-100">
+        <div className="flex gap-2 border border-red-500/40 bg-red-500/10 px-3 py-3 text-sm text-red-100">
           <AlertCircle className="mt-0.5 size-4 shrink-0" />
           <p>{error}</p>
         </div>
@@ -211,15 +218,15 @@ export function LineupBuilder({
       <Button
         type="button"
         size="lg"
-        disabled={!validation.ok || confirming}
+        disabled={!validation.ok || confirming || lineup.confirmed}
         onClick={onConfirm}
-        className="h-12 w-full bg-gold font-semibold text-navy-deep hover:bg-gold/90"
+        className="h-12 w-full bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
       >
         {confirming ? (
           <>
             <Loader2 className="size-4 animate-spin" /> Confirmant…
           </>
-        ) : state.lineup.confirmed ? (
+        ) : lineup.confirmed ? (
           <>
             <CheckCircle2 className="size-4" /> Alineació confirmada
           </>
@@ -228,14 +235,14 @@ export function LineupBuilder({
         )}
       </Button>
 
-      <section className="overflow-hidden rounded-2xl border border-white/10 bg-navy/60">
-        <header className="space-y-3 border-b border-white/10 px-4 py-3">
-          <h2 className="font-display text-xl tracking-wide text-cream">
-            Mercat CBB · FCBQ
+      <section className="overflow-hidden border border-line bg-panel/80">
+        <header className="space-y-3 border-b border-line px-4 py-3">
+          <h2 className="font-display text-xl tracking-wide text-bone">
+            Mercat CBB
           </h2>
-          <p className="text-xs text-cream/50">
-            {ROSTER.length} jugadors dels sèniors amb estadístiques FCBQ. Lo Sifonet
-            B encara no té plantilla publicada.
+          <p className="text-xs text-mute">
+            {roster.length} jugadors FCBQ · fotos oficials quan el CDN les
+            publiqui; si no, silueta amb inicials.
           </p>
           <div className="flex flex-wrap gap-2">
             {(["all", "base", "aler", "pivot"] as const).map((key) => (
@@ -247,8 +254,8 @@ export function LineupBuilder({
                 onClick={() => setFilter(key)}
                 className={
                   filter === key
-                    ? "bg-grana text-cream hover:bg-grana-bright"
-                    : "text-cream/70 hover:bg-white/10 hover:text-cream"
+                    ? "bg-grana text-bone hover:bg-grana-bright"
+                    : "text-mute hover:bg-white/10 hover:text-bone"
                 }
               >
                 {key === "all" ? "Tots" : POSITION_LABEL[key]}
@@ -263,11 +270,11 @@ export function LineupBuilder({
               onClick={() => setTeamFilter("all")}
               className={
                 teamFilter === "all"
-                  ? "bg-gold text-navy-deep hover:bg-gold/90"
-                  : "text-cream/70 hover:bg-white/10 hover:text-cream"
+                  ? "bg-panel-2 text-bone ring-1 ring-white/20"
+                  : "text-mute hover:bg-white/10 hover:text-bone"
               }
             >
-              Tots els equips
+              Equips
             </Button>
             {TEAM_ORDER.map((tid) => (
               <Button
@@ -276,44 +283,44 @@ export function LineupBuilder({
                 size="sm"
                 variant={teamFilter === tid ? "default" : "ghost"}
                 onClick={() => setTeamFilter(tid)}
-                disabled={!TEAMS[tid].rosterAvailable && tid === "masc-b"}
                 className={
                   teamFilter === tid
-                    ? "bg-gold text-navy-deep hover:bg-gold/90"
-                    : "text-cream/70 hover:bg-white/10 hover:text-cream"
+                    ? "bg-panel-2 text-bone ring-1 ring-white/20"
+                    : "text-mute hover:bg-white/10 hover:text-bone"
                 }
                 title={TEAMS[tid].fullName}
               >
                 {TEAMS[tid].label}
-                {!TEAMS[tid].rosterAvailable ? " · —" : ""}
               </Button>
             ))}
           </div>
         </header>
-        {teamFilter === "masc-b" ? (
-          <div className="px-4 py-8 text-center text-sm text-cream/55">
-            <p className="font-medium text-cream">Lo Sifonet CB Balaguer B</p>
+        {teamFilter === "masc-b" && !TEAMS["masc-b"].rosterAvailable ? (
+          <div className="px-4 py-8 text-center text-sm text-mute">
+            <p className="font-medium text-bone">Lo Sifonet CB Balaguer B</p>
             <p className="mt-1">
-              L&apos;FCBQ encara no publica estadístiques ni plantilla per a aquest
-              equip (2A Territorial Senior Masculí).
+              L&apos;FCBQ encara no publica plantilla per a aquest equip.
             </p>
           </div>
         ) : market.length === 0 ? (
-          <div className="px-4 py-8 text-center text-sm text-cream/55">
+          <div className="px-4 py-8 text-center text-sm text-mute">
             No hi ha més jugadors amb aquest filtre.
           </div>
         ) : (
           <div>
             {market.map((player) => {
-              const posFull = counts[player.position] >= LINEUP_SLOTS[player.position];
+              const posFull =
+                counts[player.position] >= LINEUP_SLOTS[player.position];
               const tooExpensive = remaining < player.price;
-              const full = state.lineup.playerIds.length >= LINEUP_SIZE;
+              const full = lineup.playerIds.length >= LINEUP_SIZE;
               return (
                 <PlayerRow
                   key={player.id}
                   player={player}
-                  action="add"
-                  disabled={posFull || tooExpensive || full}
+                  action={lineup.confirmed ? "none" : "add"}
+                  disabled={
+                    lineup.confirmed || posFull || tooExpensive || full
+                  }
                   onAction={() => togglePlayer(player.id)}
                 />
               );

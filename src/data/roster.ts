@@ -92,6 +92,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
+    photoUrl: null,
   },
   {
     id: "eduard-bernat",
@@ -104,6 +105,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
+    photoUrl: null,
   },
   {
     id: "toni-salud",
@@ -116,6 +118,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
+    photoUrl: null,
   },
   {
     id: "ivan-franco",
@@ -128,6 +131,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
+    photoUrl: null,
   },
   {
     id: "gerard-garcia",
@@ -140,6 +144,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
+    photoUrl: null,
   },
   {
     id: "marc-escoda",
@@ -152,6 +157,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
+    photoUrl: null,
   },
   {
     id: "babacar-toure",
@@ -164,6 +170,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
+    photoUrl: null,
   },
   {
     id: "gerard-soldevila",
@@ -176,6 +183,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
+    photoUrl: null,
   },
   {
     id: "roger-companys",
@@ -188,6 +196,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
+    photoUrl: null,
   },
 
   // —— Cudos Consultors CB Balaguer A (femení) ——
@@ -202,6 +211,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
+    photoUrl: null,
   },
   {
     id: "julia-pla",
@@ -214,6 +224,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a", "fem-b"],
+    photoUrl: null,
     note: "Apareix també a Farratges B (FCBQ).",
   },
   {
@@ -227,6 +238,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
+    photoUrl: null,
   },
   {
     id: "neus-escoda",
@@ -239,6 +251,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
+    photoUrl: null,
   },
   {
     id: "monica-fontanet",
@@ -251,6 +264,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
+    photoUrl: null,
   },
   {
     id: "gueralt-sole",
@@ -263,6 +277,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-a", "fem-b"],
+    photoUrl: null,
     note: "Apareix a Cudos A i Farratges B; preu/VAL agafen el millor mostreig FCBQ.",
   },
   {
@@ -276,6 +291,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
+    photoUrl: null,
   },
   {
     id: "mariana-mballo",
@@ -288,6 +304,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-a", "fem-b"],
+    photoUrl: null,
     note: "Apareix també a Cudos A (FCBQ).",
   },
   {
@@ -301,6 +318,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
+    photoUrl: null,
   },
   {
     id: "ada-dorienie",
@@ -313,6 +331,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
+    photoUrl: null,
   },
 
   // —— Farratges La Noguera CB Balaguer B (només exclusives) ——
@@ -327,6 +346,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
+    photoUrl: null,
   },
   {
     id: "nuria-jimenez",
@@ -339,6 +359,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
+    photoUrl: null,
   },
   {
     id: "abril-gracia",
@@ -351,6 +372,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
+    photoUrl: null,
   },
   {
     id: "xenia-andreu",
@@ -363,6 +385,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
+    photoUrl: null,
   },
   {
     id: "gina-betbese",
@@ -375,6 +398,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
+    photoUrl: null,
   },
   {
     id: "gina-trilla",
@@ -387,6 +411,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
+    photoUrl: null,
   },
   {
     id: "jana-alarcon",
@@ -399,6 +424,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
+    photoUrl: null,
   },
 ];
 
@@ -422,7 +448,7 @@ export const CAPTAIN_MULTIPLIER = 2;
 export const WIN_BONUS = 0.2;
 
 /** GameState.version — invalida partides amb plantilla antiga. */
-export const GAME_VERSION = 2;
+export const GAME_VERSION = 3;
 
 export const OPPONENTS = [
   "CB Cervera",
