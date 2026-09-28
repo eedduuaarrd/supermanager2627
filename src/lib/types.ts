@@ -78,6 +78,8 @@ export interface FantasyTeamInfo {
   id: string;
   name: string;
   createdAt: string;
+  /** `initial` = unlimited canvis until first tip-off; then `normal`. */
+  transferPhase?: "initial" | "normal";
 }
 
 export interface SessionUser {

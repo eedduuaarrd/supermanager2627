@@ -4,8 +4,10 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 
 export const MAX_TEAMS_PER_USER = 5;
-/** 2 = multi fantasy teams; 3 = weekly jornada rounds meta; 4 = transfer canvis; 5 = cash ledger. */
-export const SCHEMA_VERSION = "5";
+/** 2 = multi fantasy teams; 3 = weekly jornada rounds meta; 4 = transfer canvis; 5 = cash ledger; 6 = transfer_phase. */
+export const SCHEMA_VERSION = "6";
+
+export type TransferPhase = "initial" | "normal";
 
 export type DbUser = {
   id: string;
@@ -23,6 +25,8 @@ export type DbFantasyTeam = {
   user_id: string;
   name: string;
   created_at: string;
+  /** `initial` = unlimited canvis until first tip-off lock; then `normal` (max 3). */
+  transfer_phase: TransferPhase;
 };
 
 export type DbLineup = {
@@ -79,7 +83,8 @@ function migrateToMultiTeams(db: Database.Database) {
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       name TEXT NOT NULL,
-      created_at TEXT NOT NULL
+      created_at TEXT NOT NULL,
+      transfer_phase TEXT NOT NULL DEFAULT 'normal'
     );
   `);
 
@@ -300,7 +305,8 @@ export function getDb(): Database.Database {
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       name TEXT NOT NULL,
-      created_at TEXT NOT NULL
+      created_at TEXT NOT NULL,
+      transfer_phase TEXT NOT NULL DEFAULT 'normal'
     );
 
     CREATE TABLE IF NOT EXISTS lineups (
@@ -366,10 +372,32 @@ export function getDb(): Database.Database {
   migrateToMultiTeams(db);
   migrateWeeklyRounds(db);
   migrateTransferWindow(db);
+  migrateTransferPhase(db);
   // Cash ledger conversion runs from scoring.ensureLineupRow (needs roster prices).
 
   globalForDb.__smDb = db;
   return db;
+}
+
+/**
+ * transfer_phase: new teams start as `initial` (unlimited canvis until tip-off).
+ * Existing teams are backfilled as `normal` so the 3-cap already applies.
+ */
+function migrateTransferPhase(db: Database.Database) {
+  const cols = tableColumns(db, "fantasy_teams");
+  if (!cols.includes("transfer_phase")) {
+    db.exec(
+      `ALTER TABLE fantasy_teams ADD COLUMN transfer_phase TEXT NOT NULL DEFAULT 'normal'`,
+    );
+  }
+  db.prepare(
+    `UPDATE fantasy_teams SET transfer_phase = 'normal'
+     WHERE transfer_phase IS NULL OR transfer_phase = ''`,
+  ).run();
+  db.prepare(
+    `INSERT INTO meta (key, value) VALUES (?, ?)
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+  ).run("schema_version", SCHEMA_VERSION);
 }
 
 function migrateTransferWindow(db: Database.Database) {

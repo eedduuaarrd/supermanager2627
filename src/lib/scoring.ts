@@ -22,7 +22,11 @@ import {
 import { formatLockMessageCa, isLineupLocked } from "@/lib/fixtures";
 import type { RoundScore } from "@/lib/types";
 import { parsePlayerIds, validateLineupSave, spentBudget } from "@/lib/game";
-import { requireActiveTeamId } from "@/lib/teams";
+import {
+  getTeamTransferPhase,
+  promoteInitialTeamsIfLocked,
+  requireActiveTeamId,
+} from "@/lib/teams";
 import {
   MAX_TRANSFERS,
   countChangesUsed,
@@ -345,6 +349,7 @@ export function saveLineup(
   }
   const lockAt = getLineupLockAt(db);
   if (isLineupLocked(lockAt)) {
+    promoteInitialTeamsIfLocked(new Date(), db);
     return {
       ok: false,
       error: formatLockMessageCa(lockAt!),
@@ -368,9 +373,11 @@ export function saveLineup(
   );
   if (!check.ok) return check;
 
+  const phase = getTeamTransferPhase(teamId, db);
   const snapshotIds = parseSnapshotIds(existing.snapshot_ids);
   const changesUsed = countChangesUsed(snapshotIds, playerIds);
-  if (changesUsed > MAX_TRANSFERS) {
+  // Initial roster: unlimited canvis until first tip-off lock flips phase.
+  if (phase !== "initial" && changesUsed > MAX_TRANSFERS) {
     return { ok: false, error: maxChangesExceededCa(MAX_TRANSFERS) };
   }
 

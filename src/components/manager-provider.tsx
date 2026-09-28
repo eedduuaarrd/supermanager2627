@@ -19,6 +19,8 @@ export type SaveStatus = "idle" | "saving" | "saved" | "error";
 
 export type TransferInfo = {
   windowOpen: boolean;
+  phase?: "initial" | "normal";
+  unlimited?: boolean;
   changesUsed: number;
   changesRemaining: number;
   maxChanges: number;
@@ -134,6 +136,8 @@ export function ManagerProvider({
     if (t && typeof t === "object") {
       setTransfer({
         windowOpen: Boolean(t.windowOpen),
+        phase: t.phase === "initial" ? "initial" : "normal",
+        unlimited: Boolean(t.unlimited),
         changesUsed: Number(t.changesUsed ?? 0),
         changesRemaining: Number(t.changesRemaining ?? 0),
         maxChanges: Number(t.maxChanges ?? 3),
@@ -212,6 +216,8 @@ export function ManagerProvider({
           const t = data.transfer;
           setTransfer({
             windowOpen: Boolean(t.windowOpen),
+            phase: t.phase === "initial" ? "initial" : "normal",
+            unlimited: Boolean(t.unlimited),
             changesUsed: Number(t.changesUsed ?? 0),
             changesRemaining: Number(t.changesRemaining ?? 0),
             maxChanges: Number(t.maxChanges ?? 3),

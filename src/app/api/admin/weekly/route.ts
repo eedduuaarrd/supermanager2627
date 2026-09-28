@@ -1,13 +1,18 @@
 import { NextResponse } from "next/server";
 import { readSession } from "@/lib/auth";
 import { getCurrentRound } from "@/lib/db";
-import { computeLineupLockAt, loadFixtures } from "@/lib/fixtures";
+import {
+  computeLineupLockAt,
+  isLineupLocked,
+  loadFixtures,
+} from "@/lib/fixtures";
 import {
   getLineupLockAt,
   getRoundStatus,
   setLineupLockAt,
 } from "@/lib/rounds";
 import { closeJornada, openNextJornada } from "@/lib/scoring";
+import { promoteInitialTeamsIfLocked } from "@/lib/teams";
 
 export const runtime = "nodejs";
 
@@ -31,7 +36,8 @@ function authorize(req: Request, bodyToken?: string): boolean {
  * - close: score current jornada from FCBQ game rows, lock lineups (no advance)
  * - open: open next jornada after a close
  * - run: close + advance (score + open next) — typical weekend cron after refresh
- * - lock: recompute/store lineup_lock_at from fixtures.json (or body.lockAt)
+ * - lock: recompute/store lineup_lock_at from fixtures.json (or body.lockAt);
+ *   if tip-off already passed, promote transfer_phase initial → normal
  *
  * Also accepts session cookie for logged-in admin (UI).
  */
@@ -85,15 +91,21 @@ export async function POST(req: Request) {
         );
       }
       setLineupLockAt(lockAt);
+      const promoted = isLineupLocked(lockAt)
+        ? promoteInitialTeamsIfLocked()
+        : 0;
       return NextResponse.json({
         ok: true,
         action: "lock",
         round,
         lockAt,
+        promotedInitialTeams: promoted,
         note:
           lockAt == null
             ? "Sense tip-off publicat: alineació oberta."
-            : "lineup_lock_at actualitzat des de fixtures.",
+            : isLineupLocked(lockAt)
+              ? "lineup_lock_at assolit: fase initial → normal."
+              : "lineup_lock_at actualitzat des de fixtures.",
       });
     }
 

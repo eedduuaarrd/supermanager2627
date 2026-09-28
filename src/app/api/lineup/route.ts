@@ -7,7 +7,11 @@ import {
 } from "@/lib/fixtures";
 import { getLineupLockAt, getRoundStatus } from "@/lib/rounds";
 import { ensureLineupRow, saveLineup } from "@/lib/scoring";
-import { requireActiveTeamId } from "@/lib/teams";
+import {
+  getTeamTransferPhase,
+  promoteInitialTeamsIfLocked,
+  requireActiveTeamId,
+} from "@/lib/teams";
 import { INITIAL_BUDGET, LINEUP_SIZE, resolvePlayerId } from "@/data/roster";
 import { parsePlayerIds } from "@/lib/game";
 import {
@@ -42,6 +46,8 @@ function lockState() {
   const roundStatus = getRoundStatus();
   const lockAt = getLineupLockAt();
   const tipLocked = isLineupLocked(lockAt);
+  // Tip-off reached: flip initial → normal for all fantasy teams still open.
+  if (tipLocked) promoteInitialTeamsIfLocked();
   const locked = roundStatus === "closed" || tipLocked;
   const tipMessage =
     tipLocked && lockAt
@@ -59,6 +65,7 @@ function lockState() {
 }
 
 function transferPayload(
+  teamId: string,
   row: {
     player_ids: string;
     snapshot_ids?: string;
@@ -68,12 +75,14 @@ function transferPayload(
 ) {
   const currentIds = parsePlayerIds(row.player_ids);
   const snapshotIds = parseSnapshotIds(row.snapshot_ids);
+  const phase = getTeamTransferPhase(teamId);
   return buildTransferState({
     windowOpen: !lock.locked,
     snapshotIds,
     currentIds,
     lockAt: lock.lockAt,
     tipLockMessage: lock.tipMessage,
+    phase,
   });
 }
 
@@ -86,7 +95,7 @@ export async function GET() {
   const round = getCurrentRound();
   const lock = lockState();
   const row = ensureLineupRow(teamId, round);
-  const transfer = transferPayload(row, lock);
+  const transfer = transferPayload(teamId, row, lock);
   return NextResponse.json({
     round,
     roundStatus: lock.roundStatus,
@@ -113,6 +122,7 @@ export async function PUT(req: Request) {
       currentIds: [],
       lockAt: lock.lockAt,
       tipLockMessage: lock.tipMessage,
+      phase: "normal",
     });
     return NextResponse.json(
       {
@@ -149,7 +159,7 @@ export async function PUT(req: Request) {
   }
 
   const round = getCurrentRound();
-  const transfer = transferPayload(result.row, lock);
+  const transfer = transferPayload(teamId, result.row, lock);
   return NextResponse.json({
     round,
     roundStatus: lock.roundStatus,

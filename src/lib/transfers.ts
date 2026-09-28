@@ -11,20 +11,32 @@
  *   canvi. Substituir = treure + afegir = 1 canvi (l'afegit). Omplir un slot
  *   buit amb un jugador nou = 1 canvi. Tornar a posar algú que ja era a
  *   l'instantània = 0.
- * - Màxim 3 canvis per equip fantasy i per jornada.
+ * - Màxim 3 canvis per equip fantasy i per jornada (fase `normal`).
+ *
+ * Fase `initial` (equip nou):
+ * - `fantasy_teams.transfer_phase = 'initial'` al crear l'equip.
+ * - Canvis il·limitats mentre la finestra/mercat permeti editar i no hi hagi
+ *   bloqueig per tip-off.
+ * - Quan el tip-off de la jornada arriba (`lineup_lock_at` assolit), tots els
+ *   equips `initial` passen a `normal` (lock refresh, weekend sync, o lazy
+ *   en GET/PUT alineació). La regla és per equip fantasy, no per usuari.
  *
  * Finestra: diumenge 23:59 Europe/Madrid → primer tip-off de la jornada.
  * Fora de la finestra (després del tip-off fins al proper diumenge 23:59):
- * només lectura.
+ * només lectura. El tip-off bloqueja tothom (també fase initial).
  */
 
 import { parsePlayerIds } from "@/lib/game";
+import type { TransferPhase } from "@/lib/db";
 
 export const MAX_TRANSFERS = 3;
 export const MADRID_TZ = "Europe/Madrid";
 
 export type TransferState = {
   windowOpen: boolean;
+  phase: TransferPhase;
+  /** Unlimited while phase === 'initial' and window open. */
+  unlimited: boolean;
   changesUsed: number;
   changesRemaining: number;
   maxChanges: number;
@@ -133,14 +145,23 @@ export function buildTransferState(opts: {
   currentIds: string[];
   lockAt: string | null;
   tipLockMessage: string | null;
+  phase?: TransferPhase;
 }): TransferState {
+  const phase: TransferPhase =
+    opts.phase === "initial" ? "initial" : "normal";
+  const unlimited = phase === "initial" && opts.windowOpen;
   const changesUsed = countChangesUsed(opts.snapshotIds, opts.currentIds);
-  const changesRemaining = Math.max(0, MAX_TRANSFERS - changesUsed);
+  const maxChanges = unlimited ? Number.MAX_SAFE_INTEGER : MAX_TRANSFERS;
+  const changesRemaining = unlimited
+    ? Number.MAX_SAFE_INTEGER
+    : Math.max(0, MAX_TRANSFERS - changesUsed);
   if (!opts.windowOpen) {
     return {
       windowOpen: false,
+      phase,
+      unlimited: false,
       changesUsed,
-      changesRemaining,
+      changesRemaining: Math.max(0, MAX_TRANSFERS - changesUsed),
       maxChanges: MAX_TRANSFERS,
       snapshotIds: opts.snapshotIds,
       nextWindowAt: nextSundayWindowOpenAt(),
@@ -150,13 +171,16 @@ export function buildTransferState(opts: {
   }
   return {
     windowOpen: true,
-    changesUsed,
+    phase,
+    unlimited,
+    changesUsed: unlimited ? 0 : changesUsed,
     changesRemaining,
-    maxChanges: MAX_TRANSFERS,
+    maxChanges,
     snapshotIds: opts.snapshotIds,
     nextWindowAt: null,
     lockAt: opts.lockAt,
     // Limit is silent until save rejects (maxChangesExceededCa → 403).
+    // Initial phase: also silent (no "Plantilla inicial oberta" banner).
     message: null,
   };
 }

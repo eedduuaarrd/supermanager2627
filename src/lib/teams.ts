@@ -5,28 +5,47 @@ import {
   MAX_TEAMS_PER_USER,
   type DbFantasyTeam,
   type DbUser,
+  type TransferPhase,
 } from "@/lib/db";
 import { INITIAL_BUDGET } from "@/data/roster";
+import { isLineupLocked } from "@/lib/fixtures";
+import { getLineupLockAt } from "@/lib/rounds";
 
 export type FantasyTeamSummary = {
   id: string;
   name: string;
   createdAt: string;
+  transferPhase: TransferPhase;
 };
+
+function toSummary(row: {
+  id: string;
+  name: string;
+  created_at: string;
+  transfer_phase?: string | null;
+}): FantasyTeamSummary {
+  return {
+    id: row.id,
+    name: row.name,
+    createdAt: row.created_at,
+    transferPhase: row.transfer_phase === "initial" ? "initial" : "normal",
+  };
+}
 
 export function listTeams(userId: string): FantasyTeamSummary[] {
   const db = getDb();
   const rows = db
     .prepare(
-      `SELECT id, name, created_at FROM fantasy_teams
+      `SELECT id, name, created_at, transfer_phase FROM fantasy_teams
        WHERE user_id = ? ORDER BY created_at ASC`,
     )
-    .all(userId) as { id: string; name: string; created_at: string }[];
-  return rows.map((r) => ({
-    id: r.id,
-    name: r.name,
-    createdAt: r.created_at,
-  }));
+    .all(userId) as {
+    id: string;
+    name: string;
+    created_at: string;
+    transfer_phase: string | null;
+  }[];
+  return rows.map(toSummary);
 }
 
 export function getTeamForUser(
@@ -103,7 +122,8 @@ export function createTeamForUser(
 
   const tx = db.transaction(() => {
     db.prepare(
-      `INSERT INTO fantasy_teams (id, user_id, name, created_at) VALUES (?, ?, ?, ?)`,
+      `INSERT INTO fantasy_teams (id, user_id, name, created_at, transfer_phase)
+       VALUES (?, ?, ?, ?, 'initial')`,
     ).run(id, userId, trimmed, created_at);
 
     if (setActive) {
@@ -123,8 +143,54 @@ export function createTeamForUser(
 
   return {
     ok: true,
-    team: { id, name: trimmed, createdAt: created_at },
+    team: {
+      id,
+      name: trimmed,
+      createdAt: created_at,
+      transferPhase: "initial",
+    },
   };
+}
+
+export function getTeamTransferPhase(
+  teamId: string,
+  db = getDb(),
+): TransferPhase {
+  const row = db
+    .prepare(`SELECT transfer_phase FROM fantasy_teams WHERE id = ?`)
+    .get(teamId) as { transfer_phase: string | null } | undefined;
+  return row?.transfer_phase === "initial" ? "initial" : "normal";
+}
+
+/**
+ * When tip-off lock is active, flip every `initial` fantasy team to `normal`.
+ * Per-team: unlimited canvis only until the first tip-off they experience.
+ * Returns how many teams were promoted.
+ */
+export function promoteInitialTeamsIfLocked(
+  now = new Date(),
+  db = getDb(),
+): number {
+  const lockAt = getLineupLockAt(db);
+  if (!isLineupLocked(lockAt, now)) return 0;
+  const result = db
+    .prepare(
+      `UPDATE fantasy_teams SET transfer_phase = 'normal'
+       WHERE transfer_phase = 'initial'`,
+    )
+    .run();
+  return Number(result.changes ?? 0);
+}
+
+/** Force-promote all initial teams (e.g. after jornada close / lock job). */
+export function promoteAllInitialTeams(db = getDb()): number {
+  const result = db
+    .prepare(
+      `UPDATE fantasy_teams SET transfer_phase = 'normal'
+       WHERE transfer_phase = 'initial'`,
+    )
+    .run();
+  return Number(result.changes ?? 0);
 }
 
 export function setActiveTeam(
@@ -141,7 +207,7 @@ export function setActiveTeam(
 
   return {
     ok: true,
-    team: { id: team.id, name: team.name, createdAt: team.created_at },
+    team: toSummary(team),
   };
 }
 
@@ -177,7 +243,7 @@ export function renameTeam(
 
   return {
     ok: true,
-    team: { id: teamId, name: trimmed, createdAt: team.created_at },
+    team: toSummary({ ...team, name: trimmed }),
   };
 }
 
