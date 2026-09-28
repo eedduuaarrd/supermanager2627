@@ -20,14 +20,14 @@ type SlotDef = {
  * left/top mark the CHIP CIRCLE center; labels sit below outside the circle.
  */
 const SLOTS: SlotDef[] = [
-  { key: "s0", left: "18%", top: "22%" },
-  { key: "s1", left: "50%", top: "22%" },
-  { key: "s2", left: "82%", top: "22%" },
-  { key: "s3", left: "18%", top: "50%" },
-  { key: "s4", left: "50%", top: "50%" },
-  { key: "s5", left: "82%", top: "50%" },
-  { key: "s6", left: "32%", top: "78%" },
-  { key: "s7", left: "68%", top: "78%" },
+  { key: "s0", left: "16%", top: "18%" },
+  { key: "s1", left: "50%", top: "18%" },
+  { key: "s2", left: "84%", top: "18%" },
+  { key: "s3", left: "16%", top: "48%" },
+  { key: "s4", left: "50%", top: "48%" },
+  { key: "s5", left: "84%", top: "48%" },
+  { key: "s6", left: "30%", top: "78%" },
+  { key: "s7", left: "70%", top: "78%" },
 ];
 
 function shortName(name: string) {
@@ -253,7 +253,7 @@ function EmptySlot({
       disabled={disabled || !onClick}
       onClick={onClick}
       className={cn(
-        "court-chip court-chip--empty relative flex h-14 w-14 flex-col items-center justify-center sm:h-16 sm:w-16",
+        "court-chip court-chip--empty relative flex h-[3.75rem] w-[3.75rem] flex-col items-center justify-center sm:h-[4.25rem] sm:w-[4.25rem]",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grana-bright",
         "disabled:cursor-default",
       )}
@@ -261,7 +261,7 @@ function EmptySlot({
     >
       <div
         className={cn(
-          "flex h-14 w-14 items-center justify-center rounded-full sm:h-16 sm:w-16",
+          "flex h-[3.75rem] w-[3.75rem] items-center justify-center rounded-full sm:h-[4.25rem] sm:w-[4.25rem]",
           "border-2 border-dashed border-bone/50",
           "bg-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[2px]",
           !disabled && "transition active:scale-95",
@@ -277,33 +277,31 @@ function FilledChip({
   player,
   isCaptain,
   isSelected,
-  confirmed,
   onSelect,
 }: {
   player: Player;
   isCaptain: boolean;
   isSelected: boolean;
-  confirmed?: boolean;
   onSelect?: (id: string | null) => void;
 }) {
   const href = `/jugador/${player.id}`;
   return (
     <div
       className={cn(
-        "court-chip group relative flex h-14 w-14 flex-col items-center justify-center sm:h-16 sm:w-16",
+        "court-chip group relative flex h-[3.75rem] w-[3.75rem] flex-col items-center justify-center sm:h-[4.25rem] sm:w-[4.25rem]",
         isCaptain && "court-chip--captain",
         isSelected && "court-chip--selected",
       )}
     >
       <button
         type="button"
-        disabled={confirmed || !onSelect}
+        disabled={!onSelect}
         onClick={() => {
           if (!onSelect) return;
           onSelect(isSelected ? null : player.id);
         }}
         className={cn(
-          "relative h-14 w-14 sm:h-16 sm:w-16",
+          "relative h-[3.75rem] w-[3.75rem] sm:h-[4.25rem] sm:w-[4.25rem]",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grana-bright",
           "disabled:cursor-default",
         )}
@@ -319,7 +317,7 @@ function FilledChip({
           photoUrl={player.photoUrl}
           size="lg"
           className={cn(
-            "!h-14 !w-14 rounded-full ring-2 sm:!h-16 sm:!w-16",
+            "!h-[3.75rem] !w-[3.75rem] rounded-full ring-2 sm:!h-[4.25rem] sm:!w-[4.25rem]",
             isSelected
               ? "ring-grana-bright shadow-[0_0_0_4px_rgba(194,49,66,0.35)]"
               : isCaptain
@@ -335,13 +333,13 @@ function FilledChip({
       </button>
       <Link
         href={href}
-        className="absolute left-1/2 top-[calc(100%+0.25rem)] z-10 w-[5.25rem] -translate-x-1/2 text-center"
+        className="absolute left-1/2 top-[calc(100%+0.4rem)] z-10 w-[5.5rem] -translate-x-1/2 text-center"
         aria-label={`Fitxa de ${player.name}`}
       >
-        <p className="truncate text-[10px] font-semibold leading-tight text-bone drop-shadow sm:text-[11px]">
+        <p className="truncate text-[10px] font-semibold leading-snug text-bone drop-shadow sm:text-[11px]">
           {shortName(player.name)}
         </p>
-        <p className="text-[9px] tabular-nums text-bone/65 sm:text-[10px]">
+        <p className="mt-0.5 text-[9px] tabular-nums text-bone/65 sm:text-[10px]">
           VAL {player.avgVal}
           <span className="mx-0.5 text-white/25">·</span>
           {formatPrice(player.price).replace(/\s/g, "")}

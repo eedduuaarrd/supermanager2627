@@ -14,7 +14,7 @@ import {
 import type { Lineup, Player } from "@/lib/types";
 import { AlertCircle, Crown, UserMinus } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface LineupBuilderProps {
   roster: Player[];
@@ -55,6 +55,17 @@ export function LineupBuilder({
 }: LineupBuilderProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+
+  const sheetOpen = selectedId != null && !pickerOpen;
+
+  useEffect(() => {
+    if (!sheetOpen) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setSelectedId(null);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sheetOpen]);
 
   const remaining = remainingBudget(budget, lineup.playerIds);
   const validation = validateLineup(lineup, budget);
@@ -125,8 +136,8 @@ export function LineupBuilder({
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-2">
-      <section className="budget-strip shrink-0 border border-line bg-panel/80 px-3 py-2 backdrop-blur-md">
+    <div className="flex h-full min-h-0 flex-col gap-3">
+      <section className="budget-strip shrink-0 border border-line bg-panel/80 px-3.5 py-2.5 backdrop-blur-md sm:py-3">
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[10px] uppercase tracking-[0.18em] text-mute">
@@ -156,13 +167,13 @@ export function LineupBuilder({
             </p>
           </div>
         </div>
-        <div className="mt-1.5 h-1 overflow-hidden bg-white/10">
+        <div className="mt-2 h-1 overflow-hidden bg-white/10">
           <div
             className="h-full bg-grana transition-all duration-500"
             style={{ width: `${spentPct}%` }}
           />
         </div>
-        <div className="mt-1.5 flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5 text-[11px] text-mute">
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-x-2 gap-y-1 text-[11px] text-mute">
           {incomplete && filled > 0 ? (
             <span>{softProgressLabel(filled)}</span>
           ) : filled === 0 ? (
@@ -180,7 +191,7 @@ export function LineupBuilder({
         </div>
       </section>
 
-      <section className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <section className="flex min-h-0 flex-1 flex-col overflow-hidden pt-0.5">
         <CourtBoard
           players={selectedPlayers}
           captainId={lineup.captainId}
@@ -221,42 +232,55 @@ export function LineupBuilder({
         onClose={() => setPickerOpen(false)}
       />
 
-      {selectedPlayer && !pickerOpen && (
-        <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-40 border-t border-line bg-ink/95 px-4 py-2.5 backdrop-blur-md">
-          <div className="mx-auto flex w-full max-w-lg items-center gap-2">
-            <Link
-              href={`/jugador/${selectedPlayer.id}`}
-              className="min-w-0 flex-1"
-            >
-              <p className="truncate text-sm font-semibold text-bone underline-offset-2 hover:underline">
-                {selectedPlayer.name}
-              </p>
-              <p className="text-xs text-mute">
-                VAL {selectedPlayer.avgVal} · Veure fitxa
-              </p>
-            </Link>
-            <Button
-              type="button"
-              size="lg"
-              onClick={() => setCaptain(selectedPlayer.id)}
-              className={
-                lineup.captainId === selectedPlayer.id
-                  ? "h-11 shrink-0 bg-grana text-bone hover:bg-grana-bright"
-                  : "h-11 shrink-0 border border-line bg-panel-2 text-bone hover:bg-white/10"
-              }
-            >
-              <Crown className="size-4" /> Capità
-            </Button>
-            <Button
-              type="button"
-              size="lg"
-              onClick={() => removePlayer(selectedPlayer.id)}
-              className="h-11 shrink-0 bg-bone text-ink hover:bg-white"
-            >
-              <UserMinus className="size-4" /> Treure
-            </Button>
+      {sheetOpen && selectedPlayer && (
+        <>
+          <button
+            type="button"
+            aria-label="Tancar accions"
+            className="fixed inset-0 z-[35] cursor-default bg-black/25"
+            onClick={() => setSelectedId(null)}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Accions per a ${selectedPlayer.name}`}
+            className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-50 border-t border-line bg-ink/95 px-4 py-3 backdrop-blur-md"
+          >
+            <div className="mx-auto flex w-full max-w-lg items-center gap-2.5">
+              <Link
+                href={`/jugador/${selectedPlayer.id}`}
+                className="min-w-0 flex-1"
+              >
+                <p className="truncate text-sm font-semibold text-bone underline-offset-2 hover:underline">
+                  {selectedPlayer.name}
+                </p>
+                <p className="text-xs text-mute">
+                  VAL {selectedPlayer.avgVal} · Veure fitxa
+                </p>
+              </Link>
+              <Button
+                type="button"
+                size="lg"
+                onClick={() => setCaptain(selectedPlayer.id)}
+                className={
+                  lineup.captainId === selectedPlayer.id
+                    ? "h-11 shrink-0 bg-grana text-bone hover:bg-grana-bright"
+                    : "h-11 shrink-0 border border-line bg-panel-2 text-bone hover:bg-white/10"
+                }
+              >
+                <Crown className="size-4" /> Capità
+              </Button>
+              <Button
+                type="button"
+                size="lg"
+                onClick={() => removePlayer(selectedPlayer.id)}
+                className="h-11 shrink-0 bg-bone text-ink hover:bg-white"
+              >
+                <UserMinus className="size-4" /> Treure
+              </Button>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

@@ -26,7 +26,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-dvh min-h-0 flex-col overflow-hidden">
       <header className="z-30 shrink-0 border-b border-line bg-ink/90 backdrop-blur-md">
-        <div className="mx-auto flex h-11 max-w-lg items-center px-4">
+        <div className="mx-auto flex h-12 max-w-lg items-center px-4">
           <Link href="/jornada" className="font-display text-lg text-bone">
             Supermanager
             <span className="text-grana-bright"> Balaguer</span>
@@ -36,9 +36,11 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <main
         className={cn(
-          "mx-auto flex w-full max-w-lg min-h-0 flex-1 flex-col px-4 pt-2",
+          "mx-auto flex w-full max-w-lg min-h-0 flex-1 flex-col px-4",
           "pb-[calc(3.5rem+env(safe-area-inset-bottom))]",
-          isEquip ? "overflow-hidden" : "overflow-y-auto overscroll-contain",
+          isEquip
+            ? "overflow-y-auto overscroll-contain pt-3"
+            : "overflow-y-auto overscroll-contain pt-2",
         )}
       >
         {children}
