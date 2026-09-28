@@ -120,6 +120,7 @@ export function needsPlayerIdsMigration(raw: string): boolean {
 
 export type LineupIssue = "incomplete" | "budget" | "captain" | "duplicate";
 
+/** Soft / full checklist (8 + captain). UI hints only — does not block autosave. */
 export function validateLineup(
   lineup: Lineup,
   budget: number,
@@ -136,6 +137,33 @@ export function validateLineup(
   }
 
   return { ok: issues.length === 0, issues };
+}
+
+/**
+ * Hard rules for persisting a lineup (partial OK: 0–8).
+ * Blocks only duplicates, over-budget, and captain not in roster.
+ */
+export function validateLineupSave(
+  playerIds: string[],
+  captainId: string | null,
+  budget: number,
+): { ok: true } | { ok: false; error: string } {
+  if (playerIds.length > LINEUP_SIZE) {
+    return { ok: false, error: `Com a màxim ${LINEUP_SIZE} jugadors.` };
+  }
+  if (new Set(playerIds).size !== playerIds.length) {
+    return { ok: false, error: "No pots repetir jugadors." };
+  }
+  if (remainingBudget(budget, playerIds) < 0) {
+    return { ok: false, error: "Has superat el pressupost disponible." };
+  }
+  if (captainId && !playerIds.includes(captainId)) {
+    return {
+      ok: false,
+      error: "El capità ha de formar part de l'alineació.",
+    };
+  }
+  return { ok: true };
 }
 
 function seededRandom(seed: number) {
@@ -162,14 +190,13 @@ function simulatePlayerScore(
 export function simulateRound(
   state: GameState,
 ): { state: GameState; result: RoundResult } | { error: string } {
-  const { ok, issues } = validateLineup(state.lineup, state.budget);
-  if (!ok || !state.lineup.confirmed) {
-    return {
-      error:
-        issues.includes("incomplete") || !state.lineup.confirmed
-          ? "Confirma una alineació vàlida abans de tancar la jornada."
-          : "L'alineació no compleix les normes del mercat.",
-    };
+  const saveCheck = validateLineupSave(
+    state.lineup.playerIds,
+    state.lineup.captainId,
+    state.budget,
+  );
+  if (!saveCheck.ok) {
+    return { error: saveCheck.error };
   }
 
   const seed =

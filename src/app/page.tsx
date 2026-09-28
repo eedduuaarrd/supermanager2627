@@ -36,9 +36,9 @@ export default async function Home() {
           <span className="block text-grana-bright">Balaguer</span>
         </h1>
         <p className="animate-fade-up-delay mt-6 max-w-xl text-base leading-relaxed text-mute sm:text-lg">
-          Competició fantasy per als sèniors del club. Construeix la plantilla,
-          confirma l&apos;alineació cada jornada i disputa la classificació
-          general amb la resta de mànagers.
+          Competició fantasy per als sèniors del club. Construeix la plantilla
+          cada jornada (es desa sola) i disputa la classificació general amb la
+          resta de mànagers.
         </p>
         <div className="animate-fade-up-delay mt-8 flex flex-wrap gap-3">
           <Link

@@ -15,7 +15,7 @@ import type { RoundScore } from "@/lib/types";
 import {
   needsPlayerIdsMigration,
   parsePlayerIds,
-  validateLineup,
+  validateLineupSave,
 } from "@/lib/game";
 
 function seededRandom(seed: number) {
@@ -137,45 +137,23 @@ export function saveLineup(
   userId: string,
   playerIds: string[],
   captainId: string | null,
-) {
+): { ok: true; row: DbLineup } | { ok: false; error: string } {
   const db = getDb();
   const round = getCurrentRound(db);
-  ensureLineupRow(userId, round);
+  const existing = ensureLineupRow(userId, round);
+  const check = validateLineupSave(playerIds, captainId, existing.budget);
+  if (!check.ok) return check;
+
+  // Managers never confirm; scoring uses last saved playerIds at admin close.
   db.prepare(
     `UPDATE lineups
      SET player_ids = ?, captain_id = ?, confirmed = 0, confirmed_at = NULL
      WHERE user_id = ? AND round = ?`,
   ).run(JSON.stringify(playerIds), captainId, userId, round);
-  return ensureLineupRow(userId, round);
+  return { ok: true, row: ensureLineupRow(userId, round) };
 }
 
-export function confirmLineup(userId: string): { ok: true } | { error: string } {
-  const db = getDb();
-  const round = getCurrentRound(db);
-  const row = ensureLineupRow(userId, round);
-  const playerIds = parsePlayerIds(row.player_ids);
-  const lineup = {
-    playerIds,
-    captainId: row.captain_id,
-    confirmed: false,
-    confirmedAt: null,
-  };
-  const { ok, issues } = validateLineup(lineup, row.budget);
-  if (!ok) {
-    return {
-      error:
-        issues[0] === "captain"
-          ? "Tria un capità abans de confirmar."
-          : "L'alineació no compleix les normes (8 jugadors, pressupost i capità).",
-    };
-  }
-  db.prepare(
-    `UPDATE lineups SET confirmed = 1, confirmed_at = ? WHERE user_id = ? AND round = ?`,
-  ).run(new Date().toISOString(), userId, round);
-  return { ok: true };
-}
-
-/** Close current jornada for all confirmed lineups; advance round. Admin-gated at API. */
+/** Admin closes jornada: score every saved lineup, then advance. */
 export function simulateJornada(): {
   round: number;
   scored: number;
@@ -186,14 +164,14 @@ export function simulateJornada(): {
   const round = getCurrentRound(db);
   const opponent = OPPONENTS[(round - 1) % OPPONENTS.length];
 
-  const confirmed = db
-    .prepare(
-      `SELECT * FROM lineups WHERE round = ? AND confirmed = 1`,
-    )
+  const lineups = db
+    .prepare(`SELECT * FROM lineups WHERE round = ?`)
     .all(round) as DbLineup[];
 
+  const closedAt = new Date().toISOString();
+
   const tx = db.transaction(() => {
-    for (const row of confirmed) {
+    for (const row of lineups) {
       const playerIds = parsePlayerIds(row.player_ids);
       const seed =
         round * 997 +
@@ -237,14 +215,18 @@ export function simulateJornada(): {
         won ? 1 : 0,
         JSON.stringify(scores),
         row.captain_id,
-        new Date().toISOString(),
+        closedAt,
       );
+
+      // Historical lock after admin close (not a manager confirm).
+      db.prepare(
+        `UPDATE lineups SET confirmed = 1, confirmed_at = ? WHERE user_id = ? AND round = ?`,
+      ).run(closedAt, row.user_id, round);
     }
 
     const next = round + 1;
     setCurrentRound(next, db);
 
-    // Seed empty lineup rows for next round for all users
     const users = db.prepare("SELECT id FROM users").all() as { id: string }[];
     for (const u of users) {
       ensureLineupRow(u.id, next);
@@ -255,7 +237,7 @@ export function simulateJornada(): {
 
   return {
     round,
-    scored: confirmed.length,
+    scored: lineups.length,
     nextRound: round + 1,
     opponent,
   };

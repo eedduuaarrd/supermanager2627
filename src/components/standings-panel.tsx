@@ -153,8 +153,8 @@ export function StandingsPanel({
             Administració
           </p>
           <p className="mt-2 text-sm text-mute">
-            Tanca la jornada actual: puntua totes les alineacions confirmades i
-            obre la següent.
+            Tanca la jornada actual: puntua l&apos;última alineació desada de
+            cada mànager i obre la següent.
           </p>
           <Button
             type="button"

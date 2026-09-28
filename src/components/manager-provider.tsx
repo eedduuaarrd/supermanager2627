@@ -7,10 +7,14 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
-  useTransition,
   type ReactNode,
 } from "react";
+
+const AUTOSAVE_MS = 300;
+
+export type SaveStatus = "idle" | "saving" | "saved" | "error";
 
 type ManagerContextValue = {
   user: SessionUser;
@@ -22,10 +26,9 @@ type ManagerContextValue = {
   bootError: string | null;
   actionError: string | null;
   saving: boolean;
-  confirming: boolean;
+  saveStatus: SaveStatus;
   reload: () => Promise<void>;
-  persistLineup: (next: Lineup) => Promise<void>;
-  confirmLineup: () => Promise<boolean>;
+  persistLineup: (next: Lineup) => void;
   clearActionError: () => void;
 };
 
@@ -53,7 +56,11 @@ export function ManagerProvider({
   const [actionError, setActionError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [confirming, startConfirm] = useTransition();
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const savedClearTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingRef = useRef<Lineup | null>(null);
 
   const reload = useCallback(async () => {
     const [rosterRes, lineupRes] = await Promise.all([
@@ -81,10 +88,17 @@ export function ManagerProvider({
       .finally(() => setReady(true));
   }, [reload]);
 
-  const persistLineup = useCallback(
+  useEffect(() => {
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+      if (savedClearTimer.current) clearTimeout(savedClearTimer.current);
+    };
+  }, []);
+
+  const flushSave = useCallback(
     async (next: Lineup) => {
-      setLineup(next);
       setSaving(true);
+      setSaveStatus("saving");
       setActionError(null);
       try {
         const res = await fetch("/api/lineup", {
@@ -97,15 +111,25 @@ export function ManagerProvider({
         });
         const data = await res.json();
         if (!res.ok) {
-          setActionError(data.error ?? "No s'ha pogut desar.");
+          setActionError(data.error ?? "Error en desar");
+          setSaveStatus("error");
           await reload();
           return;
         }
-        setLineup(data.lineup);
+        // Avoid clobbering newer local edits while a save was in flight.
+        if (pendingRef.current === null) {
+          setLineup(data.lineup);
+        }
         setRound(data.round);
         setBudget(data.budget);
+        setSaveStatus("saved");
+        if (savedClearTimer.current) clearTimeout(savedClearTimer.current);
+        savedClearTimer.current = setTimeout(() => {
+          setSaveStatus((s) => (s === "saved" ? "idle" : s));
+        }, 1800);
       } catch {
-        setActionError("Error de xarxa en desar l'alineació.");
+        setActionError("Error en desar");
+        setSaveStatus("error");
       } finally {
         setSaving(false);
       }
@@ -113,31 +137,27 @@ export function ManagerProvider({
     [reload],
   );
 
-  const confirmLineup = useCallback(async () => {
-    setActionError(null);
-    let ok = false;
-    await new Promise<void>((resolve) => {
-      startConfirm(async () => {
-        try {
-          const res = await fetch("/api/lineup/confirm", { method: "POST" });
-          const data = await res.json();
-          if (!res.ok) {
-            setActionError(data.error ?? "No s'ha pogut confirmar.");
-            ok = false;
-          } else {
-            setLineup(data.lineup);
-            ok = true;
-          }
-        } catch {
-          setActionError("Error de xarxa en confirmar.");
-          ok = false;
-        } finally {
-          resolve();
-        }
-      });
-    });
-    return ok;
-  }, []);
+  const persistLineup = useCallback(
+    (next: Lineup) => {
+      const normalized: Lineup = {
+        ...next,
+        confirmed: false,
+        confirmedAt: null,
+      };
+      setLineup(normalized);
+      pendingRef.current = normalized;
+      setSaveStatus("saving");
+      setActionError(null);
+
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+      saveTimer.current = setTimeout(() => {
+        const toSave = pendingRef.current;
+        pendingRef.current = null;
+        if (toSave) void flushSave(toSave);
+      }, AUTOSAVE_MS);
+    },
+    [flushSave],
+  );
 
   const value = useMemo<ManagerContextValue>(
     () => ({
@@ -150,10 +170,9 @@ export function ManagerProvider({
       bootError,
       actionError,
       saving,
-      confirming,
+      saveStatus,
       reload,
       persistLineup,
-      confirmLineup,
       clearActionError: () => setActionError(null),
     }),
     [
@@ -166,10 +185,9 @@ export function ManagerProvider({
       bootError,
       actionError,
       saving,
-      confirming,
+      saveStatus,
       reload,
       persistLineup,
-      confirmLineup,
     ],
   );
 

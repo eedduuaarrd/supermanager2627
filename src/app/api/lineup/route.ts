@@ -7,6 +7,19 @@ import { parsePlayerIds } from "@/lib/game";
 
 export const runtime = "nodejs";
 
+function lineupPayload(row: {
+  player_ids: string;
+  captain_id: string | null;
+}) {
+  return {
+    playerIds: parsePlayerIds(row.player_ids),
+    captainId: row.captain_id,
+    // Managers never confirm; flag is only set on admin round close (historical).
+    confirmed: false,
+    confirmedAt: null,
+  };
+}
+
 export async function GET() {
   const user = await readSession();
   if (!user) {
@@ -17,12 +30,7 @@ export async function GET() {
   return NextResponse.json({
     round,
     budget: row.budget ?? INITIAL_BUDGET,
-    lineup: {
-      playerIds: parsePlayerIds(row.player_ids),
-      captainId: row.captain_id,
-      confirmed: row.confirmed === 1,
-      confirmedAt: row.confirmed_at,
-    },
+    lineup: lineupPayload(row),
   });
 }
 
@@ -41,24 +49,20 @@ export async function PUT(req: Request) {
       ? body.captainId
       : null;
 
-  const round = getCurrentRound();
-  const existing = ensureLineupRow(user.id, round);
-  if (existing.confirmed === 1) {
-    return NextResponse.json(
-      { error: "L'alineació ja està confirmada per aquesta jornada." },
-      { status: 409 },
-    );
+  const result = saveLineup(user.id, playerIds, captainId);
+  if (!result.ok) {
+    return NextResponse.json({ error: result.error }, { status: 400 });
   }
 
-  const row = saveLineup(user.id, playerIds, captainId);
+  const round = getCurrentRound();
   return NextResponse.json({
     round,
-    budget: row.budget,
-    lineup: {
-      playerIds: parsePlayerIds(row.player_ids),
-      captainId: row.captain_id,
-      confirmed: row.confirmed === 1,
-      confirmedAt: row.confirmed_at,
-    },
+    budget: result.row.budget,
+    lineup: lineupPayload(result.row),
   });
+}
+
+/** Alias for older clients — same as PUT. */
+export async function POST(req: Request) {
+  return PUT(req);
 }

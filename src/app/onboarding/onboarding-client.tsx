@@ -27,8 +27,8 @@ export function OnboardingClient() {
       <h1 className="mt-2 font-display text-4xl text-bone">Com funciona</h1>
       <p className="mt-4 text-sm leading-relaxed text-mute">
         Cada jornada construeixes una alineació de 8 jugadors dels sèniors del
-        club, amb pressupost limitat. El capità suma el doble. Confirma abans
-        que es tanqui la jornada i disputa la classificació.
+        club, amb pressupost limitat. El capità suma el doble. L&apos;alineació
+        es desa sola; es puntua quan es tanqui la jornada.
       </p>
       <ul className="mt-6 space-y-3 border-l border-grana pl-4 text-sm text-bone">
         <li>8 jugadors (qualsevol mix)</li>

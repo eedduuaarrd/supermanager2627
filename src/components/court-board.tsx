@@ -45,7 +45,6 @@ function assignSlots(players: Player[]): (Player | null)[] {
 interface CourtBoardProps {
   players: Player[];
   captainId: string | null;
-  confirmed?: boolean;
   selectedId?: string | null;
   onSelect?: (id: string | null) => void;
   onEmptySlot?: (slot: { slotIndex: number }) => void;
@@ -56,7 +55,6 @@ interface CourtBoardProps {
 export function CourtBoard({
   players,
   captainId,
-  confirmed,
   selectedId,
   onSelect,
   onEmptySlot,
@@ -217,15 +215,14 @@ export function CourtBoard({
                     player={player}
                     isCaptain={isCaptain}
                     isSelected={isSelected}
-                    confirmed={confirmed}
                     onSelect={onSelect}
                   />
                 ) : (
                   <EmptySlot
                     slotIndex={i}
-                    disabled={confirmed || players.length >= LINEUP_SIZE}
+                    disabled={players.length >= LINEUP_SIZE}
                     onClick={
-                      confirmed || !onEmptySlot
+                      !onEmptySlot
                         ? undefined
                         : () => onEmptySlot({ slotIndex: i })
                     }
@@ -279,19 +276,17 @@ function FilledChip({
   player,
   isCaptain,
   isSelected,
-  confirmed,
   onSelect,
 }: {
   player: Player;
   isCaptain: boolean;
   isSelected: boolean;
-  confirmed?: boolean;
   onSelect?: (id: string | null) => void;
 }) {
   return (
     <button
       type="button"
-      disabled={confirmed || !onSelect}
+      disabled={!onSelect}
       onClick={() => {
         if (!onSelect) return;
         onSelect(isSelected ? null : player.id);

@@ -6,26 +6,29 @@ import { LINEUP_SIZE } from "@/data/roster";
 import { projectedPoints } from "@/lib/game";
 import Link from "next/link";
 
-function lineupStatusLabel(
-  filled: number,
-  confirmed: boolean,
-): { label: string; tone: string } {
-  if (confirmed) {
-    return { label: "Confirmada", tone: "text-emerald-400" };
-  }
+function lineupStatusLabel(filled: number, hasCaptain: boolean): {
+  label: string;
+  tone: string;
+} {
   if (filled === 0) {
     return { label: "Buida", tone: "text-mute" };
   }
   if (filled < LINEUP_SIZE) {
-    return { label: `Incompleta · ${filled}/${LINEUP_SIZE}`, tone: "text-amber-200" };
+    return {
+      label: `Incompleta · ${filled}/${LINEUP_SIZE}`,
+      tone: "text-amber-200",
+    };
   }
-  return { label: "Completa · pendent de confirmar", tone: "text-grana-bright" };
+  if (!hasCaptain) {
+    return { label: "Completa · sense capità", tone: "text-amber-200" };
+  }
+  return { label: "Desada", tone: "text-emerald-400" };
 }
 
 function JornadaContent() {
   const { user, round, lineup } = useManager();
   const filled = lineup.playerIds.length;
-  const status = lineupStatusLabel(filled, lineup.confirmed);
+  const status = lineupStatusLabel(filled, Boolean(lineup.captainId));
   const projected = projectedPoints(lineup);
 
   return (
@@ -38,8 +41,9 @@ function JornadaContent() {
           Jornada {round}
         </h1>
         <p className="mt-3 max-w-md text-sm leading-relaxed text-mute">
-          Configura 8 jugadors (qualsevol mix), tria capità (×2) i
-          confirma abans que es tanqui la jornada.
+          Configura fins a 8 jugadors (qualsevol mix) i tria capità (×2).
+          L&apos;alineació es desa sola; es puntua quan l&apos;admin tanca la
+          jornada.
         </p>
       </section>
 
@@ -63,9 +67,9 @@ function JornadaContent() {
           </div>
         </div>
         <p className="mt-3 text-xs text-mute">
-          {lineup.confirmed
-            ? "Ja està bloquejada per a aquesta jornada. Pots consultar la classificació quan es tanqui."
-            : "Obre l'equip, omple els slots amb + i confirma quan estigui llesta."}
+          {filled === 0
+            ? "Obre l'equip i afegeix jugadors amb +. Es desa automàticament."
+            : "Pots continuar editant fins que es tanqui la jornada."}
         </p>
       </section>
 
@@ -73,7 +77,7 @@ function JornadaContent() {
         href="/equip"
         className="inline-flex h-12 w-full items-center justify-center bg-grana text-sm font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
       >
-        {lineup.confirmed ? "Veure l'alineació" : "Configura l'alineació"}
+        {filled === 0 ? "Configura l'alineació" : "Edita l'alineació"}
       </Link>
 
       <p className="text-center text-xs text-mute">
