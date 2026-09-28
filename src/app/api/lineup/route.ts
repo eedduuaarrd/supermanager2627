@@ -3,7 +3,7 @@ import { readSession } from "@/lib/auth";
 import { getCurrentRound } from "@/lib/db";
 import { ensureLineupRow, saveLineup } from "@/lib/scoring";
 import { requireActiveTeamId } from "@/lib/teams";
-import { INITIAL_BUDGET, LINEUP_SIZE } from "@/data/roster";
+import { INITIAL_BUDGET, LINEUP_SIZE, resolvePlayerId } from "@/data/roster";
 import { parsePlayerIds } from "@/lib/game";
 
 export const runtime = "nodejs";
@@ -12,9 +12,15 @@ function lineupPayload(row: {
   player_ids: string;
   captain_id: string | null;
 }) {
+  const playerIds = parsePlayerIds(row.player_ids);
+  let captainId: string | null = null;
+  if (row.captain_id) {
+    const mapped = resolvePlayerId(row.captain_id);
+    if (mapped && playerIds.includes(mapped)) captainId = mapped;
+  }
   return {
-    playerIds: parsePlayerIds(row.player_ids),
-    captainId: row.captain_id,
+    playerIds,
+    captainId,
     confirmed: false,
     confirmedAt: null,
   };
@@ -47,10 +53,12 @@ export async function PUT(req: Request) {
     captainId?: string | null;
   };
   const playerIds = parsePlayerIds(body.playerIds ?? []).slice(0, LINEUP_SIZE);
-  const captainId =
+  const rawCaptain =
     typeof body.captainId === "string" || body.captainId === null
       ? body.captainId
       : null;
+  const captainId =
+    typeof rawCaptain === "string" ? resolvePlayerId(rawCaptain) : rawCaptain;
 
   const result = saveLineup(teamId, playerIds, captainId);
   if (!result.ok) {

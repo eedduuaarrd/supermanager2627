@@ -169,14 +169,16 @@ export function saveLineup(
   const db = getDb();
   const round = getCurrentRound(db);
   const existing = ensureLineupRow(teamId, round);
-  const check = validateLineupSave(playerIds, captainId, existing.budget);
+  // Migrate collapsed dual-team captain ids the same way as playerIds.
+  const resolvedCaptain = resolveCaptainId(captainId, playerIds);
+  const check = validateLineupSave(playerIds, resolvedCaptain, existing.budget);
   if (!check.ok) return check;
 
   db.prepare(
     `UPDATE lineups
      SET player_ids = ?, captain_id = ?, confirmed = 0, confirmed_at = NULL
      WHERE team_id = ? AND round = ?`,
-  ).run(JSON.stringify(playerIds), captainId, teamId, round);
+  ).run(JSON.stringify(playerIds), resolvedCaptain, teamId, round);
   return { ok: true, row: ensureLineupRow(teamId, round) };
 }
 
