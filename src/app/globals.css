@@ -1,0 +1,166 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-display);
+  --font-display: var(--font-display);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-navy: var(--navy);
+  --color-navy-deep: var(--navy-deep);
+  --color-grana: var(--grana);
+  --color-grana-bright: var(--grana-bright);
+  --color-gold: var(--gold);
+  --color-cream: var(--cream);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --navy: #13253f;
+  --navy-deep: #0a1628;
+  --grana: #8f1d2c;
+  --grana-bright: #b3263a;
+  --gold: #e2b34a;
+  --cream: #f4efe6;
+  --background: #0a1628;
+  --foreground: #f4efe6;
+  --card: #13253f;
+  --card-foreground: #f4efe6;
+  --popover: #13253f;
+  --popover-foreground: #f4efe6;
+  --primary: #8f1d2c;
+  --primary-foreground: #f4efe6;
+  --secondary: #1c3354;
+  --secondary-foreground: #f4efe6;
+  --muted: #1c3354;
+  --muted-foreground: #b7c0ce;
+  --accent: #e2b34a;
+  --accent-foreground: #0a1628;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: rgb(255 255 255 / 12%);
+  --input: rgb(255 255 255 / 14%);
+  --ring: #e2b34a;
+  --chart-1: #e2b34a;
+  --chart-2: #b3263a;
+  --chart-3: #7aa2d6;
+  --chart-4: #f4efe6;
+  --chart-5: #4d6a93;
+  --radius: 0.75rem;
+  --sidebar: #13253f;
+  --sidebar-foreground: #f4efe6;
+  --sidebar-primary: #8f1d2c;
+  --sidebar-primary-foreground: #f4efe6;
+  --sidebar-accent: #1c3354;
+  --sidebar-accent-foreground: #f4efe6;
+  --sidebar-border: rgb(255 255 255 / 12%);
+  --sidebar-ring: #e2b34a;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: 0.02em;
+  }
+}
+
+/* Court atmosphere */
+.court-bg {
+  background-color: #0a1628;
+  background-image:
+    radial-gradient(ellipse 90% 55% at 50% -10%, rgb(143 29 44 / 45%), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 20%, rgb(226 179 74 / 12%), transparent 45%),
+    linear-gradient(180deg, #0a1628 0%, #13253f 48%, #0a1628 100%),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 48px,
+      rgb(255 255 255 / 2.5%) 48px,
+      rgb(255 255 255 / 2.5%) 49px
+    );
+  background-attachment: fixed;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-gold {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(226 179 74 / 0%);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgb(226 179 74 / 12%);
+  }
+}
+
+.animate-rise {
+  animation: rise-in 0.55s ease-out both;
+}
+
+.animate-rise-delay {
+  animation: rise-in 0.7s ease-out 0.12s both;
+}
+
+.brand-pulse {
+  animation: pulse-gold 2.8s ease-in-out infinite;
+}
