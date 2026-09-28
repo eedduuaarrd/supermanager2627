@@ -40,6 +40,79 @@ export type StandingRow = {
   isYou: boolean;
 };
 
+export type TeamRoundHistoryRow = {
+  round: number;
+  points: number;
+  cumulative: number;
+  rank: number | null;
+  opponent: string;
+  captainId: string | null;
+  playedAt: string;
+  scores: RoundScore[];
+};
+
+/** Scored jornadas for one fantasy team, oldest → newest, with cumulative + rank. */
+export function getTeamRoundHistory(teamId: string): TeamRoundHistoryRow[] {
+  const db = getDb();
+  const rows = db
+    .prepare(
+      `SELECT round, points, opponent, scores_json, captain_id, played_at
+       FROM round_scores
+       WHERE team_id = ?
+       ORDER BY round ASC`,
+    )
+    .all(teamId) as {
+    round: number;
+    points: number;
+    opponent: string;
+    scores_json: string;
+    captain_id: string | null;
+    played_at: string;
+  }[];
+
+  if (rows.length === 0) return [];
+
+  const rounds = rows.map((r) => r.round);
+  const placeholders = rounds.map(() => "?").join(",");
+  const peerScores = db
+    .prepare(
+      `SELECT team_id, round, points FROM round_scores WHERE round IN (${placeholders})`,
+    )
+    .all(...rounds) as { team_id: string; round: number; points: number }[];
+
+  const byRound = new Map<number, { team_id: string; points: number }[]>();
+  for (const p of peerScores) {
+    const list = byRound.get(p.round) ?? [];
+    list.push({ team_id: p.team_id, points: p.points });
+    byRound.set(p.round, list);
+  }
+
+  let cumulative = 0;
+  return rows.map((row) => {
+    cumulative += row.points;
+    const peers = byRound.get(row.round) ?? [];
+    peers.sort((a, b) => b.points - a.points || a.team_id.localeCompare(b.team_id));
+    const rankIdx = peers.findIndex((p) => p.team_id === teamId);
+    let scores: RoundScore[] = [];
+    try {
+      scores = JSON.parse(row.scores_json) as RoundScore[];
+      if (!Array.isArray(scores)) scores = [];
+    } catch {
+      scores = [];
+    }
+    return {
+      round: row.round,
+      points: row.points,
+      cumulative,
+      rank: rankIdx >= 0 ? rankIdx + 1 : null,
+      opponent: row.opponent,
+      captainId: row.captain_id,
+      playedAt: row.played_at,
+      scores,
+    };
+  });
+}
+
 export function getStandings(
   scope: "jornada" | "general",
   viewerId?: string,

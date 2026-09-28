@@ -1,6 +1,7 @@
 "use client";
 
 import { BootGate } from "@/components/boot-gate";
+import { JornadaPointsHistory } from "@/components/jornada-points-history";
 import { LineupBuilder } from "@/components/lineup-builder";
 import { useManager } from "@/components/manager-provider";
 import { TeamSwitcher } from "@/components/team-switcher";
@@ -36,6 +37,7 @@ function EquipContent() {
         </p>
         <TeamSwitcher />
       </div>
+      <JornadaPointsHistory />
       <div className="min-h-0 flex-1">
         <LineupBuilder
           roster={roster!}
