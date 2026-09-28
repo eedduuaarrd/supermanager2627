@@ -7,9 +7,8 @@
       "url": "https://www.basquetcatala.cat/estadistica/equip/5f55017e-893e-4323-8b41-b58323ea8f73",
       "players": [
         {
-          "number": null,
+          "number": 19,
           "name": "HECTOR LOZANO MARTINEZ",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 23.5,
@@ -27,9 +26,8 @@
           }
         },
         {
-          "number": null,
+          "number": 20,
           "name": "EDUARD BERNAT SUCARRAT",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 27.1,
@@ -47,9 +45,8 @@
           }
         },
         {
-          "number": null,
+          "number": 43,
           "name": "TONI SALUD GARCIA",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 24.2,
@@ -67,9 +64,8 @@
           }
         },
         {
-          "number": null,
+          "number": 6,
           "name": "IVAN FRANCO GUERRERO",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 27.5,
@@ -89,7 +85,6 @@
         {
           "number": null,
           "name": "GERARD GARCIA ROSAURO",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 26.4,
@@ -107,9 +102,8 @@
           }
         },
         {
-          "number": null,
+          "number": 24,
           "name": "MARC ESCODA ANGERRI",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 18.0,
@@ -127,9 +121,8 @@
           }
         },
         {
-          "number": null,
+          "number": 68,
           "name": "BABACAR TOURE GASSAMA",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 23.0,
@@ -147,9 +140,8 @@
           }
         },
         {
-          "number": null,
+          "number": 26,
           "name": "GERARD SOLDEVILA CASAS",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 16.1,
@@ -167,9 +159,8 @@
           }
         },
         {
-          "number": null,
+          "number": 8,
           "name": "ROGER COMPANYS SOLÀ",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 14.1,
@@ -204,9 +195,8 @@
       "url": "https://www.basquetcatala.cat/estadistica/equip/839e2243-48dc-4459-aec5-a2dadeb3ad53",
       "players": [
         {
-          "number": null,
+          "number": 11,
           "name": "ARES BUÑOL PERELLÓ",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 26.4,
@@ -224,9 +214,8 @@
           }
         },
         {
-          "number": null,
+          "number": 13,
           "name": "JÚLIA PLA PLA",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 29.4,
@@ -244,9 +233,8 @@
           }
         },
         {
-          "number": null,
-          "name": "ANDREA PERAT GRÀCIA",
-          "position": null,
+          "number": 21,
+          "name": "ANDREA PERAT GRACIA",
           "stats": {
             "PJ": 1,
             "MIN": 27.4,
@@ -264,9 +252,8 @@
           }
         },
         {
-          "number": null,
+          "number": 88,
           "name": "NEUS ESCODA ANGERRI",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 26.8,
@@ -284,9 +271,8 @@
           }
         },
         {
-          "number": null,
-          "name": "MÒNICA FONTANET MALLOL",
-          "position": null,
+          "number": 95,
+          "name": "MONICA FONTANET MALLOL",
           "stats": {
             "PJ": 1,
             "MIN": 19.4,
@@ -305,8 +291,7 @@
         },
         {
           "number": null,
-          "name": "GUERALT SOLÉ TORRES",
-          "position": null,
+          "name": "QUERALT SOLE TORRES",
           "stats": {
             "PJ": 1,
             "MIN": 10.8,
@@ -324,9 +309,8 @@
           }
         },
         {
-          "number": null,
+          "number": 10,
           "name": "CLARA PANIAGUA MARVÀ",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 16.3,
@@ -345,8 +329,7 @@
         },
         {
           "number": null,
-          "name": "MARIANA MBALLO DIALLO",
-          "position": null,
+          "name": "MARIAMA MBALLO DIALLO",
           "stats": {
             "PJ": 1,
             "MIN": 10.6,
@@ -364,9 +347,8 @@
           }
         },
         {
-          "number": null,
+          "number": 79,
           "name": "MARTINA BENÍTEZ FARRANDO",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 15.7,
@@ -385,8 +367,7 @@
         },
         {
           "number": null,
-          "name": "ADA DORIENE MORALEDA",
-          "position": null,
+          "name": "ADA DOMENE MORALEDA",
           "stats": {
             "PJ": 1,
             "MIN": 13.0,
@@ -413,8 +394,7 @@
       "players": [
         {
           "number": null,
-          "name": "GUERALT SOLÉ TORRES",
-          "position": null,
+          "name": "QUERALT SOLE TORRES",
           "stats": {
             "PJ": 1,
             "MIN": 37.5,
@@ -432,9 +412,8 @@
           }
         },
         {
-          "number": null,
+          "number": 13,
           "name": "JÚLIA PLA PLA",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 24.4,
@@ -452,9 +431,8 @@
           }
         },
         {
-          "number": null,
-          "name": "JANA ROLDÁN ARANDILLA",
-          "position": null,
+          "number": 8,
+          "name": "JANA ROLDAN ARANDILLA",
           "stats": {
             "PJ": 1,
             "MIN": 19.3,
@@ -472,9 +450,8 @@
           }
         },
         {
-          "number": null,
+          "number": 30,
           "name": "NÚRIA JIMÉNEZ ARAN",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 23.0,
@@ -493,8 +470,7 @@
         },
         {
           "number": null,
-          "name": "MARIANA MBALLO DIALLO",
-          "position": null,
+          "name": "MARIAMA MBALLO DIALLO",
           "stats": {
             "PJ": 1,
             "MIN": 23.7,
@@ -512,9 +488,8 @@
           }
         },
         {
-          "number": null,
+          "number": 33,
           "name": "ABRIL GRÀCIA PALACÍN",
-          "position": null,
           "stats": {
             "PJ": 1,
             "MIN": 8.6,
@@ -532,9 +507,8 @@
           }
         },
         {
-          "number": null,
-          "name": "XÈNIA ANDREU MONELL",
-          "position": null,
+          "number": 93,
+          "name": "XENIA ANDREU MONELL",
           "stats": {
             "PJ": 1,
             "MIN": 11.1,
@@ -552,9 +526,8 @@
           }
         },
         {
-          "number": null,
-          "name": "GINA BETBESÉ SÀNCHEZ",
-          "position": null,
+          "number": 11,
+          "name": "GINA BETBESÉ SÁNCHEZ",
           "stats": {
             "PJ": 1,
             "MIN": 2.7,
@@ -572,9 +545,8 @@
           }
         },
         {
-          "number": null,
-          "name": "GINA TRILLA PINIÈS",
-          "position": null,
+          "number": 25,
+          "name": "GINA TRILLA PINIÉS",
           "stats": {
             "PJ": 1,
             "MIN": 33.5,
@@ -592,9 +564,8 @@
           }
         },
         {
-          "number": null,
-          "name": "JANA ALARCÓN SOLANÉS",
-          "position": null,
+          "number": 24,
+          "name": "JANA ALARCON SOLANES",
           "stats": {
             "PJ": 1,
             "MIN": 4.2,
@@ -619,5 +590,7 @@
     "source": "Federació Catalana de Bàsquet (basquetcatala.cat)",
     "api_endpoint_pattern": "https://mastats.optimalway.consulting.com/VITbcqhearngir{team-id}/stats",
     "notes": "Jersey numbers not displayed on the website. Positions not shown. Team 2 (c057eeae-3aae-4e33-b2ab-54fabb2700ae) has no statistics available."
-  }
+  },
+  "extractedAt": "2026-09-28",
+  "notes": "Live OptimalWay msstats roster names (Plantilla source). Jersey from API dorsal when non-zero. Positions not used in fantasy."
 }

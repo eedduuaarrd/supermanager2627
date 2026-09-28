@@ -40,11 +40,11 @@ const BASE_IDS = {
   "ANDREA PERAT GRACIA": "andrea-perat",
   "NEUS ESCODA ANGERRI": "neus-escoda",
   "MONICA FONTANET MALLOL": "monica-fontanet",
-  "GUERALT SOLE TORRES": "gueralt-sole",
+  "QUERALT SOLE TORRES": "queralt-sole",
   "CLARA PANIAGUA MARVA": "clara-paniagua",
-  "MARIANA MBALLO DIALLO": "mariana-mballo",
+  "MARIAMA MBALLO DIALLO": "mariama-mballo",
   "MARTINA BENITEZ FARRANDO": "martina-benitez",
-  "ADA DORIENE MORALEDA": "ada-dorienie",
+  "ADA DOMENE MORALEDA": "ada-domene",
   "JANA ROLDAN ARANDILLA": "jana-roldan",
   "NURIA JIMENEZ ARAN": "nuria-jimenez",
   "ABRIL GRACIA PALACIN": "abril-gracia",
@@ -54,7 +54,7 @@ const BASE_IDS = {
   "JANA ALARCON SOLANES": "jana-alarcon",
 };
 
-const DUAL_BASES = new Set(["julia-pla", "gueralt-sole", "mariana-mballo"]);
+const DUAL_BASES = new Set(["julia-pla", "queralt-sole", "mariama-mballo"]);
 
 function norm(s) {
   return s.normalize("NFKD").replace(/\p{M}/gu, "").toUpperCase()

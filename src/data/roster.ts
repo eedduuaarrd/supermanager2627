@@ -15,7 +15,8 @@ import type { Player, TeamId } from "@/lib/types";
  *
  * Regla Balaguer: persona × equip = jugador fantasy distint (no es deduplica).
  * Ids: `slug` per un sol equip; `slug__equip` quan la mateixa persona juga a dos.
- * L'FCBQ no publica número de samarreta. Sense posicions: alineació de 8 lliures.
+ * Noms = title-case de la Plantilla / API OptimalWay (accents només si surten a Fede).
+ * L'FCBQ no mostra dorsal a la UI web; l'API sí (opcional). Sense posicions: 8 slots lliures.
  * Preus derivats de PTS + VAL + MIN de la mostra FCBQ (1 partit a la captura).
  *
  * Regles: plantilla 8, pressupost 100.000 € (mercat multi-equip, 29 entrades).
@@ -90,7 +91,7 @@ export const ROSTER: Player[] = [
   // —— Teixidó Associats CB Balaguer A (masculí) ——
   {
     id: "hector-lozano",
-    name: "Hèctor Lozano Martínez",
+    name: "Hector Lozano Martinez",
     number: null,
     pts: 16,
     avgVal: avgFrom(-3, 16),
@@ -150,7 +151,7 @@ export const ROSTER: Player[] = [
   },
   {
     id: "babacar-toure",
-    name: "Babacar Touré Gassama",
+    name: "Babacar Toure Gassama",
     number: null,
     pts: 6,
     avgVal: avgFrom(-15, 6),
@@ -224,7 +225,7 @@ export const ROSTER: Player[] = [
   },
   {
     id: "andrea-perat",
-    name: "Andrea Perat Gràcia",
+    name: "Andrea Perat Gracia",
     number: null,
     pts: 8,
     avgVal: avgFrom(18, 8),
@@ -248,7 +249,7 @@ export const ROSTER: Player[] = [
   },
   {
     id: "monica-fontanet",
-    name: "Mònica Fontanet Mallol",
+    name: "Monica Fontanet Mallol",
     number: null,
     pts: 6,
     avgVal: avgFrom(13, 6),
@@ -259,8 +260,8 @@ export const ROSTER: Player[] = [
     photoUrl: "/players/monica-fontanet.jpg",
   },
   {
-    id: "gueralt-sole__cudos-a",
-    name: "Gueralt Solé Torres",
+    id: "queralt-sole__cudos-a",
+    name: "Queralt Sole Torres",
     number: null,
     pts: 5,
     avgVal: avgFrom(-13, 5),
@@ -269,7 +270,7 @@ export const ROSTER: Player[] = [
     teamId: "fem-a",
     teamIds: ["fem-a"],
     photoUrl: "/players/gueralt-sole.jpg",
-    note: "També al mercat com a gueralt-sole__farratges-b (Farratges La Noguera CB Balaguer B).",
+    note: "També al mercat com a queralt-sole__farratges-b (Farratges La Noguera CB Balaguer B).",
   },
   {
     id: "clara-paniagua",
@@ -284,8 +285,8 @@ export const ROSTER: Player[] = [
     photoUrl: "/players/clara-paniagua.png",
   },
   {
-    id: "mariana-mballo__cudos-a",
-    name: "Mariana Mballo Diallo",
+    id: "mariama-mballo__cudos-a",
+    name: "Mariama Mballo Diallo",
     number: null,
     pts: 1,
     avgVal: avgFrom(-12, 1),
@@ -294,7 +295,7 @@ export const ROSTER: Player[] = [
     teamId: "fem-a",
     teamIds: ["fem-a"],
     photoUrl: "/players/mariana-mballo.jpg",
-    note: "També al mercat com a mariana-mballo__farratges-b (Farratges La Noguera CB Balaguer B).",
+    note: "També al mercat com a mariama-mballo__farratges-b (Farratges La Noguera CB Balaguer B).",
   },
   {
     id: "martina-benitez",
@@ -309,8 +310,8 @@ export const ROSTER: Player[] = [
     photoUrl: "/players/martina-benitez.jpg",
   },
   {
-    id: "ada-dorienie",
-    name: "Ada Doriene Moraleda",
+    id: "ada-domene",
+    name: "Ada Domene Moraleda",
     number: null,
     pts: 0,
     avgVal: avgFrom(-17, 0),
@@ -322,8 +323,8 @@ export const ROSTER: Player[] = [
   },
   // —— Farratges La Noguera CB Balaguer B (femení) ——
   {
-    id: "gueralt-sole__farratges-b",
-    name: "Gueralt Solé Torres",
+    id: "queralt-sole__farratges-b",
+    name: "Queralt Sole Torres",
     number: null,
     pts: 23,
     avgVal: avgFrom(-1, 23),
@@ -332,7 +333,7 @@ export const ROSTER: Player[] = [
     teamId: "fem-b",
     teamIds: ["fem-b"],
     photoUrl: "/players/gueralt-sole.jpg",
-    note: "També al mercat com a gueralt-sole__cudos-a (Cudos Consultors CB Balaguer A).",
+    note: "També al mercat com a queralt-sole__cudos-a (Cudos Consultors CB Balaguer A).",
   },
   {
     id: "julia-pla__farratges-b",
@@ -349,7 +350,7 @@ export const ROSTER: Player[] = [
   },
   {
     id: "jana-roldan",
-    name: "Jana Roldán Arandilla",
+    name: "Jana Roldan Arandilla",
     number: null,
     pts: 5,
     avgVal: avgFrom(0, 5),
@@ -372,8 +373,8 @@ export const ROSTER: Player[] = [
     photoUrl: "/players/abril-gracia.jpg",
   },
   {
-    id: "mariana-mballo__farratges-b",
-    name: "Mariana Mballo Diallo",
+    id: "mariama-mballo__farratges-b",
+    name: "Mariama Mballo Diallo",
     number: null,
     pts: 2,
     avgVal: avgFrom(12, 2),
@@ -382,7 +383,7 @@ export const ROSTER: Player[] = [
     teamId: "fem-b",
     teamIds: ["fem-b"],
     photoUrl: "/players/mariana-mballo.jpg",
-    note: "També al mercat com a mariana-mballo__cudos-a (Cudos Consultors CB Balaguer A).",
+    note: "També al mercat com a mariama-mballo__cudos-a (Cudos Consultors CB Balaguer A).",
   },
   {
     id: "nuria-jimenez",
@@ -398,7 +399,7 @@ export const ROSTER: Player[] = [
   },
   {
     id: "xenia-andreu",
-    name: "Xènia Andreu Monell",
+    name: "Xenia Andreu Monell",
     number: null,
     pts: 1,
     avgVal: avgFrom(-8, 1),
@@ -410,7 +411,7 @@ export const ROSTER: Player[] = [
   },
   {
     id: "gina-betbese",
-    name: "Gina Betbesé Sànchez",
+    name: "Gina Betbesé Sánchez",
     number: null,
     pts: 0,
     avgVal: avgFrom(-6, 0),
@@ -422,7 +423,7 @@ export const ROSTER: Player[] = [
   },
   {
     id: "gina-trilla",
-    name: "Gina Trilla Piniès",
+    name: "Gina Trilla Piniés",
     number: null,
     pts: 0,
     avgVal: avgFrom(11, 0),
@@ -434,7 +435,7 @@ export const ROSTER: Player[] = [
   },
   {
     id: "jana-alarcon",
-    name: "Jana Alarcón Solanés",
+    name: "Jana Alarcon Solanes",
     number: null,
     pts: 0,
     avgVal: avgFrom(-2, 0),
@@ -453,7 +454,7 @@ export const CAPTAIN_MULTIPLIER = 2;
 export const WIN_BONUS = 0.2;
 
 /** GameState.version — bump when roster ids / dual-team rule change. */
-export const GAME_VERSION = 5;
+export const GAME_VERSION = 6;
 
 export const OPPONENTS = [
   "CB Cervera",
@@ -472,8 +473,16 @@ export const OPPONENTS = [
  */
 export const LEGACY_PLAYER_ID_MAP: Record<string, string> = {
   "julia-pla": "julia-pla__cudos-a",
-  "gueralt-sole": "gueralt-sole__farratges-b",
-  "mariana-mballo": "mariana-mballo__farratges-b",
+  // Spelling fixes (Fede 2026-09-28): Gueralt→Queralt, Mariana→Mariama, Doriene→Domene
+  "gueralt-sole": "queralt-sole__farratges-b",
+  "gueralt-sole__cudos-a": "queralt-sole__cudos-a",
+  "gueralt-sole__farratges-b": "queralt-sole__farratges-b",
+  "queralt-sole": "queralt-sole__farratges-b",
+  "mariana-mballo": "mariama-mballo__farratges-b",
+  "mariana-mballo__cudos-a": "mariama-mballo__cudos-a",
+  "mariana-mballo__farratges-b": "mariama-mballo__farratges-b",
+  "mariama-mballo": "mariama-mballo__farratges-b",
+  "ada-dorienie": "ada-domene",
 };
 
 export function resolvePlayerId(id: string): string | null {

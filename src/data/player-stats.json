@@ -312,7 +312,7 @@
     },
     "andrea-perat": {
       "playerId": "andrea-perat",
-      "fcbqName": "ANDREA PERAT GRÀCIA",
+      "fcbqName": "ANDREA PERAT GRACIA",
       "fcbqPersonId": null,
       "teamId": "fem-a",
       "games": [
@@ -366,7 +366,7 @@
     },
     "monica-fontanet": {
       "playerId": "monica-fontanet",
-      "fcbqName": "MÒNICA FONTANET MALLOL",
+      "fcbqName": "MONICA FONTANET MALLOL",
       "fcbqPersonId": null,
       "teamId": "fem-a",
       "games": [
@@ -391,9 +391,9 @@
       ],
       "source": "fcbq-team-page-aggregate"
     },
-    "gueralt-sole__cudos-a": {
-      "playerId": "gueralt-sole__cudos-a",
-      "fcbqName": "GUERALT SOLÉ TORRES",
+    "queralt-sole__cudos-a": {
+      "playerId": "queralt-sole__cudos-a",
+      "fcbqName": "QUERALT SOLE TORRES",
       "fcbqPersonId": null,
       "teamId": "fem-a",
       "games": [
@@ -445,9 +445,9 @@
       ],
       "source": "fcbq-team-page-aggregate"
     },
-    "mariana-mballo__cudos-a": {
-      "playerId": "mariana-mballo__cudos-a",
-      "fcbqName": "MARIANA MBALLO DIALLO",
+    "mariama-mballo__cudos-a": {
+      "playerId": "mariama-mballo__cudos-a",
+      "fcbqName": "MARIAMA MBALLO DIALLO",
       "fcbqPersonId": null,
       "teamId": "fem-a",
       "games": [
@@ -499,9 +499,9 @@
       ],
       "source": "fcbq-team-page-aggregate"
     },
-    "ada-dorienie": {
-      "playerId": "ada-dorienie",
-      "fcbqName": "ADA DORIENE MORALEDA",
+    "ada-domene": {
+      "playerId": "ada-domene",
+      "fcbqName": "ADA DOMENE MORALEDA",
       "fcbqPersonId": null,
       "teamId": "fem-a",
       "games": [
@@ -526,9 +526,9 @@
       ],
       "source": "fcbq-team-page-aggregate"
     },
-    "gueralt-sole__farratges-b": {
-      "playerId": "gueralt-sole__farratges-b",
-      "fcbqName": "GUERALT SOLÉ TORRES",
+    "queralt-sole__farratges-b": {
+      "playerId": "queralt-sole__farratges-b",
+      "fcbqName": "QUERALT SOLE TORRES",
       "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
@@ -582,7 +582,7 @@
     },
     "jana-roldan": {
       "playerId": "jana-roldan",
-      "fcbqName": "JANA ROLDÁN ARANDILLA",
+      "fcbqName": "JANA ROLDAN ARANDILLA",
       "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
@@ -634,9 +634,9 @@
       ],
       "source": "fcbq-team-page-aggregate"
     },
-    "mariana-mballo__farratges-b": {
-      "playerId": "mariana-mballo__farratges-b",
-      "fcbqName": "MARIANA MBALLO DIALLO",
+    "mariama-mballo__farratges-b": {
+      "playerId": "mariama-mballo__farratges-b",
+      "fcbqName": "MARIAMA MBALLO DIALLO",
       "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
@@ -690,7 +690,7 @@
     },
     "xenia-andreu": {
       "playerId": "xenia-andreu",
-      "fcbqName": "XÈNIA ANDREU MONELL",
+      "fcbqName": "XENIA ANDREU MONELL",
       "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
@@ -717,7 +717,7 @@
     },
     "gina-betbese": {
       "playerId": "gina-betbese",
-      "fcbqName": "GINA BETBESÉ SÀNCHEZ",
+      "fcbqName": "GINA BETBESÉ SÁNCHEZ",
       "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
@@ -744,7 +744,7 @@
     },
     "gina-trilla": {
       "playerId": "gina-trilla",
-      "fcbqName": "GINA TRILLA PINIÈS",
+      "fcbqName": "GINA TRILLA PINIÉS",
       "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
@@ -771,7 +771,7 @@
     },
     "jana-alarcon": {
       "playerId": "jana-alarcon",
-      "fcbqName": "JANA ALARCÓN SOLANÉS",
+      "fcbqName": "JANA ALARCON SOLANES",
       "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
