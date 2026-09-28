@@ -85,6 +85,7 @@ export function PlayerRow({
               price={player.price}
               prevPrice={player.prevPrice}
               className="text-xs"
+              showDelta
             />
           </p>
         </div>

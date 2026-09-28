@@ -138,6 +138,8 @@ export default async function JugadorPage({
               price={player.price}
               prevPrice={player.prevPrice}
               className="font-semibold text-bone"
+              showDelta
+              variacioLabel
             />
           </p>
         </div>

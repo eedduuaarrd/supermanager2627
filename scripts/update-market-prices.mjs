@@ -101,14 +101,27 @@ const out = {
 
 writeFileSync(OUT, JSON.stringify(out, null, 2) + "\n");
 
-const nonzero = Object.values(prices).filter((p) => p.price > 0).length;
+const all = Object.values(prices);
+const zeros = all.filter((p) => !p.price || p.price === 0);
+const belowFloor = all.filter((p) => p.price > 0 && p.price < 500);
+if (zeros.length || belowFloor.length) {
+  console.error(
+    `ABORT: ${zeros.length} zero-price and ${belowFloor.length} below-floor quotes — floor is ${500}`,
+  );
+  process.exit(1);
+}
+
+const nonzero = all.filter((p) => p.price > 0).length;
+const moved = all.filter(
+  (p) => p.prevPrice != null && p.prevPrice !== p.price,
+).length;
 const sample = Object.entries(prices)
   .sort((a, b) => b[1].price - a[1].price)
   .slice(0, 5)
   .map(([id, p]) => `${id}=${p.price}`)
   .join(", ");
 console.log(
-  `Wrote ${OUT}: ${ids.length} players, ${nonzero} with price>0. Top: ${sample}`,
+  `Wrote ${OUT}: ${ids.length} players, ${nonzero} with price>0, ${moved} moved vs prev. Top: ${sample}`,
 );
 console.log(
   `Example theoretical Ares: ${roundToPriceStep(theoreticalPrice(34))}`,

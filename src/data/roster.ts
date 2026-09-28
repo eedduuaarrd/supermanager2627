@@ -1,5 +1,5 @@
 import type { Player, TeamId } from "@/lib/types";
-import { computeMarketPrice } from "@/lib/market-price";
+import { applyPriceFloor, computeMarketPrice } from "@/lib/market-price";
 import marketPricesJson from "@/data/market-prices.json";
 
 /**
@@ -495,11 +495,20 @@ function applyMarketPrices(seed: Player[]): Player[] {
   const map = file.prices ?? {};
   return seed.map((p) => {
     const mp = map[p.id];
-    if (!mp) return p;
+    if (!mp) {
+      return { ...p, price: applyPriceFloor(p.price) };
+    }
+    const rawPrev = mp.prevPrice;
+    const prevPrice =
+      rawPrev != null && Number.isFinite(rawPrev) && rawPrev > 0
+        ? applyPriceFloor(rawPrev)
+        : null;
     return {
       ...p,
-      price: mp.price,
-      prevPrice: mp.prevPrice ?? null,
+      price: applyPriceFloor(
+        typeof mp.price === "number" ? mp.price : p.price,
+      ),
+      prevPrice,
       ...(typeof mp.avgVal === "number" ? { avgVal: Math.round(mp.avgVal) } : {}),
     };
   });

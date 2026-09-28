@@ -99,3 +99,13 @@ export function priceTrend(
   }
   return price > prevPrice ? "up" : "down";
 }
+
+/** Absolute € change vs previous quote (null when unknown / flat seed). */
+export function priceDelta(
+  price: number,
+  prevPrice?: number | null,
+): number | null {
+  if (prevPrice == null || !Number.isFinite(prevPrice)) return null;
+  const d = price - prevPrice;
+  return d === 0 ? null : d;
+}

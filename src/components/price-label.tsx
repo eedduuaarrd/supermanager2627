@@ -1,5 +1,5 @@
 import { formatPrice } from "@/data/roster";
-import { priceTrend } from "@/lib/market-price";
+import { priceDelta, priceTrend } from "@/lib/market-price";
 import { cn } from "@/lib/utils";
 
 interface PriceLabelProps {
@@ -9,6 +9,12 @@ interface PriceLabelProps {
   /** Compact: drop currency spacing (court chips). */
   compact?: boolean;
   showArrow?: boolean;
+  /**
+   * Show short € delta next to the quote (market picker / player page).
+   * With `variacioLabel`, appends “variació” when there is room.
+   */
+  showDelta?: boolean;
+  variacioLabel?: boolean;
 }
 
 export function PriceLabel({
@@ -17,11 +23,21 @@ export function PriceLabel({
   className,
   compact,
   showArrow = true,
+  showDelta = false,
+  variacioLabel = false,
 }: PriceLabelProps) {
   const trend = priceTrend(price, prevPrice);
+  const delta = showDelta ? priceDelta(price, prevPrice) : null;
   const text = compact
     ? formatPrice(price).replace(/\s/g, "")
     : formatPrice(price);
+
+  const deltaText =
+    delta == null
+      ? null
+      : `${delta > 0 ? "+" : "−"}${formatPrice(Math.abs(delta))}${
+          variacioLabel ? " variació" : ""
+        }`;
 
   return (
     <span
@@ -43,6 +59,16 @@ export function PriceLabel({
         </span>
       )}
       <span>{text}</span>
+      {deltaText && (
+        <span
+          className={cn(
+            "ml-1 text-[0.8em] font-normal leading-none opacity-90",
+            compact && "ml-0.5",
+          )}
+        >
+          {deltaText}
+        </span>
+      )}
     </span>
   );
 }
