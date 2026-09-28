@@ -37,6 +37,10 @@ export interface RoundScore {
   points: number;
   minutes: number;
   winBonus: boolean;
+  /** VAL | PM when scored from FCBQ; omitted for legacy rows. */
+  statSource?: "VAL" | "PM";
+  dnp?: boolean;
+  note?: string;
 }
 
 export interface RoundResult {

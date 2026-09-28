@@ -4,7 +4,8 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 
 export const MAX_TEAMS_PER_USER = 5;
-export const SCHEMA_VERSION = "2";
+/** 2 = multi fantasy teams; 3 = weekly jornada rounds meta. */
+export const SCHEMA_VERSION = "3";
 
 export type DbUser = {
   id: string;
@@ -328,6 +329,14 @@ export function getDb(): Database.Database {
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS rounds (
+      id INTEGER PRIMARY KEY,
+      label TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'open',
+      opened_at TEXT,
+      scored_at TEXT
+    );
   `);
 
   const current = db
@@ -340,10 +349,89 @@ export function getDb(): Database.Database {
     );
   }
 
+  const status = db
+    .prepare("SELECT value FROM meta WHERE key = ?")
+    .get("round_status") as DbMeta | undefined;
+  if (!status) {
+    db.prepare("INSERT INTO meta (key, value) VALUES (?, ?)").run(
+      "round_status",
+      "open",
+    );
+  }
+
   migrateToMultiTeams(db);
+  migrateWeeklyRounds(db);
 
   globalForDb.__smDb = db;
   return db;
+}
+
+function migrateWeeklyRounds(db: Database.Database) {
+  const current = db
+    .prepare("SELECT value FROM meta WHERE key = ?")
+    .get("schema_version") as DbMeta | undefined;
+  if (current?.value === SCHEMA_VERSION) {
+    // Still ensure jornada 1 row exists on warm restarts.
+    const round = Number(
+      (
+        db
+          .prepare("SELECT value FROM meta WHERE key = ?")
+          .get("current_round") as DbMeta | undefined
+      )?.value ?? 1,
+    );
+    const row = db
+      .prepare("SELECT id FROM rounds WHERE id = ?")
+      .get(round) as { id: number } | undefined;
+    if (!row) {
+      db.prepare(
+        `INSERT INTO rounds (id, label, status, opened_at, scored_at)
+         VALUES (?, ?, 'open', ?, NULL)`,
+      ).run(round, `Jornada ${round}`, new Date().toISOString());
+    }
+    return;
+  }
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS rounds (
+      id INTEGER PRIMARY KEY,
+      label TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'open',
+      opened_at TEXT,
+      scored_at TEXT
+    );
+  `);
+
+  const statusRow = db
+    .prepare("SELECT value FROM meta WHERE key = ?")
+    .get("round_status") as DbMeta | undefined;
+  if (!statusRow) {
+    db.prepare("INSERT INTO meta (key, value) VALUES (?, ?)").run(
+      "round_status",
+      "open",
+    );
+  }
+
+  const round = Number(
+    (
+      db
+        .prepare("SELECT value FROM meta WHERE key = ?")
+        .get("current_round") as DbMeta | undefined
+    )?.value ?? 1,
+  );
+  const existing = db
+    .prepare("SELECT id FROM rounds WHERE id = ?")
+    .get(round) as { id: number } | undefined;
+  if (!existing) {
+    db.prepare(
+      `INSERT INTO rounds (id, label, status, opened_at, scored_at)
+       VALUES (?, ?, 'open', ?, NULL)`,
+    ).run(round, `Jornada ${round}`, new Date().toISOString());
+  }
+
+  db.prepare(
+    `INSERT INTO meta (key, value) VALUES (?, ?)
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+  ).run("schema_version", SCHEMA_VERSION);
 }
 
 export function getCurrentRound(db = getDb()): number {

@@ -3,6 +3,7 @@
 import { useManager } from "@/components/manager-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
 
@@ -25,6 +26,7 @@ export function TeamManager() {
   const [pending, start] = useTransition();
 
   const atLimit = teams.length >= maxTeams;
+  const empty = teams.length === 0;
 
   function onCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -63,108 +65,139 @@ export function TeamManager() {
   }
 
   return (
-    <section className="border border-line bg-panel/80 px-4 py-4">
-      <div className="flex items-start justify-between gap-3">
+    <section className="border border-line/90 bg-panel/55 px-4 py-4 backdrop-blur-[2px]">
+      <div className="flex items-end justify-between gap-3">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.18em] text-mute">
-            Equips fantasy
-          </p>
-          <p className="mt-1 text-sm text-mute">
-            {teams.length}/{maxTeams} equips · màxim {maxTeams}
+          <h2 className="font-display text-xl tracking-wide text-bone">
+            Els meus equips
+          </h2>
+          <p className="mt-0.5 text-xs text-mute">
+            {teams.length}/{maxTeams} · màxim {maxTeams}
           </p>
         </div>
+        {!createOpen && !empty && (
+          <Button
+            type="button"
+            disabled={atLimit}
+            onClick={() => setCreateOpen(true)}
+            className="h-9 shrink-0 border border-line bg-panel-2 px-3 text-xs font-semibold uppercase tracking-wide text-bone hover:bg-white/10 disabled:opacity-50"
+          >
+            <Plus className="size-3.5" /> Nou equip
+          </Button>
+        )}
       </div>
 
-      <ul className="mt-4 space-y-2">
-        {teams.map((t) => {
-          const active = t.id === activeTeamId;
-          const isRenaming = renamingId === t.id;
-          return (
-            <li
-              key={t.id}
-              className={`border border-line px-3 py-2.5 ${
-                active ? "bg-grana/10" : "bg-panel-2/40"
-              }`}
-            >
-              {isRenaming ? (
-                <form
-                  className="flex gap-2"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    onRename(t.id);
-                  }}
-                >
-                  <Input
-                    value={renameValue}
-                    onChange={(e) => setRenameValue(e.target.value)}
-                    className="h-9 border-line bg-panel text-bone"
-                    autoFocus
-                    maxLength={40}
-                  />
-                  <Button
-                    type="submit"
-                    disabled={pending}
-                    className="h-9 bg-grana text-bone hover:bg-grana-bright"
-                  >
-                    Desa
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      setRenamingId(null);
-                      setRenameValue("");
+      {empty && !createOpen && (
+        <div className="mt-4 border border-dashed border-line px-3 py-5 text-center">
+          <p className="text-sm text-mute">
+            Crea el teu primer equip fantasy per jugar la jornada.
+          </p>
+          <Button
+            type="button"
+            onClick={() => setCreateOpen(true)}
+            className="mt-3 h-10 w-full bg-grana text-sm font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
+          >
+            <Plus className="size-4" /> Nou equip
+          </Button>
+        </div>
+      )}
+
+      {!empty && (
+        <ul className="mt-3 space-y-1.5">
+          {teams.map((t) => {
+            const active = t.id === activeTeamId;
+            const isRenaming = renamingId === t.id;
+            return (
+              <li
+                key={t.id}
+                className={cn(
+                  "border border-line px-3 py-2 transition-colors",
+                  active ? "bg-grana/15" : "bg-panel-2/30 hover:bg-panel-2/55",
+                )}
+              >
+                {isRenaming ? (
+                  <form
+                    className="flex gap-2"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      onRename(t.id);
                     }}
-                    className="h-9 border border-line bg-transparent text-mute hover:bg-white/5"
                   >
-                    Cancel·la
-                  </Button>
-                </form>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => void switchTeam(t.id)}
-                    className="min-w-0 flex-1 text-left"
-                  >
-                    <p className="truncate font-medium text-bone">
-                      {t.name}
-                      {active ? (
-                        <span className="ml-2 text-[10px] uppercase tracking-wider text-grana-bright">
-                          actiu
-                        </span>
-                      ) : null}
-                    </p>
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Canviar nom"
-                    onClick={() => {
-                      setRenamingId(t.id);
-                      setRenameValue(t.name);
-                    }}
-                    className="rounded-sm p-1.5 text-mute hover:bg-white/5 hover:text-bone"
-                  >
-                    <Pencil className="size-3.5" />
-                  </button>
-                  {teams.length > 1 && (
+                    <Input
+                      value={renameValue}
+                      onChange={(e) => setRenameValue(e.target.value)}
+                      className="h-9 border-line bg-panel text-bone"
+                      autoFocus
+                      maxLength={40}
+                    />
+                    <Button
+                      type="submit"
+                      disabled={pending}
+                      className="h-9 bg-grana text-bone hover:bg-grana-bright"
+                    >
+                      Desa
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        setRenamingId(null);
+                        setRenameValue("");
+                      }}
+                      className="h-9 border border-line bg-transparent text-mute hover:bg-white/5"
+                    >
+                      Cancel·la
+                    </Button>
+                  </form>
+                ) : (
+                  <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      aria-label="Eliminar equip"
-                      onClick={() => onDelete(t.id)}
-                      className="rounded-sm p-1.5 text-mute hover:bg-white/5 hover:text-red-300"
+                      onClick={() => void switchTeam(t.id)}
+                      className="min-w-0 flex-1 text-left"
                     >
-                      <Trash2 className="size-3.5" />
+                      <p className="truncate font-medium text-bone">
+                        {t.name}
+                        {active ? (
+                          <span className="ml-2 text-[10px] uppercase tracking-wider text-grana-bright">
+                            actiu
+                          </span>
+                        ) : null}
+                      </p>
                     </button>
-                  )}
-                </div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+                    <button
+                      type="button"
+                      aria-label="Canviar nom"
+                      onClick={() => {
+                        setRenamingId(t.id);
+                        setRenameValue(t.name);
+                      }}
+                      className="rounded-sm p-1.5 text-mute hover:bg-white/5 hover:text-bone"
+                    >
+                      <Pencil className="size-3.5" />
+                    </button>
+                    {teams.length > 1 && (
+                      <button
+                        type="button"
+                        aria-label="Eliminar equip"
+                        onClick={() => onDelete(t.id)}
+                        className="rounded-sm p-1.5 text-mute hover:bg-white/5 hover:text-red-300"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </button>
+                    )}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
-      {createOpen ? (
-        <form onSubmit={onCreate} className="mt-4 space-y-3 border-t border-line pt-4">
+      {createOpen && (
+        <form
+          onSubmit={onCreate}
+          className="mt-3 space-y-3 border-t border-line pt-3"
+        >
           <label className="block text-[10px] uppercase tracking-[0.18em] text-mute">
             Nom de l&apos;equip
           </label>
@@ -199,15 +232,6 @@ export function TeamManager() {
             </Button>
           </div>
         </form>
-      ) : (
-        <Button
-          type="button"
-          disabled={atLimit}
-          onClick={() => setCreateOpen(true)}
-          className="mt-4 h-10 w-full border border-line bg-panel-2 text-bone hover:bg-white/10 disabled:opacity-50"
-        >
-          <Plus className="size-4" /> Nou equip
-        </Button>
       )}
 
       {atLimit && (

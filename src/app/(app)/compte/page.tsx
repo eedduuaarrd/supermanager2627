@@ -48,10 +48,11 @@ export default function ComptePage() {
           Regles ràpides
         </p>
         <ul className="mt-3 space-y-2 text-sm text-mute">
-          <li>Fins a {maxTeams} equips per compte</li>
+          <li>Fins a {maxTeams} equips per compte (gestió a Inici)</li>
           <li>8 jugadors per alineació (qualsevol mix)</li>
           <li>Pressupost 100.000 € per equip</li>
           <li>Capità ×2 als punts de jornada</li>
+          <li>Cada setmana, jornada nova amb els partits del club</li>
         </ul>
       </section>
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { readSession } from "@/lib/auth";
 import { getCurrentRound } from "@/lib/db";
+import { getRoundStatus } from "@/lib/rounds";
 import { ensureLineupRow, saveLineup } from "@/lib/scoring";
 import { requireActiveTeamId } from "@/lib/teams";
 import { INITIAL_BUDGET, LINEUP_SIZE, resolvePlayerId } from "@/data/roster";
@@ -11,6 +12,8 @@ export const runtime = "nodejs";
 function lineupPayload(row: {
   player_ids: string;
   captain_id: string | null;
+  confirmed: number;
+  confirmed_at: string | null;
 }) {
   const playerIds = parsePlayerIds(row.player_ids);
   let captainId: string | null = null;
@@ -21,8 +24,8 @@ function lineupPayload(row: {
   return {
     playerIds,
     captainId,
-    confirmed: false,
-    confirmedAt: null,
+    confirmed: row.confirmed === 1,
+    confirmedAt: row.confirmed_at,
   };
 }
 
@@ -33,9 +36,11 @@ export async function GET() {
   }
   const teamId = requireActiveTeamId(user.id);
   const round = getCurrentRound();
+  const roundStatus = getRoundStatus();
   const row = ensureLineupRow(teamId, round);
   return NextResponse.json({
     round,
+    roundStatus,
     budget: row.budget ?? INITIAL_BUDGET,
     teamId,
     lineup: lineupPayload(row),
@@ -46,6 +51,12 @@ export async function PUT(req: Request) {
   const user = await readSession();
   if (!user) {
     return NextResponse.json({ error: "Cal iniciar sessió." }, { status: 401 });
+  }
+  if (getRoundStatus() === "closed") {
+    return NextResponse.json(
+      { error: "La jornada està tancada. No es pot modificar l'alineació." },
+      { status: 403 },
+    );
   }
   const teamId = requireActiveTeamId(user.id);
   const body = (await req.json()) as {
@@ -68,6 +79,7 @@ export async function PUT(req: Request) {
   const round = getCurrentRound();
   return NextResponse.json({
     round,
+    roundStatus: getRoundStatus(),
     budget: result.row.budget,
     teamId,
     lineup: lineupPayload(result.row),

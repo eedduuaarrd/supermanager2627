@@ -2,8 +2,14 @@
 /**
  * Refresh src/data/player-stats.json from FCBQ team plantillas.
  * Balaguer rule: person × team = distinct fantasy id (no cross-team dedupe).
+ *
+ * Merges into existing history — never invents future games.
+ * New PJ=1 samples get round/jornada = null until weekly-jornada assigns them.
+ * Existing games keep their round/jornada and box scores.
+ *
+ * Usage: node scripts/refresh-fcbq-stats.mjs [--from path]
  */
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -65,7 +71,20 @@ function fantasyId(base, teamSlug) {
   return DUAL_BASES.has(base) ? `${base}__${teamSlug}` : base;
 }
 
-function buildFromRosters(rosters) {
+function fingerprint(g) {
+  return [g.teamId, g.pts, g.min, g.pm, g.val, g.t2c, g.t3c, g.tlc].join("|");
+}
+
+function loadExisting() {
+  if (!existsSync(OUT)) return { players: {} };
+  try {
+    return JSON.parse(readFileSync(OUT, "utf8"));
+  } catch {
+    return { players: {} };
+  }
+}
+
+function buildFromRosters(rosters, existing) {
   const players = {};
   for (const t of rosters.teams ?? []) {
     const meta = TEAM_MAP[t.id];
@@ -77,33 +96,80 @@ function buildFromRosters(rosters) {
       const pid = fantasyId(base, slug);
       const stats = p.stats ?? {};
       const pj = stats.PJ ?? 0;
+      const prev = existing.players?.[pid];
       const entry = (players[pid] ??= {
-        playerId: pid, fcbqName: p.name, fcbqPersonId: null, teamId, games: [],
+        playerId: pid,
+        fcbqName: p.name,
+        fcbqPersonId: prev?.fcbqPersonId ?? null,
+        teamId,
+        games: Array.isArray(prev?.games) ? [...prev.games] : [],
         source: "fcbq-team-page-aggregate",
       });
+      entry.number = p.number ?? entry.number ?? null;
+
       if (pj === 1) {
-        if (entry.games.some((g) => g.teamId === teamId)) continue;
-        entry.number = p.number ?? null;
-        entry.games.push({
-          date: null, round: null, opponent: null, teamId, fcbqTeamId: t.id,
+        const candidate = {
+          date: null,
+          round: null,
+          jornada: null,
+          opponent: null,
+          teamId,
+          fcbqTeamId: t.id,
           competition: t.competition ?? null,
-          min: stats.MIN ?? null, pts: stats.PTS ?? null,
-          t2c: stats.T2C ?? null, t2i: stats.T2I ?? null,
-          t3c: stats.T3C ?? null, t3i: stats.T3I ?? null,
-          tlc: stats.TLC ?? null, tli: stats.TLI ?? null,
-          // FCBQ Plantilla often leaves VAL as "—"; PM is +/-.
+          min: stats.MIN ?? null,
+          pts: stats.PTS ?? null,
+          t2c: stats.T2C ?? null,
+          t2i: stats.T2I ?? null,
+          t3c: stats.T3C ?? null,
+          t3i: stats.T3I ?? null,
+          tlc: stats.TLC ?? null,
+          tli: stats.TLI ?? null,
           val: stats.VAL ?? null,
           pm: stats.PM ?? null,
           note:
             stats.VAL == null
               ? "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
               : "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit).",
-        });
+        };
+        const fp = fingerprint(candidate);
+        const match = entry.games.find((g) => fingerprint(g) === fp);
+        if (match) {
+          // Keep assigned round/jornada/date/opponent; refresh raw box fields.
+          Object.assign(match, {
+            min: candidate.min,
+            pts: candidate.pts,
+            t2c: candidate.t2c,
+            t2i: candidate.t2i,
+            t3c: candidate.t3c,
+            t3i: candidate.t3i,
+            tlc: candidate.tlc,
+            tli: candidate.tli,
+            val: candidate.val,
+            pm: candidate.pm,
+            note: candidate.note,
+            competition: candidate.competition,
+          });
+        } else if (entry.games.some((g) => g.teamId === teamId)) {
+          // Same team already has a different box — append only if clearly new.
+          entry.games.push(candidate);
+        } else {
+          entry.games.push(candidate);
+        }
       } else if (pj > 1) {
-        entry.seasonNote = `FCBQ mostra PJ=${pj} (mitjanes); cal scrape per partit.`;
+        entry.seasonNote = `FCBQ mostra PJ=${pj} (mitjanes); cal scrape per partit per afegir jornades.`;
+      } else if (pj === 0 && entry.games.length === 0) {
+        // No invent — leave empty history.
       }
     }
   }
+
+  // Preserve players that disappeared from a snapshot (history stays).
+  for (const [pid, prev] of Object.entries(existing.players ?? {})) {
+    if (!players[pid]) {
+      players[pid] = prev;
+    }
+  }
+
   return {
     extractedAt: new Date().toISOString().slice(0, 10),
     source: "basquetcatala.cat estadistica/equip (team plantilla tables)",
@@ -111,7 +177,10 @@ function buildFromRosters(rosters) {
     notes: [
       "When PJ=1, team-page totals equal that one game (honest seed).",
       "Person × team = distinct fantasy id (no cross-team dedupe).",
-      "Refresh: node scripts/refresh-fcbq-stats.mjs [--from path | --live]",
+      "Each game.round/jornada maps to fantasy jornada when assigned.",
+      "Do not invent future games; append only when FCBQ publishes new stats.",
+      "Refresh: node scripts/refresh-fcbq-stats.mjs [--from path]",
+      "Weekly ops: node scripts/weekly-jornada.mjs",
     ],
     players,
   };
@@ -121,7 +190,10 @@ const args = process.argv.slice(2);
 const fromIdx = args.indexOf("--from");
 if (args.includes("--live")) throw new Error("Use --from snapshot (reCAPTCHA).");
 const path = fromIdx >= 0 ? args[fromIdx + 1] : join(root, "src/data/fcbq-rosters.json");
-const out = buildFromRosters(JSON.parse(readFileSync(path, "utf8")));
+const existing = loadExisting();
+const out = buildFromRosters(JSON.parse(readFileSync(path, "utf8")), existing);
 writeFileSync(OUT, JSON.stringify(out, null, 2) + "\n");
 const withGames = Object.values(out.players).filter((p) => p.games.length > 0);
-console.log(`Wrote ${OUT}: ${Object.keys(out.players).length} players, ${withGames.length} with games, ${withGames.reduce((n, p) => n + p.games.length, 0)} game rows`);
+console.log(
+  `Wrote ${OUT}: ${Object.keys(out.players).length} players, ${withGames.length} with games, ${withGames.reduce((n, p) => n + p.games.length, 0)} game rows`,
+);

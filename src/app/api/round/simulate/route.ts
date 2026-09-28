@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { readSession } from "@/lib/auth";
-import { simulateJornada } from "@/lib/scoring";
+import { closeJornada } from "@/lib/scoring";
 
 export const runtime = "nodejs";
 
+/** Admin closes jornada: score from that week's FCBQ stats and open the next. */
 export async function POST() {
   const user = await readSession();
   if (!user) {
@@ -16,11 +17,11 @@ export async function POST() {
     );
   }
   try {
-    const result = simulateJornada();
+    const result = closeJornada({ advance: true });
     return NextResponse.json(result);
   } catch {
     return NextResponse.json(
-      { error: "No s'ha pogut simular la jornada." },
+      { error: "No s'ha pogut tancar la jornada." },
       { status: 500 },
     );
   }

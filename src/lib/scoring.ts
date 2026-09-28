@@ -1,41 +1,22 @@
 import {
   CAPTAIN_MULTIPLIER,
   INITIAL_BUDGET,
-  OPPONENTS,
-  WIN_BONUS,
   getPlayer,
   resolvePlayerId,
 } from "@/data/roster";
 import {
   getCurrentRound,
   getDb,
-  setCurrentRound,
   type DbLineup,
 } from "@/lib/db";
+import {
+  fantasyStatFromGame,
+  getPlayerGameForRound,
+} from "@/lib/player-stats";
+import { markRoundScored, openRound, getRoundStatus } from "@/lib/rounds";
 import type { RoundScore } from "@/lib/types";
 import { parsePlayerIds, validateLineupSave } from "@/lib/game";
 import { requireActiveTeamId } from "@/lib/teams";
-
-function seededRandom(seed: number) {
-  let t = seed + 0x6d2b79f5;
-  return () => {
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function simulatePlayerScore(
-  avgVal: number,
-  rand: () => number,
-  won: boolean,
-): number {
-  const variance = (rand() - 0.45) * 10;
-  let val = Math.round(avgVal + variance);
-  if (rand() < 0.08) val = Math.max(-2, val - 8);
-  if (won && val > 0) val = Math.round(val * (1 + WIN_BONUS));
-  return val;
-}
 
 export type StandingRow = {
   teamId: string;
@@ -50,12 +31,19 @@ export type StandingRow = {
 export function getStandings(
   scope: "jornada" | "general",
   viewerId?: string,
-): { round: number; rows: StandingRow[] } {
+): { round: number; rows: StandingRow[]; roundStatus: "open" | "closed" } {
   const db = getDb();
   const currentRound = getCurrentRound(db);
+  const roundStatus = getRoundStatus(db);
 
   if (scope === "jornada") {
-    const targetRound = Math.max(1, currentRound - 1);
+    // Show last scored jornada when current is open with no scores yet.
+    const hasCurrent = db
+      .prepare(`SELECT 1 FROM round_scores WHERE round = ? LIMIT 1`)
+      .get(currentRound);
+    const targetRound = hasCurrent
+      ? currentRound
+      : Math.max(1, currentRound - (roundStatus === "open" ? 1 : 0));
     const rows = db
       .prepare(
         `SELECT t.id AS teamId, u.id AS userId, u.display_name AS displayName,
@@ -69,6 +57,7 @@ export function getStandings(
 
     return {
       round: targetRound,
+      roundStatus,
       rows: rows.map((r, i) => ({
         ...r,
         rank: i + 1,
@@ -91,6 +80,7 @@ export function getStandings(
 
   return {
     round: currentRound,
+    roundStatus,
     rows: rows.map((r, i) => ({
       ...r,
       rank: i + 1,
@@ -168,7 +158,19 @@ export function saveLineup(
 ): { ok: true; row: DbLineup } | { ok: false; error: string } {
   const db = getDb();
   const round = getCurrentRound(db);
+  if (getRoundStatus(db) === "closed") {
+    return {
+      ok: false,
+      error: "La jornada està tancada. L'alineació ja no es pot modificar.",
+    };
+  }
   const existing = ensureLineupRow(teamId, round);
+  if (existing.confirmed) {
+    return {
+      ok: false,
+      error: "L'alineació d'aquesta jornada està bloquejada.",
+    };
+  }
   // Migrate collapsed dual-team captain ids the same way as playerIds.
   const resolvedCaptain = resolveCaptainId(captainId, playerIds);
   const check = validateLineupSave(playerIds, resolvedCaptain, existing.budget);
@@ -182,47 +184,78 @@ export function saveLineup(
   return { ok: true, row: ensureLineupRow(teamId, round) };
 }
 
-/** Admin closes jornada: score every saved team lineup, then advance. */
-export function simulateJornada(): {
+function scoreLineupFromFcbq(
+  row: DbLineup,
+  round: number,
+): { teamPoints: number; scores: RoundScore[]; label: string } {
+  const playerIds = parsePlayerIds(row.player_ids);
+  const scores: RoundScore[] = playerIds.map((playerId) => {
+    const game = getPlayerGameForRound(playerId, round);
+    const { points: base, source, minutes } = fantasyStatFromGame(game);
+    const points =
+      playerId === row.captain_id ? base * CAPTAIN_MULTIPLIER : base;
+    return {
+      playerId,
+      points,
+      minutes: Math.round(minutes),
+      winBonus: false,
+      // Extended fields consumed by UI via scores_json
+      ...(source === "DNP"
+        ? { dnp: true, note: "No ha jugat aquesta jornada (0)" }
+        : { statSource: source }),
+    } as RoundScore;
+  });
+  const teamPoints = scores.reduce((s, x) => s + x.points, 0);
+
+  // Opponent label from first real game row among the lineup (club week).
+  let label = `FCBQ J${round}`;
+  for (const id of playerIds) {
+    const g = getPlayerGameForRound(id, round);
+    if (g?.opponent) {
+      label = g.opponent;
+      break;
+    }
+    if (g) {
+      const p = getPlayer(id);
+      if (p) {
+        label = `Partits club · J${round}`;
+        break;
+      }
+    }
+  }
+
+  return { teamPoints, scores, label };
+}
+
+/**
+ * Close current jornada using that week's FCBQ box scores (VAL else PM).
+ * Locks lineups; does not invent games — DNP → 0.
+ * Optionally opens the next jornada when `advance` is true.
+ */
+export function closeJornada(options?: {
+  advance?: boolean;
+}): {
   round: number;
   scored: number;
-  nextRound: number;
+  nextRound: number | null;
   opponent: string;
+  roundStatus: "open" | "closed";
 } {
   const db = getDb();
   const round = getCurrentRound(db);
-  const opponent = OPPONENTS[(round - 1) % OPPONENTS.length];
+  const advance = options?.advance !== false;
 
   const lineups = db
     .prepare(`SELECT * FROM lineups WHERE round = ?`)
     .all(round) as DbLineup[];
 
   const closedAt = new Date().toISOString();
+  let opponent = `FCBQ J${round}`;
 
   const tx = db.transaction(() => {
     for (const row of lineups) {
-      const playerIds = parsePlayerIds(row.player_ids);
-      const seed =
-        round * 997 +
-        row.team_id.split("").reduce((a, c) => a + c.charCodeAt(0), 0) +
-        playerIds.reduce((a, id) => a + id.charCodeAt(0), 0);
-      const rand = seededRandom(seed);
-      const won = rand() > 0.42;
-
-      const scores: RoundScore[] = playerIds.map((playerId) => {
-        const player = getPlayer(playerId);
-        const avg = player?.avgVal ?? 5;
-        const base = simulatePlayerScore(avg, rand, won);
-        const points =
-          playerId === row.captain_id ? base * CAPTAIN_MULTIPLIER : base;
-        return {
-          playerId,
-          points,
-          minutes: Math.round(18 + rand() * 16),
-          winBonus: won && base > 0,
-        };
-      });
-      const teamPoints = scores.reduce((s, x) => s + x.points, 0);
+      const { teamPoints, scores, label } = scoreLineupFromFcbq(row, round);
+      if (label) opponent = label;
 
       db.prepare(
         `INSERT INTO round_scores (team_id, round, points, opponent, won, scores_json, captain_id, played_at)
@@ -238,8 +271,8 @@ export function simulateJornada(): {
         row.team_id,
         round,
         teamPoints,
-        opponent,
-        won ? 1 : 0,
+        label,
+        0, // no invented W/L bonus
         JSON.stringify(scores),
         row.captain_id,
         closedAt,
@@ -250,9 +283,46 @@ export function simulateJornada(): {
       ).run(closedAt, row.team_id, round);
     }
 
-    const next = round + 1;
-    setCurrentRound(next, db);
+    markRoundScored(round, closedAt, db);
 
+    if (advance) {
+      const next = round + 1;
+      openRound(next, db);
+      const teams = db.prepare("SELECT id FROM fantasy_teams").all() as {
+        id: string;
+      }[];
+      for (const t of teams) {
+        ensureLineupRow(t.id, next);
+      }
+    }
+  });
+
+  tx();
+
+  const nextRound = advance ? round + 1 : null;
+  return {
+    round,
+    scored: lineups.length,
+    nextRound,
+    opponent,
+    roundStatus: advance ? "open" : "closed",
+  };
+}
+
+/** Open the next jornada after a close without advance, or ensure current is open. */
+export function openNextJornada(): {
+  round: number;
+  roundStatus: "open";
+} {
+  const db = getDb();
+  const current = getCurrentRound(db);
+  const status = getRoundStatus(db);
+  if (status === "open") {
+    return { round: current, roundStatus: "open" };
+  }
+  const next = current + 1;
+  const tx = db.transaction(() => {
+    openRound(next, db);
     const teams = db.prepare("SELECT id FROM fantasy_teams").all() as {
       id: string;
     }[];
@@ -260,13 +330,13 @@ export function simulateJornada(): {
       ensureLineupRow(t.id, next);
     }
   });
-
   tx();
+  return { round: next, roundStatus: "open" };
+}
 
-  return {
-    round,
-    scored: lineups.length,
-    nextRound: round + 1,
-    opponent,
-  };
+/**
+ * @deprecated name kept for admin button — scores from FCBQ, not random sim.
+ */
+export function simulateJornada() {
+  return closeJornada({ advance: true });
 }
