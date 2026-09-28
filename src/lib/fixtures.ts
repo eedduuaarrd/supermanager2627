@@ -8,6 +8,10 @@ export type ClubFixture = {
   tipOff: string | null;
   home: boolean | null;
   opponent: string | null;
+  /** FCBQ Local column when scraped from calendar. */
+  homeTeam?: string | null;
+  /** FCBQ Visitant column when scraped from calendar. */
+  awayTeam?: string | null;
   opponentId?: string | null;
   matchCallUuid?: string | null;
   matchDayNum?: number | null;
@@ -24,6 +28,8 @@ export type ClubTeamFixtures = {
   teamId: TeamId;
   slug: string;
   shortName: string;
+  /** Full club side name for matchup lines (not the short label). */
+  fullName: string;
   fixtures: ClubFixture[];
 };
 
@@ -40,12 +46,53 @@ export type NextMatch = {
   fcbqTeamId: string;
   teamId: TeamId;
   shortName: string;
+  fullName: string;
   opponent: string | null;
   tipOff: string | null;
   date: string | null;
   home: boolean | null;
+  /** Ready-to-show `{local} vs {visitant}` using FCBQ/full names. */
+  matchup: string | null;
   matchCallUuid: string | null;
 };
+
+/** Short label → full display name when fixtures.json lacks fullName. */
+const FULL_NAME_BY_TEAM_ID: Record<string, string> = {
+  "masc-a": "Teixidó Associats A",
+  "masc-b": "Lo Sifonet CB Balaguer B",
+  "fem-a": "Cudos Consultors CB Balaguer A",
+  "fem-b": "Farratges La Noguera CB Balaguer B",
+};
+
+export function teamFullName(team: {
+  teamId?: string;
+  fullName?: string | null;
+  shortName?: string;
+}): string {
+  if (typeof team.fullName === "string" && team.fullName.trim()) {
+    return team.fullName.trim();
+  }
+  if (team.teamId && FULL_NAME_BY_TEAM_ID[team.teamId]) {
+    return FULL_NAME_BY_TEAM_ID[team.teamId];
+  }
+  return team.shortName?.trim() || "Equip";
+}
+
+/**
+ * Home first, away second — no local/visitant labels.
+ * Our side uses the club `fullName`; opponent keeps the FCBQ schedule string.
+ */
+export function formatMatchupLine(
+  ourFullName: string,
+  opponent: string | null | undefined,
+  home: boolean | null | undefined,
+): string | null {
+  const them = opponent?.trim() || null;
+  if (!them) return null;
+  const us = ourFullName.trim() || "Equip";
+  if (home === false) return `${them} vs ${us}`;
+  return `${us} vs ${them}`;
+}
 
 const EMPTY: FixturesFile = { teams: [] };
 
@@ -175,18 +222,25 @@ function toNextMatch(
   team: ClubTeamFixtures,
   best: ClubFixture | null,
 ): NextMatch {
+  const fullName = teamFullName(team);
+  const opponent = best?.opponent ?? null;
+  const home = best?.home ?? null;
   return {
     fcbqTeamId: team.fcbqTeamId,
     teamId: team.teamId,
     shortName: team.shortName,
-    opponent: best?.opponent ?? null,
+    fullName,
+    opponent,
     tipOff: best?.tipOff ?? null,
     date:
       best?.date ??
       dateKey(
         best ?? { date: null, tipOff: null, home: null, opponent: null },
       ),
-    home: best?.home ?? null,
+    home,
+    matchup: best
+      ? formatMatchupLine(fullName, opponent, home)
+      : null,
     matchCallUuid: best?.matchCallUuid ?? null,
   };
 }

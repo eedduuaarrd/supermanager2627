@@ -107,18 +107,15 @@ export default async function JugadorPage({
       {nextMatch && (
         <section className="border-b border-line/60 pb-3">
           <p className="text-[10px] uppercase tracking-[0.14em] text-mute">
-            Proper partit · {nextMatch.shortName}
+            Proper partit · {nextMatch.fullName || nextMatch.shortName}
           </p>
-          {nextMatch.opponent ? (
+          {nextMatch.matchup || nextMatch.opponent ? (
             <div className="mt-1 flex items-baseline justify-between gap-3">
               <p className="min-w-0 truncate text-sm text-bone">
-                {nextMatch.home === true
-                  ? "local"
-                  : nextMatch.home === false
-                    ? "visitant"
-                    : null}
-                {nextMatch.home != null ? " · " : ""}
-                vs {nextMatch.opponent}
+                {nextMatch.matchup ||
+                  (nextMatch.home === false
+                    ? `${nextMatch.opponent} vs ${nextMatch.fullName || nextMatch.shortName}`
+                    : `${nextMatch.fullName || nextMatch.shortName} vs ${nextMatch.opponent}`)}
               </p>
               <p className="shrink-0 text-xs tabular-nums text-mute">
                 {formatNextWhen(nextMatch.tipOff, nextMatch.date)}

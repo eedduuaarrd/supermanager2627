@@ -18,10 +18,12 @@ type RoundMeta = {
 
 type NextMatch = {
   shortName: string;
+  fullName?: string;
   opponent: string | null;
   tipOff: string | null;
   date: string | null;
   home: boolean | null;
+  matchup?: string | null;
 };
 
 type RankInfo = {
@@ -57,12 +59,6 @@ function formatMatchWhen(m: NextMatch): string {
     }
   }
   return "Data pendent";
-}
-
-function homeAwayLabel(home: boolean | null): string | null {
-  if (home === true) return "local";
-  if (home === false) return "visitant";
-  return null;
 }
 
 function lineupComplete(filled: number, hasCaptain: boolean) {
@@ -282,24 +278,23 @@ function JornadaContent() {
           </p>
           <ul className="space-y-2">
             {nextMatches.map((m) => {
-              const venue = homeAwayLabel(m.home);
+              const line =
+                m.matchup ||
+                (m.opponent
+                  ? m.home === false
+                    ? `${m.opponent} vs ${m.fullName || m.shortName}`
+                    : `${m.fullName || m.shortName} vs ${m.opponent}`
+                  : null);
               return (
                 <li
                   key={m.shortName}
                   className="flex items-baseline justify-between gap-3 border-b border-line/60 pb-2 last:border-0"
                 >
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-bone">
-                      {m.shortName}
-                    </p>
-                    <p className="truncate text-xs text-mute">
-                      {m.opponent
-                        ? `${venue ? `${venue} · ` : ""}vs ${m.opponent}`
-                        : "Sense proper partit al calendari FCBQ"}
-                    </p>
-                  </div>
+                  <p className="min-w-0 truncate text-sm font-medium text-bone">
+                    {line ?? "Sense proper partit al calendari FCBQ"}
+                  </p>
                   <p className="shrink-0 text-xs tabular-nums text-mute">
-                    {m.opponent ? formatMatchWhen(m) : "—"}
+                    {line ? formatMatchWhen(m) : "—"}
                   </p>
                 </li>
               );

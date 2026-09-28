@@ -32,6 +32,7 @@ export const CLUB_TEAMS = [
     teamId: "masc-a",
     slug: "teixido-a",
     shortName: "Teixidó A",
+    fullName: "Teixidó Associats A",
     legacyTeamId: 92083,
     homeNames: [
       "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A",
@@ -43,6 +44,7 @@ export const CLUB_TEAMS = [
     teamId: "masc-b",
     slug: "sifonet-b",
     shortName: "Lo Sifonet B",
+    fullName: "Lo Sifonet CB Balaguer B",
     legacyTeamId: 94248,
     homeNames: ["LO SIFONET CB BALAGUER B", "LO SIFONET"],
   },
@@ -51,6 +53,7 @@ export const CLUB_TEAMS = [
     teamId: "fem-a",
     slug: "cudos-a",
     shortName: "Cudos A",
+    fullName: "Cudos Consultors CB Balaguer A",
     legacyTeamId: 91097,
     homeNames: ["CUDOS CONSULTORS CB BALAGUER A", "CUDOS CONSULTORS"],
   },
@@ -59,6 +62,7 @@ export const CLUB_TEAMS = [
     teamId: "fem-b",
     slug: "farratges-b",
     shortName: "Farratges B",
+    fullName: "Farratges La Noguera CB Balaguer B",
     legacyTeamId: 91098,
     homeNames: [
       "FARRATGES LA NOGUERA CB BALAGUER B",
@@ -100,6 +104,8 @@ function normalizeGame(g) {
     tipOff,
     home: typeof g.home === "boolean" ? g.home : null,
     opponent: g.opponent?.name ?? g.opponent ?? null,
+    homeTeam: g.homeTeam ?? null,
+    awayTeam: g.awayTeam ?? null,
     opponentId: g.opponent?.uuid ?? g.opponentId ?? null,
     matchCallUuid: g.matchCallUuid ?? null,
     matchDayNum: g.matchDayNum ?? null,
@@ -128,6 +134,8 @@ function mergeOne(prev, f) {
     opponentPoints: f.opponentPoints ?? prev.opponentPoints ?? null,
     matchCallUuid: f.matchCallUuid ?? prev.matchCallUuid ?? null,
     opponentId: f.opponentId ?? prev.opponentId ?? null,
+    homeTeam: f.homeTeam ?? prev.homeTeam ?? null,
+    awayTeam: f.awayTeam ?? prev.awayTeam ?? null,
   };
 }
 
@@ -260,11 +268,15 @@ export function fixturesFromCalendarRows(rows, meta) {
     const ourAway = isOurSide(visitant, meta.homeNames);
     if (!ourHome && !ourAway) continue;
     const home = Boolean(ourHome);
+    const homeTeam = String(local || "").trim() || null;
+    const awayTeam = String(visitant || "").trim() || null;
     out.push({
       date,
       tipOff: tipOffFromDateHora(date, hora),
       home,
       opponent: home ? visitant : local,
+      homeTeam,
+      awayTeam,
       opponentId: null,
       matchCallUuid: null,
       matchDayNum: null,

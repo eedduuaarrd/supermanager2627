@@ -29,7 +29,9 @@
           "teamPoints": 63,
           "opponentPoints": 70,
           "jornada": 1,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "C.B. TORREFARRERA A",
+          "awayTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A"
         },
         {
           "date": "2026-10-03",
@@ -43,7 +45,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A",
+          "awayTeam": "CB CAPPONT"
         },
         {
           "date": "2026-10-10",
@@ -57,7 +61,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "SEDIS SIDECO-UNIDA",
+          "awayTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A"
         },
         {
           "date": "2026-10-17",
@@ -71,7 +77,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A",
+          "awayTeam": "CB TREMP"
         },
         {
           "date": "2026-11-07",
@@ -85,7 +93,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A",
+          "awayTeam": "CB CERVERA MOBEL LINEA VERD"
         },
         {
           "date": "2026-11-14",
@@ -99,7 +109,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A",
+          "awayTeam": "ASVET CB ALPICAT B"
         },
         {
           "date": "2026-11-21",
@@ -113,7 +125,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "CAL MARXANT CEP VALLFOGONA",
+          "awayTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A"
         },
         {
           "date": "2026-11-28",
@@ -127,7 +141,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A",
+          "awayTeam": "COPISTERIA PAPERS CB BELLPUIG B"
         },
         {
           "date": "2026-12-19",
@@ -141,7 +157,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A",
+          "awayTeam": "LA TAVERNA - BAC AGRAMUNT"
         },
         {
           "date": "2027-01-09",
@@ -155,7 +173,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "EL SEGRIÀ ETT - CLUB BASQUET SERÒS",
+          "awayTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A"
         },
         {
           "date": "2027-01-16",
@@ -169,7 +189,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A",
+          "awayTeam": "CN TÀRREGA"
         },
         {
           "date": "2027-01-23",
@@ -183,7 +205,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A",
+          "awayTeam": "C.B. TORREFARRERA A"
         },
         {
           "date": "2027-01-31",
@@ -197,7 +221,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "CB CAPPONT",
+          "awayTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A"
         },
         {
           "date": "2027-02-06",
@@ -211,7 +237,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A",
+          "awayTeam": "SEDIS SIDECO-UNIDA"
         },
         {
           "date": "2027-02-13",
@@ -225,7 +253,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "CB TREMP",
+          "awayTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A"
         },
         {
           "date": "2027-03-07",
@@ -239,7 +269,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "CB CERVERA MOBEL LINEA VERD",
+          "awayTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A"
         },
         {
           "date": "2027-03-14",
@@ -253,7 +285,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "ASVET CB ALPICAT B",
+          "awayTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A"
         },
         {
           "date": "2027-04-03",
@@ -267,7 +301,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A",
+          "awayTeam": "CAL MARXANT CEP VALLFOGONA"
         },
         {
           "date": "2027-04-10",
@@ -281,7 +317,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "COPISTERIA PAPERS CB BELLPUIG B",
+          "awayTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A"
         },
         {
           "date": "2027-04-24",
@@ -295,7 +333,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "LA TAVERNA - BAC AGRAMUNT",
+          "awayTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A"
         },
         {
           "date": "2027-05-08",
@@ -309,7 +349,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A",
+          "awayTeam": "EL SEGRIÀ ETT - CLUB BASQUET SERÒS"
         },
         {
           "date": "2027-05-15",
@@ -323,9 +365,12 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "CN TÀRREGA",
+          "awayTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A"
         }
-      ]
+      ],
+      "fullName": "Teixidó Associats A"
     },
     {
       "fcbqTeamId": "c057eeae-3aae-4e33-b2ab-54fabb2700ae",
@@ -346,7 +391,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "SÍCORIS",
+          "awayTeam": "LO SIFONET CB BALAGUER B"
         },
         {
           "date": "2026-10-03",
@@ -360,7 +407,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "LO SIFONET CB BALAGUER B",
+          "awayTeam": "AGROLLOBERA PALAU D'ANGLESOLA"
         },
         {
           "date": "2026-10-10",
@@ -374,7 +423,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "LEDSC4 CB TORÀ",
+          "awayTeam": "LO SIFONET CB BALAGUER B"
         },
         {
           "date": "2026-10-17",
@@ -388,7 +439,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "LO SIFONET CB BALAGUER B",
+          "awayTeam": "CLUB BASKET BALÀFIA"
         },
         {
           "date": "2026-10-24",
@@ -402,7 +455,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "C.B. TORREFARRERA B",
+          "awayTeam": "LO SIFONET CB BALAGUER B"
         },
         {
           "date": "2026-11-08",
@@ -416,7 +471,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "CLUB BÀSQUET BORGES GARRIGUES",
+          "awayTeam": "LO SIFONET CB BALAGUER B"
         },
         {
           "date": "2026-11-14",
@@ -430,7 +487,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "LO SIFONET CB BALAGUER B",
+          "awayTeam": "CB TORREGROSSA"
         },
         {
           "date": "2026-11-22",
@@ -444,7 +503,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "CENG PETRO IMR",
+          "awayTeam": "LO SIFONET CB BALAGUER B"
         },
         {
           "date": "2026-11-28",
@@ -458,7 +519,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "LO SIFONET CB BALAGUER B",
+          "awayTeam": "AUTOCARS DEL PLA CB BELLPUIG C"
         },
         {
           "date": "2026-12-12",
@@ -472,7 +535,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "LO SIFONET CB BALAGUER B",
+          "awayTeam": "SÍCORIS"
         },
         {
           "date": "2026-12-20",
@@ -486,7 +551,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "AGROLLOBERA PALAU D'ANGLESOLA",
+          "awayTeam": "LO SIFONET CB BALAGUER B"
         },
         {
           "date": "2027-01-09",
@@ -500,7 +567,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "LO SIFONET CB BALAGUER B",
+          "awayTeam": "LEDSC4 CB TORÀ"
         },
         {
           "date": "2027-01-16",
@@ -514,7 +583,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "CLUB BASKET BALÀFIA",
+          "awayTeam": "LO SIFONET CB BALAGUER B"
         },
         {
           "date": "2027-01-23",
@@ -528,7 +599,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "LO SIFONET CB BALAGUER B",
+          "awayTeam": "C.B. TORREFARRERA B"
         },
         {
           "date": "2027-01-30",
@@ -542,7 +615,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "LO SIFONET CB BALAGUER B",
+          "awayTeam": "CLUB BÀSQUET BORGES GARRIGUES"
         },
         {
           "date": "2027-02-07",
@@ -556,7 +631,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "CB TORREGROSSA",
+          "awayTeam": "LO SIFONET CB BALAGUER B"
         },
         {
           "date": "2027-02-13",
@@ -570,7 +647,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "LO SIFONET CB BALAGUER B",
+          "awayTeam": "CENG PETRO IMR"
         },
         {
           "date": "2027-02-28",
@@ -584,9 +663,12 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ"
+          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
+          "homeTeam": "AUTOCARS DEL PLA CB BELLPUIG C",
+          "awayTeam": "LO SIFONET CB BALAGUER B"
         }
-      ]
+      ],
+      "fullName": "Lo Sifonet CB Balaguer B"
     },
     {
       "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
@@ -607,7 +689,9 @@
           "teamPoints": 59,
           "opponentPoints": 53,
           "jornada": 1,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "CUDOS CONSULTORS CB BALAGUER A",
+          "awayTeam": "MECVIL MANRESA CBF B"
         },
         {
           "date": "2026-10-03",
@@ -621,7 +705,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "FEMENÍ OSONA- OVA PROJECTS",
+          "awayTeam": "CUDOS CONSULTORS CB BALAGUER A"
         },
         {
           "date": "2026-10-10",
@@ -635,7 +721,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "CUDOS CONSULTORS CB BALAGUER A",
+          "awayTeam": "BC FONTAJAU - KABLER"
         },
         {
           "date": "2026-10-18",
@@ -649,7 +737,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "S.D. ESPANYOL BÀSQUET CORNELLÀ",
+          "awayTeam": "CUDOS CONSULTORS CB BALAGUER A"
         },
         {
           "date": "2026-10-24",
@@ -663,7 +753,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "CUDOS CONSULTORS CB BALAGUER A",
+          "awayTeam": "U. B. LLEFIÀ - JJ FINQUES BADALONA"
         },
         {
           "date": "2026-11-08",
@@ -677,7 +769,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "CB VALLS DIC",
+          "awayTeam": "CUDOS CONSULTORS CB BALAGUER A"
         },
         {
           "date": "2026-11-14",
@@ -691,7 +785,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "GIRÓ VILASSAR DE DALT",
+          "awayTeam": "CUDOS CONSULTORS CB BALAGUER A"
         },
         {
           "date": "2026-11-21",
@@ -705,7 +801,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "CUDOS CONSULTORS CB BALAGUER A",
+          "awayTeam": "KENWOOD JOVENTUT LES CORTS"
         },
         {
           "date": "2026-11-28",
@@ -719,7 +817,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "SANT GERVASI 1",
+          "awayTeam": "CUDOS CONSULTORS CB BALAGUER A"
         },
         {
           "date": "2026-12-12",
@@ -733,7 +833,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "CUDOS CONSULTORS CB BALAGUER A",
+          "awayTeam": "#SOMCAPITAL CB SANTFELIUENC"
         },
         {
           "date": "2026-12-20",
@@ -747,7 +849,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "FORMULA SR -LLUÏSOS DE GRACIA A",
+          "awayTeam": "CUDOS CONSULTORS CB BALAGUER A"
         },
         {
           "date": "2027-01-09",
@@ -761,7 +865,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "CUDOS CONSULTORS CB BALAGUER A",
+          "awayTeam": "TGN BÀSQUET A"
         },
         {
           "date": "2027-01-17",
@@ -775,7 +881,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "ODONTOMED JET TERRASSA",
+          "awayTeam": "CUDOS CONSULTORS CB BALAGUER A"
         },
         {
           "date": "2027-01-23",
@@ -789,7 +897,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "MECVIL MANRESA CBF B",
+          "awayTeam": "CUDOS CONSULTORS CB BALAGUER A"
         },
         {
           "date": "2027-01-30",
@@ -803,7 +913,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "CUDOS CONSULTORS CB BALAGUER A",
+          "awayTeam": "FEMENÍ OSONA- OVA PROJECTS"
         },
         {
           "date": "2027-02-07",
@@ -817,7 +929,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "BC FONTAJAU - KABLER",
+          "awayTeam": "CUDOS CONSULTORS CB BALAGUER A"
         },
         {
           "date": "2027-02-13",
@@ -831,7 +945,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "CUDOS CONSULTORS CB BALAGUER A",
+          "awayTeam": "S.D. ESPANYOL BÀSQUET CORNELLÀ"
         },
         {
           "date": "2027-02-27",
@@ -845,7 +961,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "U. B. LLEFIÀ - JJ FINQUES BADALONA",
+          "awayTeam": "CUDOS CONSULTORS CB BALAGUER A"
         },
         {
           "date": "2027-03-06",
@@ -859,7 +977,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "CUDOS CONSULTORS CB BALAGUER A",
+          "awayTeam": "CB VALLS DIC"
         },
         {
           "date": "2027-03-13",
@@ -873,7 +993,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "CUDOS CONSULTORS CB BALAGUER A",
+          "awayTeam": "GIRÓ VILASSAR DE DALT"
         },
         {
           "date": "2027-04-04",
@@ -887,7 +1009,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "KENWOOD JOVENTUT LES CORTS",
+          "awayTeam": "CUDOS CONSULTORS CB BALAGUER A"
         },
         {
           "date": "2027-04-10",
@@ -901,7 +1025,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "CUDOS CONSULTORS CB BALAGUER A",
+          "awayTeam": "SANT GERVASI 1"
         },
         {
           "date": "2027-04-17",
@@ -915,7 +1041,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "#SOMCAPITAL CB SANTFELIUENC",
+          "awayTeam": "CUDOS CONSULTORS CB BALAGUER A"
         },
         {
           "date": "2027-04-24",
@@ -929,7 +1057,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "CUDOS CONSULTORS CB BALAGUER A",
+          "awayTeam": "FORMULA SR -LLUÏSOS DE GRACIA A"
         },
         {
           "date": "2027-05-09",
@@ -943,7 +1073,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "TGN BÀSQUET A",
+          "awayTeam": "CUDOS CONSULTORS CB BALAGUER A"
         },
         {
           "date": "2027-05-15",
@@ -957,9 +1089,12 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "COPA CATALUNYA FEMENINA"
+          "competition": "COPA CATALUNYA FEMENINA",
+          "homeTeam": "CUDOS CONSULTORS CB BALAGUER A",
+          "awayTeam": "ODONTOMED JET TERRASSA"
         }
-      ]
+      ],
+      "fullName": "Cudos Consultors CB Balaguer A"
     },
     {
       "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
@@ -980,7 +1115,9 @@
           "teamPoints": 56,
           "opponentPoints": 54,
           "jornada": 1,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "FARRATGES LA NOGUERA CB BALAGUER B",
+          "awayTeam": "COOPERATIVA D'IVARS CB ALPICAT"
         },
         {
           "date": "2026-10-04",
@@ -994,7 +1131,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "CB CASTELLET - MARMOLES MORATONAS",
+          "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B"
         },
         {
           "date": "2026-10-11",
@@ -1008,7 +1147,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "FARRATGES LA NOGUERA CB BALAGUER B",
+          "awayTeam": "NOU CASTELLAR SÈNIOR FEMENÍ"
         },
         {
           "date": "2026-10-17",
@@ -1022,7 +1163,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "SEDIS EFAUSA",
+          "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B"
         },
         {
           "date": "2026-10-24",
@@ -1036,7 +1179,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "FARRATGES LA NOGUERA CB BALAGUER B",
+          "awayTeam": "UE SANT CUGAT - OCCIDENT"
         },
         {
           "date": "2026-11-07",
@@ -1050,7 +1195,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "CB IGUALADA SFB",
+          "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B"
         },
         {
           "date": "2026-11-14",
@@ -1064,7 +1211,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "ANA OPTICS - BASQUET SANT PERE",
+          "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B"
         },
         {
           "date": "2026-11-21",
@@ -1078,7 +1227,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "FARRATGES LA NOGUERA CB BALAGUER B",
+          "awayTeam": "SHAD CB MOLLET A"
         },
         {
           "date": "2026-11-28",
@@ -1092,7 +1243,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "CB GRANOLLERS 2",
+          "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B"
         },
         {
           "date": "2026-12-12",
@@ -1106,7 +1259,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "FARRATGES LA NOGUERA CB BALAGUER B",
+          "awayTeam": "SANT QUIRZE BÀSQUET CLUB A"
         },
         {
           "date": "2026-12-19",
@@ -1120,7 +1275,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "CLUB NATACIÓ SABADELL A",
+          "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B"
         },
         {
           "date": "2027-01-09",
@@ -1134,7 +1291,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "FARRATGES LA NOGUERA CB BALAGUER B",
+          "awayTeam": "BASQUETPIASABADELL"
         },
         {
           "date": "2027-01-17",
@@ -1148,7 +1307,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "PUJOL MOLLERUSSA",
+          "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B"
         },
         {
           "date": "2027-01-24",
@@ -1162,7 +1323,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "COOPERATIVA D'IVARS CB ALPICAT",
+          "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B"
         },
         {
           "date": "2027-01-30",
@@ -1176,7 +1339,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "FARRATGES LA NOGUERA CB BALAGUER B",
+          "awayTeam": "CB CASTELLET - MARMOLES MORATONAS"
         },
         {
           "date": "2027-02-07",
@@ -1190,7 +1355,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "NOU CASTELLAR SÈNIOR FEMENÍ",
+          "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B"
         },
         {
           "date": "2027-02-13",
@@ -1204,7 +1371,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "FARRATGES LA NOGUERA CB BALAGUER B",
+          "awayTeam": "SEDIS EFAUSA"
         },
         {
           "date": "2027-02-27",
@@ -1218,7 +1387,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "UE SANT CUGAT - OCCIDENT",
+          "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B"
         },
         {
           "date": "2027-03-06",
@@ -1232,7 +1403,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "FARRATGES LA NOGUERA CB BALAGUER B",
+          "awayTeam": "CB IGUALADA SFB"
         },
         {
           "date": "2027-03-13",
@@ -1246,7 +1419,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "FARRATGES LA NOGUERA CB BALAGUER B",
+          "awayTeam": "ANA OPTICS - BASQUET SANT PERE"
         },
         {
           "date": "2027-04-04",
@@ -1260,7 +1435,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "SHAD CB MOLLET A",
+          "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B"
         },
         {
           "date": "2027-04-10",
@@ -1274,7 +1451,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "FARRATGES LA NOGUERA CB BALAGUER B",
+          "awayTeam": "CB GRANOLLERS 2"
         },
         {
           "date": "2027-04-18",
@@ -1288,7 +1467,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "SANT QUIRZE BÀSQUET CLUB A",
+          "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B"
         },
         {
           "date": "2027-04-24",
@@ -1302,7 +1483,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "FARRATGES LA NOGUERA CB BALAGUER B",
+          "awayTeam": "CLUB NATACIÓ SABADELL A"
         },
         {
           "date": "2027-05-09",
@@ -1316,7 +1499,9 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "BASQUETPIASABADELL",
+          "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B"
         },
         {
           "date": "2027-05-15",
@@ -1330,9 +1515,12 @@
           "teamPoints": null,
           "opponentPoints": null,
           "jornada": null,
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "homeTeam": "FARRATGES LA NOGUERA CB BALAGUER B",
+          "awayTeam": "PUJOL MOLLERUSSA"
         }
-      ]
+      ],
+      "fullName": "Farratges La Noguera CB Balaguer B"
     }
   ]
 }
