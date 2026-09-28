@@ -58,6 +58,9 @@ async function main() {
   }
   if (ids.length < 5) throw new Error("need roster players");
 
+  // Seed quotes are 15k; inflate cash so this test isolates transfer_phase (not budget scarcity).
+  db.prepare(`UPDATE lineups SET budget = 500000 WHERE team_id = ?`).run(t1.team.id);
+
   // >3 adds while initial should succeed
   const first4 = ids.slice(0, 4);
   const r1 = saveLineup(t1.team.id, first4, first4[0] ?? null);

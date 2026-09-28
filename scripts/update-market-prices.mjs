@@ -4,14 +4,18 @@
  * Writes src/data/market-prices.json (roster overlays this at runtime).
  *
  * Usage:
- *   node scripts/update-market-prices.mjs           # clamp vs previous quotes
- *   node scripts/update-market-prices.mjs --seed    # ignore previous (first deploy)
+ *   node scripts/update-market-prices.mjs           # clamp ±15% vs previous quotes
+ *   node scripts/update-market-prices.mjs --seed    # flat INITIAL_PRICE for all
+ *
+ * Seed sets price = prevPrice = 15000 (no fake ↑↓). First refresh after seed
+ * uses 15000 as prev for the ±15% clamp toward avgVal × €1000/VAL.
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { computeVal } from "./compute-val.mjs";
 import {
+  INITIAL_PRICE,
   nextMarketEntry,
   theoreticalPrice,
   roundToPriceStep,
@@ -87,14 +91,17 @@ for (const id of ids) {
 const out = {
   updatedAt: updatedAt.slice(0, 10),
   formula:
-    "theoretical = max(0, avgVal) × 1000; clamp ±15%; round 500; floor MIN_PRICE 500",
+    "seed INITIAL_PRICE 15000; refresh: theoretical = max(0, avgVal) × 1000; clamp ±15% vs prev; round 500; floor MIN_PRICE 500",
   notes: [
     "Club-scale broker pricing for Supermanager Balaguer.",
+    "Every fantasy id seeds at INITIAL_PRICE 15000 (prevPrice = 15000).",
+    "Prices only move on VAL / jornada refresh (weekend sync, weekly close, FCBQ stats).",
     "Dual-team fantasy ids are priced separately.",
     "Never list 0 € — floor is MIN_PRICE (500 €).",
+    "Budget stays 100000: 8×15000=120000 > 100000 is intentional scarcity.",
     "Roster overlays these quotes at runtime (applyMarketPrices).",
     "Refresh: node scripts/update-market-prices.mjs",
-    "Seed (ignore prev): node scripts/update-market-prices.mjs --seed",
+    "Seed (flat 15000): node scripts/update-market-prices.mjs --seed",
   ],
   prices,
 };
@@ -112,6 +119,7 @@ if (zeros.length || belowFloor.length) {
 }
 
 const nonzero = all.filter((p) => p.price > 0).length;
+const atSeed = all.filter((p) => p.price === INITIAL_PRICE).length;
 const moved = all.filter(
   (p) => p.prevPrice != null && p.prevPrice !== p.price,
 ).length;
@@ -121,8 +129,8 @@ const sample = Object.entries(prices)
   .map(([id, p]) => `${id}=${p.price}`)
   .join(", ");
 console.log(
-  `Wrote ${OUT}: ${ids.length} players, ${nonzero} with price>0, ${moved} moved vs prev. Top: ${sample}`,
+  `Wrote ${OUT}: ${ids.length} players, ${nonzero} with price>0, ${atSeed} at seed ${INITIAL_PRICE}, ${moved} moved vs prev. Top: ${sample}`,
 );
 console.log(
-  `Example theoretical Ares: ${roundToPriceStep(theoreticalPrice(34))}`,
+  `Example theoretical Ares: ${roundToPriceStep(theoreticalPrice(34))}; first clamp from seed: ${roundToPriceStep(INITIAL_PRICE * 1.15)}`,
 );

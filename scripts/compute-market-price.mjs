@@ -1,11 +1,13 @@
 /**
  * Keep in sync with src/lib/market-price.ts
- * Club-scale broker: theoretical = max(0, avgVal) × 1000; clamp ±15%;
+ * Seed: every id at INITIAL_PRICE 15000 (prevPrice = 15000).
+ * Refresh: theoretical = max(0, avgVal) × 1000; clamp ±15% vs prev;
  * round €500; floor MIN_PRICE 500 € (never 0 €).
  */
 
 export const EUR_PER_VAL = 1_000;
 export const PRICE_STEP = 500;
+export const INITIAL_PRICE = 15_000;
 export const MIN_PRICE = PRICE_STEP;
 export const PRICE_CLAMP_PCT = 0.15;
 
@@ -25,10 +27,10 @@ export function theoreticalPrice(avgVal) {
 }
 
 export function computeMarketPrice(avgVal, prevPrice) {
-  const theoretical = theoreticalPrice(avgVal);
   if (prevPrice == null || !Number.isFinite(prevPrice) || prevPrice <= 0) {
-    return applyPriceFloor(roundToPriceStep(theoretical));
+    return INITIAL_PRICE;
   }
+  const theoretical = theoreticalPrice(avgVal);
   const lo = prevPrice * (1 - PRICE_CLAMP_PCT);
   const hi = prevPrice * (1 + PRICE_CLAMP_PCT);
   const clamped = Math.min(hi, Math.max(lo, theoretical));
@@ -36,13 +38,28 @@ export function computeMarketPrice(avgVal, prevPrice) {
 }
 
 export function nextMarketEntry(avgVal, current, updatedAt = new Date().toISOString()) {
-  const prev = current?.price ?? null;
+  const avg = avgVal == null || !Number.isFinite(avgVal) ? null : avgVal;
+  const theoretical = applyPriceFloor(
+    roundToPriceStep(theoreticalPrice(avgVal)),
+  );
+
+  if (current == null || !Number.isFinite(current.price) || current.price <= 0) {
+    return {
+      price: INITIAL_PRICE,
+      prevPrice: INITIAL_PRICE,
+      avgVal: avg,
+      theoretical,
+      updatedAt,
+    };
+  }
+
+  const prev = current.price;
   const price = computeMarketPrice(avgVal, prev);
   return {
     price,
     prevPrice: prev,
-    avgVal: avgVal == null || !Number.isFinite(avgVal) ? null : avgVal,
-    theoretical: applyPriceFloor(roundToPriceStep(theoreticalPrice(avgVal))),
+    avgVal: avg,
+    theoretical,
     updatedAt,
   };
 }
