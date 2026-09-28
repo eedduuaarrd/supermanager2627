@@ -19,6 +19,8 @@ import { useEffect, useState } from "react";
 interface LineupBuilderProps {
   roster: Player[];
   budget: number;
+  /** Last persisted ids (cash ledger baseline). Defaults to current lineup. */
+  savedPlayerIds?: string[];
   lineup: Lineup;
   onChange: (lineup: Lineup) => void;
   saving?: boolean;
@@ -53,6 +55,7 @@ function saveFeedback(
 export function LineupBuilder({
   roster,
   budget,
+  savedPlayerIds,
   lineup,
   onChange,
   saveStatus,
@@ -74,8 +77,9 @@ export function LineupBuilder({
     return () => window.removeEventListener("keydown", onKey);
   }, [sheetOpen]);
 
-  const remaining = remainingBudget(budget, lineup.playerIds);
-  const validation = validateLineup(lineup, budget);
+  const committedIds = savedPlayerIds ?? lineup.playerIds;
+  const remaining = remainingBudget(budget, lineup.playerIds, committedIds);
+  const validation = validateLineup(lineup, budget, committedIds);
   const projected = projectedPoints(lineup);
   const filled = lineup.playerIds.length;
   const overBudget = remaining < 0;

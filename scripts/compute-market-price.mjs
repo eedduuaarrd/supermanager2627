@@ -1,9 +1,9 @@
 /**
  * Keep in sync with src/lib/market-price.ts
- * Club-scale broker: theoretical = max(0, avgVal) × 5000; clamp ±15%; round €500.
+ * Club-scale broker: theoretical = max(0, avgVal) × 1000; clamp ±15%; round €500.
  */
 
-export const EUR_PER_VAL = 5_000;
+export const EUR_PER_VAL = 1_000;
 export const PRICE_STEP = 500;
 export const PRICE_CLAMP_PCT = 0.15;
 

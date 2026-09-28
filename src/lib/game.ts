@@ -66,8 +66,40 @@ export function spentBudget(playerIds: string[]): number {
   return playerIds.reduce((sum, id) => sum + (getPlayer(id)?.price ?? 0), 0);
 }
 
-export function remainingBudget(budget: number, playerIds: string[]): number {
-  return budget - spentBudget(playerIds);
+/**
+ * Apply buy/sell at current market quotes.
+ * Selling a player credits their current price; buying deducts it.
+ * `cash` is the persisted efectiu (lineups.budget), not the season ceiling.
+ */
+export function applyMarketTransfers(
+  cash: number,
+  fromIds: string[],
+  toIds: string[],
+): { cash: number; ok: boolean } {
+  let next = cash;
+  const from = new Set(fromIds.filter(Boolean));
+  const to = new Set(toIds.filter(Boolean));
+  for (const id of fromIds) {
+    if (!id || to.has(id)) continue;
+    next += getPlayer(id)?.price ?? 0;
+  }
+  for (const id of toIds) {
+    if (!id || from.has(id)) continue;
+    next -= getPlayer(id)?.price ?? 0;
+  }
+  return { cash: next, ok: next >= 0 };
+}
+
+/**
+ * Draft remaining cash while editing locally.
+ * `cash` + `savedIds` are the last persisted state; `draftIds` is the court.
+ */
+export function remainingBudget(
+  cash: number,
+  draftIds: string[],
+  savedIds: string[] = draftIds,
+): number {
+  return applyMarketTransfers(cash, savedIds, draftIds).cash;
 }
 
 /** Squad market value = sum of current quotes for players in lineup. */
@@ -75,9 +107,9 @@ export function squadMarketValue(playerIds: string[]): number {
   return spentBudget(playerIds);
 }
 
-/** Broker patrimoni = cash remaining + squad market value. */
-export function patrimoni(budget: number, playerIds: string[]): number {
-  return remainingBudget(budget, playerIds) + squadMarketValue(playerIds);
+/** Broker patrimoni = efectiu + valor de mercat de l'alineació. */
+export function patrimoni(cash: number, playerIds: string[]): number {
+  return cash + squadMarketValue(playerIds);
 }
 
 /**
@@ -159,14 +191,17 @@ export type LineupIssue = "incomplete" | "budget" | "captain" | "duplicate";
 /** Soft / full checklist (8 + captain). UI hints only — does not block autosave. */
 export function validateLineup(
   lineup: Lineup,
-  budget: number,
+  cash: number,
+  savedIds: string[] = lineup.playerIds,
 ): { ok: boolean; issues: LineupIssue[] } {
   const issues: LineupIssue[] = [];
   const unique = new Set(lineup.playerIds);
 
   if (unique.size !== lineup.playerIds.length) issues.push("duplicate");
   if (lineup.playerIds.length !== LINEUP_SIZE) issues.push("incomplete");
-  if (remainingBudget(budget, lineup.playerIds) < 0) issues.push("budget");
+  if (remainingBudget(cash, lineup.playerIds, savedIds) < 0) {
+    issues.push("budget");
+  }
 
   if (!lineup.captainId || !lineup.playerIds.includes(lineup.captainId)) {
     issues.push("captain");
@@ -177,20 +212,23 @@ export function validateLineup(
 
 /**
  * Hard rules for persisting a lineup (partial OK: 0–8).
- * Blocks only duplicates, over-budget, and captain not in roster.
+ * Blocks only duplicates, overspend on the transfer, and captain not in roster.
+ * `cash` / `previousIds` are the last persisted row (buy/sell at current quotes).
  */
 export function validateLineupSave(
   playerIds: string[],
   captainId: string | null,
-  budget: number,
-): { ok: true } | { ok: false; error: string } {
+  cash: number,
+  previousIds: string[] = [],
+): { ok: true; cash: number } | { ok: false; error: string } {
   if (playerIds.length > LINEUP_SIZE) {
     return { ok: false, error: `Com a màxim ${LINEUP_SIZE} jugadors.` };
   }
   if (new Set(playerIds).size !== playerIds.length) {
     return { ok: false, error: "No pots repetir jugadors." };
   }
-  if (remainingBudget(budget, playerIds) < 0) {
+  const transfer = applyMarketTransfers(cash, previousIds, playerIds);
+  if (!transfer.ok) {
     return { ok: false, error: "Has superat el pressupost disponible." };
   }
   if (captainId && !playerIds.includes(captainId)) {
@@ -199,7 +237,7 @@ export function validateLineupSave(
       error: "El capità ha de formar part de l'alineació.",
     };
   }
-  return { ok: true };
+  return { ok: true, cash: transfer.cash };
 }
 
 function seededRandom(seed: number) {
@@ -230,6 +268,7 @@ export function simulateRound(
     state.lineup.playerIds,
     state.lineup.captainId,
     state.budget,
+    state.lineup.playerIds,
   );
   if (!saveCheck.ok) {
     return { error: saveCheck.error };

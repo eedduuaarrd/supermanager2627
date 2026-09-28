@@ -5,7 +5,7 @@ import { TeamManager } from "@/components/team-manager";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/data/roster";
 import { BUY_SELL_RULE_CA, MARKET_PRICE_FOOTNOTE_CA } from "@/lib/market-price";
-import { patrimoni } from "@/lib/game";
+import { patrimoni, squadMarketValue } from "@/lib/game";
 import { VAL_FORMULA_FOOTNOTE_CA } from "@/lib/val";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 export default function ComptePage() {
   const { user, maxTeams, budget, lineup } = useManager();
   const router = useRouter();
+  const marketValue = squadMarketValue(lineup.playerIds);
   const netWorth = patrimoni(budget, lineup.playerIds);
 
   async function logout() {
@@ -49,8 +50,8 @@ export default function ComptePage() {
         <p className="mt-1 font-display text-xl tabular-nums text-bone">
           {formatPrice(netWorth)}
         </p>
-        <p className="mt-1 text-[11px] text-mute">
-          Efectiu restant + valor de mercat de l&apos;alineació
+        <p className="mt-2 text-[11px] tabular-nums text-mute">
+          Efectiu {formatPrice(budget)} · Plantilla {formatPrice(marketValue)}
         </p>
       </section>
 

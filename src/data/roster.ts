@@ -21,8 +21,9 @@ import marketPricesJson from "@/data/market-prices.json";
  * Dorsal = número de samarreta a la Plantilla (badge / columna).
  * VAL fantasy = PTS − FC − max(0, TLI−TLC) + PM (FCBQ Plantilla VAL ignora).
  * Sense posicions: alineació de 8 lliures.
- * Preus broker: theoretical = max(0, avgVal) × 5.000 €; actualització ±15%/jornada
+ * Preus broker: theoretical = max(0, avgVal) × 1.000 €; actualització ±15%/jornada
  *   (rodona a 500 €). Compra/venda al preu de mercat actual. Veure market-prices.json.
+ *   budget column = efectiu (cash); buy/sell al preu actual.
  *
  * Regles: plantilla 8, pressupost 100.000 € (mercat multi-equip, 29 entrades).
  */
@@ -513,7 +514,7 @@ export const CAPTAIN_MULTIPLIER = 2;
 export const WIN_BONUS = 0.2;
 
 /** GameState.version — bump when roster ids / dual-team / pricing rule change. */
-export const GAME_VERSION = 9;
+export const GAME_VERSION = 10;
 
 export const OPPONENTS = [
   "CB Cervera",

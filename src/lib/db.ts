@@ -4,8 +4,8 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 
 export const MAX_TEAMS_PER_USER = 5;
-/** 2 = multi fantasy teams; 3 = weekly jornada rounds meta; 4 = transfer canvis. */
-export const SCHEMA_VERSION = "4";
+/** 2 = multi fantasy teams; 3 = weekly jornada rounds meta; 4 = transfer canvis; 5 = cash ledger. */
+export const SCHEMA_VERSION = "5";
 
 export type DbUser = {
   id: string;
@@ -366,6 +366,7 @@ export function getDb(): Database.Database {
   migrateToMultiTeams(db);
   migrateWeeklyRounds(db);
   migrateTransferWindow(db);
+  // Cash ledger conversion runs from scoring.ensureLineupRow (needs roster prices).
 
   globalForDb.__smDb = db;
   return db;

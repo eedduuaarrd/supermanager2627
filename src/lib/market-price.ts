@@ -4,17 +4,19 @@
  * Inspired by public ACB SuperManager market mechanics at a high level only —
  * not a copy of ACB trademarks, assets, or verbatim rules.
  *
- * theoretical = max(0, avgVal) × €5.000 / VAL point
+ * theoretical = max(0, avgVal) × €1.000 / VAL point
+ * (keeps ~100 VAL-points of squad capacity under a 100.000 € budget,
+ * matching the public ACB budget÷€/VAL ratio at club scale)
  * Updates clamp ±15% vs previous quote, then round to nearest €500.
  */
 
-export const EUR_PER_VAL = 5_000;
+export const EUR_PER_VAL = 1_000;
 export const PRICE_STEP = 500;
 export const PRICE_CLAMP_PCT = 0.15;
 
 /** Catalan footnote for player page / Compte. */
 export const MARKET_PRICE_FOOTNOTE_CA =
-  "Preu ≈ VAL mitjana × 5.000 € (màx. ±15% per jornada). Compres i vendes al preu actual.";
+  "Preu ≈ VAL mitjana × 1.000 € (màx. ±15% per jornada). Compres i vendes al preu actual.";
 
 export const BUY_SELL_RULE_CA = "Compra i venda al preu de mercat actual.";
 

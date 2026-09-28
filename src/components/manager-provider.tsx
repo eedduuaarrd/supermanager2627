@@ -33,6 +33,8 @@ type ManagerContextValue = {
   maxTeams: number;
   roster: Player[] | null;
   budget: number;
+  /** Last persisted player ids — used with cash for draft remaining. */
+  savedPlayerIds: string[];
   round: number;
   roundStatus: "open" | "closed";
   lineupLocked: boolean;
@@ -78,6 +80,7 @@ export function ManagerProvider({
   const [maxTeams, setMaxTeams] = useState(MAX_TEAMS);
   const [roster, setRoster] = useState<Player[] | null>(null);
   const [budget, setBudget] = useState(100_000);
+  const [savedPlayerIds, setSavedPlayerIds] = useState<string[]>([]);
   const [round, setRound] = useState(initialRound);
   const [roundStatus, setRoundStatus] = useState<"open" | "closed">("open");
   const [lineupLocked, setLineupLocked] = useState(false);
@@ -142,6 +145,11 @@ export function ManagerProvider({
       setTransfer(null);
     }
     setLineup(lineupData.lineup);
+    setSavedPlayerIds(
+      Array.isArray(lineupData.lineup?.playerIds)
+        ? lineupData.lineup.playerIds
+        : [],
+    );
     setTeams(teamsData.teams ?? []);
     setActiveTeamId(teamsData.activeTeamId ?? null);
     setMaxTeams(teamsData.maxTeams ?? MAX_TEAMS);
@@ -187,6 +195,13 @@ export function ManagerProvider({
         }
         if (pendingRef.current === null) {
           setLineup(data.lineup);
+          setSavedPlayerIds(
+            Array.isArray(data.lineup?.playerIds) ? data.lineup.playerIds : [],
+          );
+        } else {
+          setSavedPlayerIds(
+            Array.isArray(data.lineup?.playerIds) ? data.lineup.playerIds : [],
+          );
         }
         setRound(data.round);
         if (data.roundStatus === "open" || data.roundStatus === "closed") {
@@ -363,6 +378,7 @@ export function ManagerProvider({
       maxTeams,
       roster,
       budget,
+      savedPlayerIds,
       round,
       roundStatus,
       lineupLocked,
@@ -390,6 +406,7 @@ export function ManagerProvider({
       maxTeams,
       roster,
       budget,
+      savedPlayerIds,
       round,
       roundStatus,
       lineupLocked,

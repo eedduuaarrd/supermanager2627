@@ -21,7 +21,7 @@ import {
 } from "@/lib/rounds";
 import { formatLockMessageCa, isLineupLocked } from "@/lib/fixtures";
 import type { RoundScore } from "@/lib/types";
-import { parsePlayerIds, validateLineupSave } from "@/lib/game";
+import { parsePlayerIds, validateLineupSave, spentBudget } from "@/lib/game";
 import { requireActiveTeamId } from "@/lib/teams";
 import {
   MAX_TRANSFERS,
@@ -184,8 +184,59 @@ function resolveCaptainId(
   return null;
 }
 
+let cashLedgerMigrated = false;
+
+/**
+ * One-shot: convert legacy mark-to-market rows (budget left at INITIAL while the
+ * squad was only charged in the UI) into real efectiu = INITIAL − market value.
+ */
+export function migrateCashLedgerOnce(db = getDb()) {
+  if (cashLedgerMigrated) return;
+  const flag = db
+    .prepare("SELECT value FROM meta WHERE key = ?")
+    .get("cash_ledger_v1") as { value: string } | undefined;
+  if (flag?.value === "1") {
+    cashLedgerMigrated = true;
+    return;
+  }
+
+  const rows = db
+    .prepare(`SELECT team_id, round, player_ids, budget FROM lineups`)
+    .all() as {
+    team_id: string;
+    round: number;
+    player_ids: string;
+    budget: number;
+  }[];
+
+  const upd = db.prepare(
+    `UPDATE lineups SET budget = ? WHERE team_id = ? AND round = ?`,
+  );
+
+  const tx = db.transaction(() => {
+    for (const row of rows) {
+      if (row.budget !== INITIAL_BUDGET) continue;
+      const ids = parsePlayerIds(row.player_ids);
+      if (ids.length === 0) continue;
+      const cash = Math.max(0, INITIAL_BUDGET - spentBudget(ids));
+      upd.run(cash, row.team_id, row.round);
+    }
+    db.prepare(
+      `INSERT INTO meta (key, value) VALUES (?, ?)
+       ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+    ).run("cash_ledger_v1", "1");
+    db.prepare(
+      `INSERT INTO meta (key, value) VALUES (?, ?)
+       ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+    ).run("schema_version", "5");
+  });
+  tx();
+  cashLedgerMigrated = true;
+}
+
 /** Read lineup row for a fantasy team and flatten legacy JSON if needed. */
 export function ensureLineupRow(teamId: string, round?: number) {
+  migrateCashLedgerOnce();
   const db = getDb();
   const r = round ?? getCurrentRound(db);
   const existing = db
@@ -200,6 +251,8 @@ export function ensureLineupRow(teamId: string, round?: number) {
   const carryCaptain = prev
     ? resolveCaptainId(prev.captain_id, carryIds)
     : null;
+  // Carry efectiu across jornadas (do not reset to INITIAL while keeping the squad).
+  const carryCash = prev?.budget ?? INITIAL_BUDGET;
 
   db.prepare(
     `INSERT INTO lineups
@@ -211,7 +264,7 @@ export function ensureLineupRow(teamId: string, round?: number) {
     r,
     JSON.stringify(carryIds),
     carryCaptain,
-    INITIAL_BUDGET,
+    carryCash,
     JSON.stringify(carryIds),
   );
 
@@ -306,7 +359,13 @@ export function saveLineup(
   }
   // Migrate collapsed dual-team captain ids the same way as playerIds.
   const resolvedCaptain = resolveCaptainId(captainId, playerIds);
-  const check = validateLineupSave(playerIds, resolvedCaptain, existing.budget);
+  const previousIds = parsePlayerIds(existing.player_ids);
+  const check = validateLineupSave(
+    playerIds,
+    resolvedCaptain,
+    existing.budget,
+    previousIds,
+  );
   if (!check.ok) return check;
 
   const snapshotIds = parseSnapshotIds(existing.snapshot_ids);
@@ -318,12 +377,13 @@ export function saveLineup(
   db.prepare(
     `UPDATE lineups
      SET player_ids = ?, captain_id = ?, confirmed = 0, confirmed_at = NULL,
-         changes_used = ?
+         changes_used = ?, budget = ?
      WHERE team_id = ? AND round = ?`,
   ).run(
     JSON.stringify(playerIds),
     resolvedCaptain,
     changesUsed,
+    check.cash,
     teamId,
     round,
   );

@@ -10,6 +10,7 @@ function EquipContent() {
   const {
     roster,
     budget,
+    savedPlayerIds,
     lineup,
     persistLineup,
     saving,
@@ -36,6 +37,7 @@ function EquipContent() {
         <LineupBuilder
           roster={roster!}
           budget={budget}
+          savedPlayerIds={savedPlayerIds}
           lineup={lineup}
           onChange={persistLineup}
           saving={saving}
