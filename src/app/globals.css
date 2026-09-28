@@ -166,22 +166,22 @@
 /* ── Court board (El teu equip) ── */
 
 .court-board {
-  background: #2a2118;
+  background: #5c4530;
   isolation: isolate;
   animation: court-board-load 0.55s ease-out both;
 }
 
 .court-board__surface {
   background:
-    radial-gradient(ellipse 65% 40% at 50% 6%, rgb(194 49 66 / 22%), transparent 55%),
+    radial-gradient(ellipse 55% 32% at 50% 8%, rgb(194 49 66 / 14%), transparent 62%),
     repeating-linear-gradient(
       94deg,
-      rgb(120 90 55 / 55%) 0px,
-      rgb(95 70 42 / 45%) 12px,
-      rgb(72 52 32 / 50%) 24px,
-      rgb(110 82 48 / 48%) 36px
+      rgb(176 136 90 / 72%) 0px,
+      rgb(156 118 76 / 64%) 10px,
+      rgb(138 104 66 / 70%) 20px,
+      rgb(166 126 82 / 68%) 30px
     ),
-    linear-gradient(180deg, #6a4e32 0%, #3d2c1c 52%, #1a1410 100%);
+    linear-gradient(180deg, #a07850 0%, #745538 50%, #4e3a28 100%);
 }
 
 .budget-strip {

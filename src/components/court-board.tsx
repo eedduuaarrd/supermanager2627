@@ -83,12 +83,12 @@ export function CourtBoard({
         >
           <defs>
             <linearGradient id="courtWood" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#8b6a45" stopOpacity="0.55" />
-              <stop offset="40%" stopColor="#6e5336" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#3d2e1f" stopOpacity="0.55" />
+              <stop offset="0%" stopColor="#c4a07a" stopOpacity="0.32" />
+              <stop offset="45%" stopColor="#a07850" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="#6e5238" stopOpacity="0.28" />
             </linearGradient>
-            <radialGradient id="paintGlow" cx="50%" cy="12%" r="45%">
-              <stop offset="0%" stopColor="#c23142" stopOpacity="0.18" />
+            <radialGradient id="paintGlow" cx="50%" cy="12%" r="42%">
+              <stop offset="0%" stopColor="#c23142" stopOpacity="0.12" />
               <stop offset="100%" stopColor="#c23142" stopOpacity="0" />
             </radialGradient>
           </defs>
@@ -100,8 +100,8 @@ export function CourtBoard({
             width="92"
             height="125.333"
             fill="none"
-            stroke="rgba(236,232,225,0.42)"
-            strokeWidth="0.75"
+            stroke="rgba(255,248,235,0.55)"
+            strokeWidth="0.8"
           />
           {/* baseline / backboard */}
           <line
@@ -180,7 +180,7 @@ export function CourtBoard({
         </svg>
 
         <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-ink/55"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink/30"
           aria-hidden
         />
 
@@ -254,8 +254,8 @@ function EmptySlot({
       <div
         className={cn(
           "flex h-16 w-16 items-center justify-center rounded-full sm:h-[4.5rem] sm:w-[4.5rem]",
-          "border-2 border-dashed border-bone/50",
-          "bg-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[2px]",
+          "border-2 border-dashed border-bone/60",
+          "bg-white/[0.14] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-[2px]",
           !disabled && "transition active:scale-95",
         )}
       >
