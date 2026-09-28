@@ -1,9 +1,9 @@
 "use client";
 
 import { useManager } from "@/components/manager-provider";
+import { TeamManager } from "@/components/team-manager";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function ComptePage() {
@@ -33,22 +33,16 @@ export default function ComptePage() {
         {user.isAdmin && (
           <p className="mt-2 text-xs text-grana-bright">Administrador</p>
         )}
-        <p className="mt-4 text-sm text-mute">
-          <Link
-            href="/jornada"
-            className="text-grana-bright underline-offset-2 hover:underline"
-          >
-            Gestiona els equips a Inici
-          </Link>
-        </p>
       </section>
+
+      <TeamManager />
 
       <section className="border border-line bg-panel/60 px-4 py-4">
         <p className="text-[10px] uppercase tracking-[0.18em] text-mute">
           Regles ràpides
         </p>
         <ul className="mt-3 space-y-2 text-sm text-mute">
-          <li>Fins a {maxTeams} equips per compte (gestió a Inici)</li>
+          <li>Fins a {maxTeams} equips per compte</li>
           <li>8 jugadors per alineació (qualsevol mix)</li>
           <li>Pressupost 100.000 € per equip</li>
           <li>Capità ×2 als punts de jornada</li>

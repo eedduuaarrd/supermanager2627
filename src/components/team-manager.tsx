@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
 
-/** Full create / switch / rename / delete for fantasy teams (Inici). */
+/** Create / switch / rename / delete fantasy teams (Compte). */
 export function TeamManager() {
   const {
     teams,
@@ -72,7 +72,7 @@ export function TeamManager() {
             Els meus equips
           </h2>
           <p className="mt-0.5 text-xs text-mute">
-            {teams.length}/{maxTeams} · màxim {maxTeams}
+            {teams.length}/{maxTeams} · canvia, reanomena o elimina
           </p>
         </div>
         {!createOpen && !empty && (

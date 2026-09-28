@@ -10,7 +10,7 @@ export function TeamSwitcher({ className }: { className?: string }) {
 
   if (teams.length <= 1) {
     return (
-      <p className={cn("truncate text-xs text-mute", className)}>
+      <p className={cn("truncate text-sm font-medium text-bone", className)}>
         {user.teamName}
       </p>
     );

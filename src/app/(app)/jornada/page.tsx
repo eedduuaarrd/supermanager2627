@@ -2,17 +2,19 @@
 
 import { BootGate } from "@/components/boot-gate";
 import { useManager } from "@/components/manager-provider";
-import { TeamManager } from "@/components/team-manager";
+import { TeamSwitcher } from "@/components/team-switcher";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { LINEUP_SIZE } from "@/data/roster";
 import { cn } from "@/lib/utils";
+import { Plus } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 type RoundMeta = {
   round: number;
   status: "open" | "closed";
   label: string;
-  weeklyNote: string;
 };
 
 type RankInfo = {
@@ -29,43 +31,43 @@ function primaryCta(opts: {
   filled: number;
   hasCaptain: boolean;
   status: "open" | "closed";
-}): { href: string; label: string; tone: "grana" | "muted" } {
-  if (!opts.hasTeams) {
-    return { href: "#equips", label: "Crea el teu equip", tone: "grana" };
-  }
+}): { href: string; label: string } | null {
+  if (!opts.hasTeams) return null;
   if (opts.status === "closed") {
-    return { href: "/equip", label: "Veure l'equip", tone: "muted" };
-  }
-  if (opts.filled === 0) {
-    return { href: "/equip", label: "Completar alineació", tone: "grana" };
+    return { href: "/classificacio", label: "Veure classificació" };
   }
   if (!lineupComplete(opts.filled, opts.hasCaptain)) {
     return {
       href: "/equip",
-      label: `Completar alineació · ${opts.filled}/${LINEUP_SIZE}`,
-      tone: "grana",
+      label:
+        opts.filled === 0
+          ? "Completar equip"
+          : `Completar equip · ${opts.filled}/${LINEUP_SIZE}`,
     };
   }
-  return { href: "/equip", label: "Anar a Equip", tone: "grana" };
+  return { href: "/classificacio", label: "Veure classificació" };
 }
 
 function JornadaContent() {
-  const { user, teams, round, lineup, activeTeamId } = useManager();
+  const { teams, lineup, activeTeamId, maxTeams, createTeam } = useManager();
   const filled = lineup.playerIds.length;
   const hasCaptain = Boolean(lineup.captainId);
-  const complete = lineupComplete(filled, hasCaptain);
   const hasTeams = teams.length > 0;
+  const atLimit = teams.length >= maxTeams;
 
   const [meta, setMeta] = useState<RoundMeta>({
-    round,
+    round: 1,
     status: "open",
-    label: `Jornada ${round}`,
-    weeklyNote: "Cada setmana hi ha jornada nova amb els partits del club.",
+    label: "Jornada 1",
   });
   const [ranks, setRanks] = useState<RankInfo>({
     jornada: null,
     general: null,
   });
+  const [createOpen, setCreateOpen] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, start] = useTransition();
 
   useEffect(() => {
     let cancelled = false;
@@ -78,14 +80,13 @@ function JornadaContent() {
         ]);
         if (cancelled) return;
         if (roundRes.ok) {
-          const data = (await roundRes.json()) as RoundMeta;
+          const data = (await roundRes.json()) as RoundMeta & {
+            weeklyNote?: string;
+          };
           setMeta({
             round: data.round,
             status: data.status === "closed" ? "closed" : "open",
             label: data.label ?? `Jornada ${data.round}`,
-            weeklyNote:
-              data.weeklyNote ??
-              "Cada setmana hi ha jornada nova amb els partits del club.",
           });
         }
         if (jRes.ok) {
@@ -103,14 +104,14 @@ function JornadaContent() {
           setRanks((r) => ({ ...r, general: mine?.rank ?? null }));
         }
       } catch {
-        /* hub degrades to lineup + round from provider */
+        /* hub degrades gracefully */
       }
     }
     void loadHub();
     return () => {
       cancelled = true;
     };
-  }, [activeTeamId, round]);
+  }, [activeTeamId]);
 
   const cta = primaryCta({
     hasTeams,
@@ -120,123 +121,131 @@ function JornadaContent() {
   });
   const open = meta.status === "open";
 
-  return (
-    <div className="hub-shell relative flex min-h-0 flex-1 flex-col gap-5 pb-3">
-      <div className="hub-glow pointer-events-none absolute inset-x-0 -top-6 h-48" aria-hidden />
+  function onCreate(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    start(async () => {
+      const result = await createTeam(newName);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      setNewName("");
+      setCreateOpen(false);
+    });
+  }
 
-      {/* Brand + jornada status */}
-      <header className="hub-fade relative z-10 pt-1">
-        <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-mute">
-          Supermanager Balaguer
-        </p>
-        <div className="hub-badge mt-3 inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 border border-line bg-panel/70 px-3 py-2 backdrop-blur-sm">
-          <span className="font-display text-2xl leading-none tracking-wide text-bone sm:text-3xl">
-            {meta.label}
-          </span>
-          <span className="text-mute" aria-hidden>
+  return (
+    <div className="hub-shell relative flex min-h-0 flex-1 flex-col justify-center gap-8 pb-6">
+      {/* 1. Jornada */}
+      <header className="hub-fade space-y-2">
+        <p className="font-display text-3xl tracking-wide text-bone sm:text-4xl">
+          {meta.label.toUpperCase()}
+          <span className="mx-2 text-mute" aria-hidden>
             ·
           </span>
-          <span
-            className={cn(
-              "font-display text-lg tracking-wide sm:text-xl",
-              open ? "text-emerald-400" : "text-mute",
-            )}
-          >
-            {open ? "Oberta" : "Tancada"}
+          <span className={open ? "text-emerald-400" : "text-mute"}>
+            {open ? "OBERTA" : "TANCADA"}
           </span>
-        </div>
-        <p className="hub-fade-delay mt-3 max-w-sm text-sm leading-snug text-mute">
-          {meta.weeklyNote}
         </p>
+        <p className="text-sm text-mute">Partits nous cada setmana.</p>
       </header>
 
-      {/* Active team + primary action */}
-      <section className="hub-fade-delay relative z-10 space-y-3">
-        {hasTeams ? (
-          <div className="flex items-center gap-2">
-            <span className="truncate rounded-sm border border-line bg-panel-2/80 px-2.5 py-1 text-sm text-bone">
-              <span className="mr-1.5 text-[10px] uppercase tracking-[0.16em] text-mute">
-                Actiu
-              </span>
-              {user.teamName}
-            </span>
-            {!complete && open && (
-              <span className="shrink-0 text-[11px] uppercase tracking-[0.14em] text-amber-200">
-                {filled === 0
-                  ? "Sense alineació"
-                  : `Incompleta · ${filled}/${LINEUP_SIZE}`}
-              </span>
-            )}
-            {complete && open && (
-              <span className="shrink-0 text-[11px] uppercase tracking-[0.14em] text-emerald-400">
-                Alineació llesta
-              </span>
+      {/* 2. Equip actiu + switch / create */}
+      <section className="hub-fade-delay space-y-3">
+        <p className="text-[11px] uppercase tracking-[0.18em] text-mute">
+          Equip actiu
+        </p>
+
+        {hasTeams && !createOpen && (
+          <div className="flex flex-wrap items-center gap-3">
+            <TeamSwitcher className="min-w-0 flex-1 [&_select]:h-11 [&_select]:max-w-none [&_select]:w-full [&_select]:text-sm [&_p]:text-base [&_p]:text-bone" />
+            {!atLimit && (
+              <button
+                type="button"
+                onClick={() => setCreateOpen(true)}
+                className="inline-flex h-11 shrink-0 items-center gap-1.5 border border-line px-3 text-xs font-semibold uppercase tracking-wide text-bone hover:bg-white/5"
+              >
+                <Plus className="size-3.5" /> Nou equip
+              </button>
             )}
           </div>
-        ) : (
-          <p className="text-sm text-mute">
-            Encara no tens cap equip fantasy. Crea&apos;n un per començar.
-          </p>
         )}
 
-        {cta.href.startsWith("#") ? (
-          <a
-            href={cta.href}
-            className={cn(
-              "hub-cta inline-flex h-12 w-full items-center justify-center text-sm font-semibold uppercase tracking-wide",
-              cta.tone === "grana"
-                ? "bg-grana text-bone hover:bg-grana-bright"
-                : "border border-line bg-panel-2 text-bone hover:bg-white/10",
+        {(!hasTeams || createOpen) && (
+          <form onSubmit={onCreate} className="space-y-3">
+            {!hasTeams && (
+              <p className="text-sm text-mute">
+                Crea el teu equip per començar.
+              </p>
             )}
-          >
-            {cta.label}
-          </a>
-        ) : (
-          <Link
-            href={cta.href}
-            className={cn(
-              "hub-cta inline-flex h-12 w-full items-center justify-center text-sm font-semibold uppercase tracking-wide",
-              cta.tone === "grana"
-                ? "bg-grana text-bone hover:bg-grana-bright"
-                : "border border-line bg-panel-2 text-bone hover:bg-white/10",
-            )}
-          >
-            {cta.label}
-          </Link>
+            <Input
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              className="h-11 border-line bg-panel text-bone"
+              placeholder="Nom de l'equip"
+              required
+              minLength={2}
+              maxLength={40}
+              autoFocus={createOpen || !hasTeams}
+            />
+            <div className="flex gap-2">
+              <Button
+                type="submit"
+                disabled={pending || atLimit}
+                className="hub-cta h-12 flex-1 bg-grana text-sm font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
+              >
+                {hasTeams ? "Crear equip" : "Nou equip"}
+              </Button>
+              {hasTeams && (
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setCreateOpen(false);
+                    setNewName("");
+                    setError(null);
+                  }}
+                  className="h-12 border border-line bg-transparent text-mute hover:bg-white/5"
+                >
+                  Cancel·la
+                </Button>
+              )}
+            </div>
+          </form>
         )}
 
-        {/* Compact ranks */}
-        {hasTeams && (
-          <div className="hub-rank flex items-center justify-between gap-3 border-y border-line/80 py-2.5 text-sm">
-            <p className="text-mute">
-              Jornada{" "}
-              <span className="font-display text-base text-bone tabular-nums">
-                {ranks.jornada != null ? `#${ranks.jornada}` : "—"}
-              </span>
-            </p>
-            <span className="text-line" aria-hidden>
-              ·
-            </span>
-            <p className="text-mute">
-              General{" "}
-              <span className="font-display text-base text-bone tabular-nums">
-                {ranks.general != null ? `#${ranks.general}` : "—"}
-              </span>
-            </p>
-            <Link
-              href="/classificacio"
-              className="ml-auto text-[11px] uppercase tracking-[0.14em] text-grana-bright hover:underline"
-            >
-              Veure
-            </Link>
-          </div>
-        )}
+        {error && <p className="text-sm text-red-200">{error}</p>}
       </section>
 
-      {/* Teams */}
-      <div id="equips" className="hub-fade-late relative z-10">
-        <TeamManager />
-      </div>
+      {/* 3. One primary CTA */}
+      {cta && !createOpen && (
+        <Link
+          href={cta.href}
+          className={cn(
+            "hub-cta hub-fade-delay inline-flex h-14 w-full items-center justify-center text-base font-semibold uppercase tracking-wide",
+            "bg-grana text-bone hover:bg-grana-bright",
+          )}
+        >
+          {cta.label}
+        </Link>
+      )}
+
+      {/* 4. One-line rank */}
+      {hasTeams && !createOpen && (
+        <p className="hub-rank text-sm text-mute">
+          Jornada{" "}
+          <span className="font-display text-bone tabular-nums">
+            {ranks.jornada != null ? `#${ranks.jornada}` : "—"}
+          </span>
+          <span className="mx-2 text-line" aria-hidden>
+            ·
+          </span>
+          General{" "}
+          <span className="font-display text-bone tabular-nums">
+            {ranks.general != null ? `#${ranks.general}` : "—"}
+          </span>
+        </p>
+      )}
     </div>
   );
 }
