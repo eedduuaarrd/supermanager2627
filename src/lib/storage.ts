@@ -1,7 +1,8 @@
+import { GAME_VERSION } from "@/data/roster";
 import { createInitialState } from "@/lib/game";
 import type { GameState } from "@/lib/types";
 
-const STORAGE_KEY = "supermanager-balaguer-v1";
+const STORAGE_KEY = "supermanager-balaguer-v2";
 
 export function loadGame(): GameState | null {
   if (typeof window === "undefined") return null;
@@ -9,7 +10,7 @@ export function loadGame(): GameState | null {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as GameState;
-    if (!parsed || parsed.version !== 1) return null;
+    if (!parsed || parsed.version !== GAME_VERSION) return null;
     return parsed;
   } catch {
     return null;

@@ -1,0 +1,623 @@
+{
+  "teams": [
+    {
+      "id": "5f55017e-893e-4323-8b41-b58323ea8f73",
+      "name": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A",
+      "competition": "TEMPORADA 2026-27 - 1A TERRITORIAL SENIOR MASCULÍ - 1A TERRITORIAL SENIOR MASCULÍ - JA FASE - GRUP 01",
+      "url": "https://www.basquetcatala.cat/estadistica/equip/5f55017e-893e-4323-8b41-b58323ea8f73",
+      "players": [
+        {
+          "number": null,
+          "name": "HECTOR LOZANO MARTINEZ",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 23.5,
+            "PTS": 16.0,
+            "T2C": 2.0,
+            "T2I": 2.0,
+            "T2%": 100.0,
+            "T3C": 3.0,
+            "T3I": 3.0,
+            "T3%": 100.0,
+            "TLC": 2.0,
+            "TLI": 2.0,
+            "TL%": 100.0,
+            "VAL": -3.0
+          }
+        },
+        {
+          "number": null,
+          "name": "EDUARD BERNAT SUCARRAT",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 27.1,
+            "PTS": 10.0,
+            "T2C": 1.0,
+            "T2I": 1.0,
+            "T2%": 100.0,
+            "T3C": 2.0,
+            "T3I": 2.0,
+            "T3%": 100.0,
+            "TLC": 2.0,
+            "TLI": 3.0,
+            "TL%": 66.7,
+            "VAL": -6.0
+          }
+        },
+        {
+          "number": null,
+          "name": "TONI SALUD GARCIA",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 24.2,
+            "PTS": 8.0,
+            "T2C": 4.0,
+            "T2I": 4.0,
+            "T2%": 100.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 1.0,
+            "TLI": 4.0,
+            "TL%": 25.0,
+            "VAL": 4.0
+          }
+        },
+        {
+          "number": null,
+          "name": "IVAN FRANCO GUERRERO",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 27.5,
+            "PTS": 8.0,
+            "T2C": 1.0,
+            "T2I": 1.0,
+            "T2%": 100.0,
+            "T3C": 1.0,
+            "T3I": 1.0,
+            "T3%": 100.0,
+            "TLC": 4.0,
+            "TLI": 5.0,
+            "TL%": 80.0,
+            "VAL": -15.0
+          }
+        },
+        {
+          "number": null,
+          "name": "GERARD GARCIA ROSAURO",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 26.4,
+            "PTS": 8.0,
+            "T2C": 0.0,
+            "T2I": 0.0,
+            "T2%": 0.0,
+            "T3C": 2.0,
+            "T3I": 2.0,
+            "T3%": 100.0,
+            "TLC": 2.0,
+            "TLI": 4.0,
+            "TL%": 50.0,
+            "VAL": -3.0
+          }
+        },
+        {
+          "number": null,
+          "name": "MARC ESCODA ANGERRI",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 18.0,
+            "PTS": 6.0,
+            "T2C": 3.0,
+            "T2I": 3.0,
+            "T2%": 100.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 0.0,
+            "TLI": 0.0,
+            "TL%": 0.0,
+            "VAL": 4.0
+          }
+        },
+        {
+          "number": null,
+          "name": "BABACAR TOURE GASSAMA",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 23.0,
+            "PTS": 6.0,
+            "T2C": 3.0,
+            "T2I": 3.0,
+            "T2%": 100.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 0.0,
+            "TLI": 1.0,
+            "TL%": 0.0,
+            "VAL": -15.0
+          }
+        },
+        {
+          "number": null,
+          "name": "GERARD SOLDEVILA CASAS",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 16.1,
+            "PTS": 0.0,
+            "T2C": 0.0,
+            "T2I": 0.0,
+            "T2%": 0.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 0.0,
+            "TLI": 0.0,
+            "TL%": 0.0,
+            "VAL": -2.0
+          }
+        },
+        {
+          "number": null,
+          "name": "ROGER COMPANYS SOLÀ",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 14.1,
+            "PTS": 0.0,
+            "T2C": 0.0,
+            "T2I": 0.0,
+            "T2%": 0.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 0.0,
+            "TLI": 2.0,
+            "TL%": 0.0,
+            "VAL": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "id": "c057eeae-3aae-4e33-b2ab-54fabb2700ae",
+      "name": "LO SIFONET CB BALAGUER B",
+      "competition": "2A. TERRITORIAL SENIOR MASCULÍ - 1A FASE-GRUP 01",
+      "url": "https://www.basquetcatala.cat/estadistica/equip/c057eeae-3aae-4e33-b2ab-54fabb2700ae",
+      "players": [],
+      "club": "Club Basquet Balaguer",
+      "team_page": "https://www.basquetcatala.cat/equip/94248"
+    },
+    {
+      "id": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
+      "name": "CUDOS CONSULTORS CB BALAGUER A",
+      "competition": "TEMPORADA 2026-27 - COPA CATALUNYA FEMENINA - FASE PRÈVIA - 01",
+      "url": "https://www.basquetcatala.cat/estadistica/equip/839e2243-48dc-4459-aec5-a2dadeb3ad53",
+      "players": [
+        {
+          "number": null,
+          "name": "ARES BUÑOL PERELLÓ",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 26.4,
+            "PTS": 16.0,
+            "T2C": 1.0,
+            "T2I": 2.0,
+            "T2%": 50.0,
+            "T3C": 3.0,
+            "T3I": 4.0,
+            "T3%": 75.0,
+            "TLC": 4.0,
+            "TLI": 6.0,
+            "TL%": 66.7,
+            "VAL": 24.0
+          }
+        },
+        {
+          "number": null,
+          "name": "JÚLIA PLA PLA",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 29.4,
+            "PTS": 13.0,
+            "T2C": 4.0,
+            "T2I": 11.0,
+            "T2%": 36.4,
+            "T3C": 1.0,
+            "T3I": 2.0,
+            "T3%": 50.0,
+            "TLC": 2.0,
+            "TLI": 2.0,
+            "TL%": 100.0,
+            "VAL": 18.0
+          }
+        },
+        {
+          "number": null,
+          "name": "ANDREA PERAT GRÀCIA",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 27.4,
+            "PTS": 8.0,
+            "T2C": 3.0,
+            "T2I": 11.0,
+            "T2%": 27.3,
+            "T3C": 0.0,
+            "T3I": 3.0,
+            "T3%": 0.0,
+            "TLC": 2.0,
+            "TLI": 3.0,
+            "TL%": 66.7,
+            "VAL": 18.0
+          }
+        },
+        {
+          "number": null,
+          "name": "NEUS ESCODA ANGERRI",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 26.8,
+            "PTS": 8.0,
+            "T2C": 3.0,
+            "T2I": 9.0,
+            "T2%": 33.3,
+            "T3C": 0.0,
+            "T3I": 2.0,
+            "T3%": 0.0,
+            "TLC": 2.0,
+            "TLI": 4.0,
+            "TL%": 50.0,
+            "VAL": 15.0
+          }
+        },
+        {
+          "number": null,
+          "name": "MÒNICA FONTANET MALLOL",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 19.4,
+            "PTS": 6.0,
+            "T2C": 0.0,
+            "T2I": 0.0,
+            "T2%": 0.0,
+            "T3C": 2.0,
+            "T3I": 3.0,
+            "T3%": 66.7,
+            "TLC": 0.0,
+            "TLI": 0.0,
+            "TL%": 0.0,
+            "VAL": 13.0
+          }
+        },
+        {
+          "number": null,
+          "name": "GUERALT SOLÉ TORRES",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 10.8,
+            "PTS": 5.0,
+            "T2C": 2.0,
+            "T2I": 8.0,
+            "T2%": 25.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 1.0,
+            "TLI": 2.0,
+            "TL%": 50.0,
+            "VAL": -13.0
+          }
+        },
+        {
+          "number": null,
+          "name": "CLARA PANIAGUA MARVÀ",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 16.3,
+            "PTS": 2.0,
+            "T2C": 1.0,
+            "T2I": 4.0,
+            "T2%": 25.0,
+            "T3C": 0.0,
+            "T3I": 2.0,
+            "T3%": 0.0,
+            "TLC": 0.0,
+            "TLI": 0.0,
+            "TL%": 0.0,
+            "VAL": -2.0
+          }
+        },
+        {
+          "number": null,
+          "name": "MARIANA MBALLO DIALLO",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 10.6,
+            "PTS": 1.0,
+            "T2C": 0.0,
+            "T2I": 2.0,
+            "T2%": 0.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 1.0,
+            "TLI": 2.0,
+            "TL%": 50.0,
+            "VAL": -12.0
+          }
+        },
+        {
+          "number": null,
+          "name": "MARTINA BENÍTEZ FARRANDO",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 15.7,
+            "PTS": 1.0,
+            "T2C": 0.0,
+            "T2I": 1.0,
+            "T2%": 0.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 1.0,
+            "TLI": 2.0,
+            "TL%": 50.0,
+            "VAL": -15.0
+          }
+        },
+        {
+          "number": null,
+          "name": "ADA DORIENE MORALEDA",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 13.0,
+            "PTS": 0.0,
+            "T2C": 0.0,
+            "T2I": 4.0,
+            "T2%": 0.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 0.0,
+            "TLI": 0.0,
+            "TL%": 0.0,
+            "VAL": -17.0
+          }
+        }
+      ]
+    },
+    {
+      "id": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
+      "name": "FARRATGES LA NOGUERA CB BALAGUER B",
+      "competition": "TEMPORADA 2026-27 - C.C. SEGONA CATEGORIA FEMENINA - FASE PRÈVIA - 01",
+      "url": "https://www.basquetcatala.cat/estadistica/equip/a5c75f3f-ca35-4553-9eb6-a29780eb2007",
+      "players": [
+        {
+          "number": null,
+          "name": "GUERALT SOLÉ TORRES",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 37.5,
+            "PTS": 23.0,
+            "T2C": 11.0,
+            "T2I": 11.0,
+            "T2%": 100.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 7.0,
+            "TLI": 12.0,
+            "TL%": 58.3,
+            "VAL": -1.0
+          }
+        },
+        {
+          "number": null,
+          "name": "JÚLIA PLA PLA",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 24.4,
+            "PTS": 15.0,
+            "T2C": 3.0,
+            "T2I": 3.0,
+            "T2%": 100.0,
+            "T3C": 2.0,
+            "T3I": 2.0,
+            "T3%": 100.0,
+            "TLC": 3.0,
+            "TLI": 5.0,
+            "TL%": 60.0,
+            "VAL": 7.0
+          }
+        },
+        {
+          "number": null,
+          "name": "JANA ROLDÁN ARANDILLA",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 19.3,
+            "PTS": 5.0,
+            "T2C": 0.0,
+            "T2I": 0.0,
+            "T2%": 0.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 5.0,
+            "TLI": 5.0,
+            "TL%": 100.0,
+            "VAL": 0.0
+          }
+        },
+        {
+          "number": null,
+          "name": "NÚRIA JIMÉNEZ ARAN",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 23.0,
+            "PTS": 2.0,
+            "T2C": 1.0,
+            "T2I": 1.0,
+            "T2%": 100.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 0.0,
+            "TLI": 0.0,
+            "TL%": 0.0,
+            "VAL": 1.0
+          }
+        },
+        {
+          "number": null,
+          "name": "MARIANA MBALLO DIALLO",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 23.7,
+            "PTS": 2.0,
+            "T2C": 1.0,
+            "T2I": 1.0,
+            "T2%": 100.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 0.0,
+            "TLI": 0.0,
+            "TL%": 0.0,
+            "VAL": 12.0
+          }
+        },
+        {
+          "number": null,
+          "name": "ABRIL GRÀCIA PALACÍN",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 8.6,
+            "PTS": 2.0,
+            "T2C": 0.0,
+            "T2I": 0.0,
+            "T2%": 0.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 2.0,
+            "TLI": 2.0,
+            "TL%": 100.0,
+            "VAL": -3.0
+          }
+        },
+        {
+          "number": null,
+          "name": "XÈNIA ANDREU MONELL",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 11.1,
+            "PTS": 1.0,
+            "T2C": 0.0,
+            "T2I": 0.0,
+            "T2%": 0.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 1.0,
+            "TLI": 2.0,
+            "TL%": 50.0,
+            "VAL": -8.0
+          }
+        },
+        {
+          "number": null,
+          "name": "GINA BETBESÉ SÀNCHEZ",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 2.7,
+            "PTS": 0.0,
+            "T2C": 0.0,
+            "T2I": 0.0,
+            "T2%": 0.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 0.0,
+            "TLI": 0.0,
+            "TL%": 0.0,
+            "VAL": -6.0
+          }
+        },
+        {
+          "number": null,
+          "name": "GINA TRILLA PINIÈS",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 33.5,
+            "PTS": 0.0,
+            "T2C": 0.0,
+            "T2I": 0.0,
+            "T2%": 0.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 0.0,
+            "TLI": 4.0,
+            "TL%": 0.0,
+            "VAL": 11.0
+          }
+        },
+        {
+          "number": null,
+          "name": "JANA ALARCÓN SOLANÉS",
+          "position": null,
+          "stats": {
+            "PJ": 1,
+            "MIN": 4.2,
+            "PTS": 0.0,
+            "T2C": 0.0,
+            "T2I": 0.0,
+            "T2%": 0.0,
+            "T3C": 0.0,
+            "T3I": 0.0,
+            "T3%": 0.0,
+            "TLC": 0.0,
+            "TLI": 0.0,
+            "TL%": 0.0,
+            "VAL": -2.0
+          }
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "extracted_date": "2026-09-28",
+    "source": "Federació Catalana de Bàsquet (basquetcatala.cat)",
+    "api_endpoint_pattern": "https://mastats.optimalway.consulting.com/VITbcqhearngir{team-id}/stats",
+    "notes": "Jersey numbers not displayed on the website. Positions not shown. Team 2 (c057eeae-3aae-4e33-b2ab-54fabb2700ae) has no statistics available."
+  }
+}

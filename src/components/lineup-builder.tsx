@@ -8,6 +8,8 @@ import {
   LINEUP_SLOTS,
   POSITION_LABEL,
   ROSTER,
+  TEAM_ORDER,
+  TEAMS,
 } from "@/data/roster";
 import {
   countByPosition,
@@ -16,7 +18,7 @@ import {
   remainingBudget,
   validateLineup,
 } from "@/lib/game";
-import type { GameState, Position } from "@/lib/types";
+import type { GameState, Position, TeamId } from "@/lib/types";
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PlayerRow } from "@/components/player-row";
@@ -37,6 +39,7 @@ export function LineupBuilder({
   error,
 }: LineupBuilderProps) {
   const [filter, setFilter] = useState<Position | "all">("all");
+  const [teamFilter, setTeamFilter] = useState<TeamId | "all">("all");
   const remaining = remainingBudget(state.budget, state.lineup.playerIds);
   const counts = countByPosition(state.lineup.playerIds);
   const validation = validateLineup(state.lineup, state.budget);
@@ -49,10 +52,11 @@ export function LineupBuilder({
   const market = useMemo(() => {
     return ROSTER.filter((p) => {
       if (state.lineup.playerIds.includes(p.id)) return false;
-      if (filter === "all") return true;
-      return p.position === filter;
+      if (filter !== "all" && p.position !== filter) return false;
+      if (teamFilter !== "all" && !p.teamIds.includes(teamFilter)) return false;
+      return true;
     }).sort((a, b) => b.price - a.price);
-  }, [filter, state.lineup.playerIds]);
+  }, [filter, teamFilter, state.lineup.playerIds]);
 
   const selectedPlayers = state.lineup.playerIds
     .map((id) => ROSTER.find((p) => p.id === id))
@@ -226,7 +230,13 @@ export function LineupBuilder({
 
       <section className="overflow-hidden rounded-2xl border border-white/10 bg-navy/60">
         <header className="space-y-3 border-b border-white/10 px-4 py-3">
-          <h2 className="font-display text-xl tracking-wide text-cream">Mercat CBB</h2>
+          <h2 className="font-display text-xl tracking-wide text-cream">
+            Mercat CBB · FCBQ
+          </h2>
+          <p className="text-xs text-cream/50">
+            {ROSTER.length} jugadors dels sèniors amb estadístiques FCBQ. Lo Sifonet
+            B encara no té plantilla publicada.
+          </p>
           <div className="flex flex-wrap gap-2">
             {(["all", "base", "aler", "pivot"] as const).map((key) => (
               <Button
@@ -245,8 +255,50 @@ export function LineupBuilder({
               </Button>
             ))}
           </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant={teamFilter === "all" ? "default" : "ghost"}
+              onClick={() => setTeamFilter("all")}
+              className={
+                teamFilter === "all"
+                  ? "bg-gold text-navy-deep hover:bg-gold/90"
+                  : "text-cream/70 hover:bg-white/10 hover:text-cream"
+              }
+            >
+              Tots els equips
+            </Button>
+            {TEAM_ORDER.map((tid) => (
+              <Button
+                key={tid}
+                type="button"
+                size="sm"
+                variant={teamFilter === tid ? "default" : "ghost"}
+                onClick={() => setTeamFilter(tid)}
+                disabled={!TEAMS[tid].rosterAvailable && tid === "masc-b"}
+                className={
+                  teamFilter === tid
+                    ? "bg-gold text-navy-deep hover:bg-gold/90"
+                    : "text-cream/70 hover:bg-white/10 hover:text-cream"
+                }
+                title={TEAMS[tid].fullName}
+              >
+                {TEAMS[tid].label}
+                {!TEAMS[tid].rosterAvailable ? " · —" : ""}
+              </Button>
+            ))}
+          </div>
         </header>
-        {market.length === 0 ? (
+        {teamFilter === "masc-b" ? (
+          <div className="px-4 py-8 text-center text-sm text-cream/55">
+            <p className="font-medium text-cream">Lo Sifonet CB Balaguer B</p>
+            <p className="mt-1">
+              L&apos;FCBQ encara no publica estadístiques ni plantilla per a aquest
+              equip (2A Territorial Senior Masculí).
+            </p>
+          </div>
+        ) : market.length === 0 ? (
           <div className="px-4 py-8 text-center text-sm text-cream/55">
             No hi ha més jugadors amb aquest filtre.
           </div>

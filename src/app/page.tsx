@@ -28,6 +28,9 @@ export default function Home() {
             <span className="rounded-md border border-white/15 px-2 py-1">
               Bonus victòria +20%
             </span>
+            <span className="rounded-md border border-white/15 px-2 py-1">
+              100.000 € · 4 equips FCBQ
+            </span>
           </div>
         </div>
       </header>
@@ -35,8 +38,9 @@ export default function Home() {
       <FantasyApp />
 
       <footer className="mt-auto border-t border-white/10 px-4 py-6 text-center text-xs text-cream/40">
-        Projecte no oficial · No afiliat a l&apos;ACB ni a Fantasy LaLiga · Dades
-        de plantilla documentades amb placeholders etiquetats
+        Projecte no oficial · Plantilles dels sèniors CBB via FCBQ
+        (basquetcatala.cat) · Posicions fantasy estimades (l&apos;FCBQ no les
+        publica a la fitxa)
       </footer>
     </main>
   );

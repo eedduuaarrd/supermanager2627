@@ -1,6 +1,9 @@
 export type Position = "base" | "aler" | "pivot";
 
-export type PlayerSource = "documentat" | "placeholder";
+export type PlayerSource = "fcbq" | "documentat" | "placeholder";
+
+/** Short keys for the four CB Balaguer senior sides on FCBQ. */
+export type TeamId = "masc-a" | "masc-b" | "fem-a" | "fem-b";
 
 export interface Player {
   id: string;
@@ -8,9 +11,15 @@ export interface Player {
   number: number | null;
   position: Position;
   price: number;
-  /** Mitjana de valoració estimada (inspirada en SuperManager). */
+  /** Mitjana de valoració (VAL FCBQ o estimada). */
   avgVal: number;
   source: PlayerSource;
+  /** Primary FCBQ senior team (short id). */
+  teamId: TeamId;
+  /** All FCBQ teams where this player appears (dual-roster). */
+  teamIds: TeamId[];
+  /** Points per game from latest FCBQ sample, if any. */
+  pts?: number;
   note?: string;
 }
 

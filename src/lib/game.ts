@@ -1,5 +1,6 @@
 import {
   CAPTAIN_MULTIPLIER,
+  GAME_VERSION,
   INITIAL_BUDGET,
   LINEUP_SIZE,
   LINEUP_SLOTS,
@@ -43,7 +44,7 @@ export function createInitialState(managerName = "Mànager CBB"): GameState {
     currentRound: 1,
     history: [],
     league: createInitialLeague(managerName),
-    version: 1,
+    version: GAME_VERSION,
   };
 }
 

@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatPrice, POSITION_LABEL } from "@/data/roster";
+import { formatPrice, POSITION_LABEL, teamLabel } from "@/data/roster";
 import type { Player } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Crown, Plus, X } from "lucide-react";
@@ -47,6 +47,15 @@ export function PlayerRow({
               <Crown className="size-3" /> Capità
             </Badge>
           )}
+          {player.teamIds.map((tid) => (
+            <Badge
+              key={tid}
+              variant="outline"
+              className="border-grana/50 text-grana-bright"
+            >
+              {teamLabel(tid)}
+            </Badge>
+          ))}
           {player.source === "placeholder" && (
             <Badge variant="outline" className="border-amber-400/40 text-amber-200">
               Placeholder
@@ -54,7 +63,8 @@ export function PlayerRow({
           )}
         </div>
         <p className="mt-0.5 text-xs text-cream/55">
-          {POSITION_LABEL[player.position]} · mitjana {player.avgVal} ·{" "}
+          {POSITION_LABEL[player.position]}
+          {player.pts != null ? ` · ${player.pts} pts` : ""} · VAL {player.avgVal} ·{" "}
           {formatPrice(player.price)}
         </p>
       </div>
