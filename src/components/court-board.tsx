@@ -324,25 +324,55 @@ function FilledChip({
           </span>
         )}
       </button>
-      <Link
+      <ChipCaption
+        player={player}
+        asLink={!isSelected}
         href={href}
-        className="absolute left-1/2 top-[calc(100%+0.4rem)] z-10 w-[5.5rem] -translate-x-1/2 text-center"
-        aria-label={`Fitxa de ${player.name}`}
-      >
-        <p className="truncate text-[10px] font-semibold leading-snug text-bone drop-shadow sm:text-[11px]">
-          {displayFirstName(player.name)}
-        </p>
-        <p className="mt-0.5 text-[9px] tabular-nums text-bone/65 sm:text-[10px]">
-          VAL {player.avgVal}
-          <span className="mx-0.5 text-white/25">·</span>
-          <PriceLabel
-            price={player.price}
-            prevPrice={player.prevPrice}
-            compact
-            className="text-[9px] sm:text-[10px]"
-          />
-        </p>
-      </Link>
+      />
     </div>
+  );
+}
+
+function ChipCaption({
+  player,
+  asLink,
+  href,
+}: {
+  player: Player;
+  asLink: boolean;
+  href: string;
+}) {
+  const className =
+    "absolute left-1/2 top-[calc(100%+0.4rem)] z-10 w-[5.5rem] -translate-x-1/2 text-center";
+  const body = (
+    <>
+      <p className="truncate text-[10px] font-semibold leading-snug text-bone drop-shadow sm:text-[11px]">
+        {displayFirstName(player.name)}
+      </p>
+      <p className="mt-0.5 text-[9px] tabular-nums text-bone/65 sm:text-[10px]">
+        VAL {player.avgVal}
+        <span className="mx-0.5 text-white/25">·</span>
+        <PriceLabel
+          price={player.price}
+          prevPrice={player.prevPrice}
+          compact
+          className="text-[9px] sm:text-[10px]"
+        />
+      </p>
+    </>
+  );
+  // When selected, action-sheet backdrop covers the court — keep caption as
+  // plain text so taps don't silently dismiss; fitxa lives in the sheet.
+  if (!asLink) {
+    return <div className={cn(className, "pointer-events-none")}>{body}</div>;
+  }
+  return (
+    <Link
+      href={href}
+      className={className}
+      aria-label={`Fitxa de ${player.name}`}
+    >
+      {body}
+    </Link>
   );
 }
