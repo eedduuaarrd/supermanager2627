@@ -2,29 +2,16 @@
 
 import { PlayerRow } from "@/components/player-row";
 import { Button } from "@/components/ui/button";
-import {
-  LINEUP_SLOTS,
-  POSITION_LABEL,
-  TEAM_ORDER,
-  TEAMS,
-} from "@/data/roster";
-import type { Player, Position, TeamId } from "@/lib/types";
+import { TEAM_ORDER, TEAMS } from "@/data/roster";
+import type { Player, TeamId } from "@/lib/types";
 import { X } from "lucide-react";
 import { useEffect, useMemo } from "react";
 
-const TITLE: Record<Position, string> = {
-  base: "Tria un base",
-  aler: "Tria un aler",
-  pivot: "Tria un pivot",
-};
-
 interface MarketSheetProps {
   open: boolean;
-  position: Position | null;
   roster: Player[];
   takenIds: string[];
   remainingBudget: number;
-  positionCounts: Record<Position, number>;
   lineupFull: boolean;
   onPick: (playerId: string) => void;
   onClose: () => void;
@@ -32,20 +19,17 @@ interface MarketSheetProps {
 
 export function MarketSheet({
   open,
-  position,
   roster,
   takenIds,
   remainingBudget,
-  positionCounts,
   lineupFull,
   onPick,
   onClose,
 }: MarketSheetProps) {
   const sections = useMemo(() => {
-    if (!position) return [] as { teamId: TeamId; players: Player[] }[];
+    if (!open) return [] as { teamId: TeamId; players: Player[] }[];
 
     const available = roster
-      .filter((p) => p.position === position)
       .filter((p) => !takenIds.includes(p.id))
       .sort((a, b) => b.price - a.price);
 
@@ -53,7 +37,7 @@ export function MarketSheet({
       teamId,
       players: available.filter((p) => p.teamIds.includes(teamId)),
     })).filter((s) => s.players.length > 0);
-  }, [position, roster, takenIds]);
+  }, [open, roster, takenIds]);
 
   useEffect(() => {
     if (!open) return;
@@ -69,9 +53,7 @@ export function MarketSheet({
     };
   }, [open, onClose]);
 
-  if (!open || !position) return null;
-
-  const posFull = positionCounts[position] >= LINEUP_SLOTS[position];
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end" role="dialog" aria-modal="true">
@@ -81,17 +63,15 @@ export function MarketSheet({
         aria-label="Tancar mercat"
         onClick={onClose}
       />
-      <div className="market-sheet relative z-10 flex max-h-[85vh] w-full flex-col overflow-hidden rounded-t-2xl border border-line border-b-0 bg-ink shadow-[0_-12px_40px_rgba(0,0,0,0.45)]">
+      <div className="market-sheet relative z-10 flex max-h-[min(85dvh,32rem)] w-full flex-col overflow-hidden rounded-t-2xl border border-line border-b-0 bg-ink shadow-[0_-12px_40px_rgba(0,0,0,0.45)]">
         <div className="flex shrink-0 flex-col items-center px-4 pt-2.5 pb-3">
           <div className="mb-2.5 h-1 w-10 rounded-full bg-white/25" aria-hidden />
           <div className="flex w-full items-start justify-between gap-3">
             <div className="min-w-0">
               <h2 className="font-display text-xl tracking-wide text-bone">
-                {TITLE[position]}
+                Tria un jugador
               </h2>
-              <p className="mt-0.5 text-xs text-mute">
-                Agrupats per equip · {POSITION_LABEL[position]}
-              </p>
+              <p className="mt-0.5 text-xs text-mute">Agrupats per equip del club</p>
             </div>
             <Button
               type="button"
@@ -109,7 +89,7 @@ export function MarketSheet({
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-[max(1rem,env(safe-area-inset-bottom))]">
           {sections.length === 0 ? (
             <div className="px-4 py-10 text-center text-sm text-mute">
-              No hi ha més {POSITION_LABEL[position].toLowerCase()}s disponibles.
+              No hi ha més jugadors disponibles.
             </div>
           ) : (
             sections.map(({ teamId, players }) => (
@@ -127,8 +107,7 @@ export function MarketSheet({
                 <div>
                   {players.map((player) => {
                     const tooExpensive = remainingBudget < player.price;
-                    const disabled =
-                      posFull || tooExpensive || lineupFull;
+                    const disabled = tooExpensive || lineupFull;
                     return (
                       <PlayerRow
                         key={player.id}

@@ -3,7 +3,6 @@ import {
   GAME_VERSION,
   INITIAL_BUDGET,
   LINEUP_SIZE,
-  LINEUP_SLOTS,
   OPPONENTS,
   WIN_BONUS,
   getPlayer,
@@ -56,21 +55,70 @@ export function remainingBudget(budget: number, playerIds: string[]): number {
   return budget - spentBudget(playerIds);
 }
 
-export function countByPosition(playerIds: string[]) {
-  const counts = { base: 0, aler: 0, pivot: 0 };
-  for (const id of playerIds) {
-    const p = getPlayer(id);
-    if (p) counts[p.position] += 1;
+/**
+ * Normalize lineup player ids from DB / API JSON.
+ * Supports legacy position-keyed `{ slots: { base, aler, pivot } }` and
+ * flat arrays / `{ playerIds }` / `{ slots: (string|null)[] }`.
+ */
+export function parsePlayerIds(raw: unknown): string[] {
+  let data: unknown = raw;
+  if (typeof raw === "string") {
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      return [];
+    }
   }
-  return counts;
+
+  if (Array.isArray(data)) {
+    return data
+      .filter((x): x is string => typeof x === "string" && x.length > 0)
+      .slice(0, LINEUP_SIZE);
+  }
+
+  if (!data || typeof data !== "object") return [];
+
+  const obj = data as Record<string, unknown>;
+
+  if (Array.isArray(obj.playerIds)) {
+    return obj.playerIds
+      .filter((x): x is string => typeof x === "string" && x.length > 0)
+      .slice(0, LINEUP_SIZE);
+  }
+
+  if (Array.isArray(obj.slots)) {
+    return obj.slots
+      .filter((x): x is string => typeof x === "string" && x.length > 0)
+      .slice(0, LINEUP_SIZE);
+  }
+
+  if (obj.slots && typeof obj.slots === "object" && !Array.isArray(obj.slots)) {
+    const slots = obj.slots as Record<string, unknown>;
+    const ids: string[] = [];
+    for (const key of ["base", "aler", "pivot"]) {
+      const arr = slots[key];
+      if (!Array.isArray(arr)) continue;
+      for (const id of arr) {
+        if (typeof id === "string" && id.length > 0) ids.push(id);
+      }
+    }
+    return ids.slice(0, LINEUP_SIZE);
+  }
+
+  return [];
 }
 
-export type LineupIssue =
-  | "incomplete"
-  | "budget"
-  | "positions"
-  | "captain"
-  | "duplicate";
+/** True when stored JSON was not already a flat string[]. */
+export function needsPlayerIdsMigration(raw: string): boolean {
+  try {
+    const data = JSON.parse(raw) as unknown;
+    return !Array.isArray(data);
+  } catch {
+    return true;
+  }
+}
+
+export type LineupIssue = "incomplete" | "budget" | "captain" | "duplicate";
 
 export function validateLineup(
   lineup: Lineup,
@@ -82,15 +130,6 @@ export function validateLineup(
   if (unique.size !== lineup.playerIds.length) issues.push("duplicate");
   if (lineup.playerIds.length !== LINEUP_SIZE) issues.push("incomplete");
   if (remainingBudget(budget, lineup.playerIds) < 0) issues.push("budget");
-
-  const counts = countByPosition(lineup.playerIds);
-  if (
-    counts.base !== LINEUP_SLOTS.base ||
-    counts.aler !== LINEUP_SLOTS.aler ||
-    counts.pivot !== LINEUP_SLOTS.pivot
-  ) {
-    issues.push("positions");
-  }
 
   if (!lineup.captainId || !lineup.playerIds.includes(lineup.captainId)) {
     issues.push("captain");
@@ -208,11 +247,9 @@ export function projectedPoints(lineup: Lineup): number {
 export function issueMessage(issue: LineupIssue): string {
   switch (issue) {
     case "incomplete":
-      return `Calen ${LINEUP_SIZE} jugadors (2 bases, 3 alers, 3 pivots).`;
+      return `Calen ${LINEUP_SIZE} jugadors.`;
     case "budget":
       return "Has superat el pressupost disponible.";
-    case "positions":
-      return "La distribució de posicions no és correcta.";
     case "captain":
       return "Tria un capità de l'alineació (x2 punts).";
     case "duplicate":

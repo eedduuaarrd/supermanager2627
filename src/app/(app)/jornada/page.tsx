@@ -38,7 +38,7 @@ function JornadaContent() {
           Jornada {round}
         </h1>
         <p className="mt-3 max-w-md text-sm leading-relaxed text-mute">
-          Configura 8 jugadors (2 bases, 3 alers, 3 pivots), tria capità (×2) i
+          Configura 8 jugadors (qualsevol mix), tria capità (×2) i
           confirma abans que es tanqui la jornada.
         </p>
       </section>

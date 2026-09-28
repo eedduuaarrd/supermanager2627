@@ -14,12 +14,10 @@ import type { Player, TeamId } from "@/lib/types";
  *   https://www.basquetcatala.cat/estadistica/equip/a5c75f3f-ca35-4553-9eb6-a29780eb2007
  *
  * L'FCBQ no publica número de samarreta ni posició a la fitxa d'estadística.
- * Posicions assignades per heurística fantasy (perfil de tir / minuts) per
- * mantenir el mercat jugable amb 2 bases / 3 alers / 3 pivots.
+ * No hi ha posicions fantasy: l'alineació són 8 jugadors lliures.
  * Preus derivats de PTS + VAL + MIN de la mostra FCBQ (1 partit a la captura).
  *
- * Regles: es manté plantilla 8 (2/3/3). Pressupost pujat a 100.000 € perquè
- * el mercat cobreix 3 equips amb estadístiques (~26 jugadors únics).
+ * Regles: plantilla 8, pressupost 100.000 € (mercat multi-equip ~26 jugadors).
  */
 
 export interface TeamInfo {
@@ -85,7 +83,6 @@ export const ROSTER: Player[] = [
     id: "hector-lozano",
     name: "Hèctor Lozano Martínez",
     number: null,
-    position: "aler",
     pts: 16,
     avgVal: avgFrom(-3, 16),
     price: priceFrom(16, -3, 23.5),
@@ -98,7 +95,6 @@ export const ROSTER: Player[] = [
     id: "eduard-bernat",
     name: "Eduard Bernat Sucarrat",
     number: null,
-    position: "base",
     pts: 10,
     avgVal: avgFrom(-6, 10),
     price: priceFrom(10, -6, 27.1),
@@ -111,7 +107,6 @@ export const ROSTER: Player[] = [
     id: "toni-salud",
     name: "Toni Salud Garcia",
     number: null,
-    position: "pivot",
     pts: 8,
     avgVal: avgFrom(4, 8),
     price: priceFrom(8, 4, 24.2),
@@ -124,7 +119,6 @@ export const ROSTER: Player[] = [
     id: "ivan-franco",
     name: "Ivan Franco Guerrero",
     number: null,
-    position: "aler",
     pts: 8,
     avgVal: avgFrom(-15, 8),
     price: priceFrom(8, -15, 27.5),
@@ -137,7 +131,6 @@ export const ROSTER: Player[] = [
     id: "gerard-garcia",
     name: "Gerard Garcia Rosauro",
     number: null,
-    position: "base",
     pts: 8,
     avgVal: avgFrom(-3, 8),
     price: priceFrom(8, -3, 26.4),
@@ -150,7 +143,6 @@ export const ROSTER: Player[] = [
     id: "marc-escoda",
     name: "Marc Escoda Angerri",
     number: null,
-    position: "aler",
     pts: 6,
     avgVal: avgFrom(4, 6),
     price: priceFrom(6, 4, 18),
@@ -163,7 +155,6 @@ export const ROSTER: Player[] = [
     id: "babacar-toure",
     name: "Babacar Touré Gassama",
     number: null,
-    position: "pivot",
     pts: 6,
     avgVal: avgFrom(-15, 6),
     price: priceFrom(6, -15, 23),
@@ -176,7 +167,6 @@ export const ROSTER: Player[] = [
     id: "gerard-soldevila",
     name: "Gerard Soldevila Casas",
     number: null,
-    position: "base",
     pts: 0,
     avgVal: 2,
     price: priceFrom(0, -2, 16.1),
@@ -189,7 +179,6 @@ export const ROSTER: Player[] = [
     id: "roger-companys",
     name: "Roger Companys Solà",
     number: null,
-    position: "pivot",
     pts: 0,
     avgVal: avgFrom(1, 0),
     price: priceFrom(0, 1, 14.1),
@@ -204,7 +193,6 @@ export const ROSTER: Player[] = [
     id: "ares-bunol",
     name: "Ares Buñol Perelló",
     number: null,
-    position: "aler",
     pts: 16,
     avgVal: avgFrom(24, 16),
     price: priceFrom(16, 24, 26.4),
@@ -217,7 +205,6 @@ export const ROSTER: Player[] = [
     id: "julia-pla",
     name: "Júlia Pla Pla",
     number: null,
-    position: "aler",
     pts: 15,
     avgVal: avgFrom(18, 15),
     price: priceFrom(15, 18, 29.4),
@@ -231,7 +218,6 @@ export const ROSTER: Player[] = [
     id: "andrea-perat",
     name: "Andrea Perat Gràcia",
     number: null,
-    position: "pivot",
     pts: 8,
     avgVal: avgFrom(18, 8),
     price: priceFrom(8, 18, 27.4),
@@ -244,7 +230,6 @@ export const ROSTER: Player[] = [
     id: "neus-escoda",
     name: "Neus Escoda Angerri",
     number: null,
-    position: "pivot",
     pts: 8,
     avgVal: avgFrom(15, 8),
     price: priceFrom(8, 15, 26.8),
@@ -257,7 +242,6 @@ export const ROSTER: Player[] = [
     id: "monica-fontanet",
     name: "Mònica Fontanet Mallol",
     number: null,
-    position: "base",
     pts: 6,
     avgVal: avgFrom(13, 6),
     price: priceFrom(6, 13, 19.4),
@@ -270,7 +254,6 @@ export const ROSTER: Player[] = [
     id: "gueralt-sole",
     name: "Gueralt Solé Torres",
     number: null,
-    position: "pivot",
     pts: 23,
     avgVal: avgFrom(12, 23),
     price: priceFrom(23, 12, 37.5),
@@ -284,7 +267,6 @@ export const ROSTER: Player[] = [
     id: "clara-paniagua",
     name: "Clara Paniagua Marvà",
     number: null,
-    position: "aler",
     pts: 2,
     avgVal: avgFrom(-2, 2),
     price: priceFrom(2, -2, 16.3),
@@ -297,7 +279,6 @@ export const ROSTER: Player[] = [
     id: "mariana-mballo",
     name: "Mariana Mballo Diallo",
     number: null,
-    position: "pivot",
     pts: 2,
     avgVal: avgFrom(12, 2),
     price: priceFrom(2, 12, 23.7),
@@ -311,7 +292,6 @@ export const ROSTER: Player[] = [
     id: "martina-benitez",
     name: "Martina Benítez Farrando",
     number: null,
-    position: "base",
     pts: 1,
     avgVal: avgFrom(-15, 1),
     price: priceFrom(1, -15, 15.7),
@@ -324,7 +304,6 @@ export const ROSTER: Player[] = [
     id: "ada-dorienie",
     name: "Ada Doriene Moraleda",
     number: null,
-    position: "pivot",
     pts: 0,
     avgVal: 1,
     price: priceFrom(0, -17, 13),
@@ -339,7 +318,6 @@ export const ROSTER: Player[] = [
     id: "jana-roldan",
     name: "Jana Roldán Arandilla",
     number: null,
-    position: "base",
     pts: 5,
     avgVal: avgFrom(0, 5),
     price: priceFrom(5, 0, 19.3),
@@ -352,7 +330,6 @@ export const ROSTER: Player[] = [
     id: "nuria-jimenez",
     name: "Núria Jiménez Aran",
     number: null,
-    position: "aler",
     pts: 2,
     avgVal: avgFrom(1, 2),
     price: priceFrom(2, 1, 23),
@@ -365,7 +342,6 @@ export const ROSTER: Player[] = [
     id: "abril-gracia",
     name: "Abril Gràcia Palacín",
     number: null,
-    position: "base",
     pts: 2,
     avgVal: avgFrom(-3, 2),
     price: priceFrom(2, -3, 8.6),
@@ -378,7 +354,6 @@ export const ROSTER: Player[] = [
     id: "xenia-andreu",
     name: "Xènia Andreu Monell",
     number: null,
-    position: "aler",
     pts: 1,
     avgVal: avgFrom(-8, 1),
     price: priceFrom(1, -8, 11.1),
@@ -391,7 +366,6 @@ export const ROSTER: Player[] = [
     id: "gina-betbese",
     name: "Gina Betbesé Sànchez",
     number: null,
-    position: "aler",
     pts: 0,
     avgVal: 1,
     price: priceFrom(0, -6, 2.7),
@@ -404,7 +378,6 @@ export const ROSTER: Player[] = [
     id: "gina-trilla",
     name: "Gina Trilla Piniès",
     number: null,
-    position: "base",
     pts: 0,
     avgVal: avgFrom(11, 0),
     price: priceFrom(0, 11, 33.5),
@@ -417,7 +390,6 @@ export const ROSTER: Player[] = [
     id: "jana-alarcon",
     name: "Jana Alarcón Solanés",
     number: null,
-    position: "pivot",
     pts: 0,
     avgVal: 1,
     price: priceFrom(0, -2, 4.2),
@@ -428,27 +400,14 @@ export const ROSTER: Player[] = [
   },
 ];
 
-export const POSITION_LABEL: Record<Player["position"], string> = {
-  base: "Base",
-  aler: "Aler",
-  pivot: "Pivot",
-};
-
-/** Manté 2/3/3: mercat més gran, mateixa plantilla fantasy jugable. */
-export const LINEUP_SLOTS = {
-  base: 2,
-  aler: 3,
-  pivot: 3,
-} as const;
-
 export const LINEUP_SIZE = 8;
-/** Pujat de 90k → 100k amb mercat multi-equip. */
+/** Pressupost amb mercat multi-equip. */
 export const INITIAL_BUDGET = 100_000;
 export const CAPTAIN_MULTIPLIER = 2;
 export const WIN_BONUS = 0.2;
 
-/** GameState.version — invalida partides amb plantilla antiga. */
-export const GAME_VERSION = 3;
+/** GameState.version — bump when lineup/roster schema changes (no positions). */
+export const GAME_VERSION = 4;
 
 export const OPPONENTS = [
   "CB Cervera",

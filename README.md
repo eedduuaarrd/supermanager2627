@@ -29,8 +29,8 @@ npm run start
 
 1. Obre la URL pública i **Registra’t** (nom, equip fantasy, correu, contrasenya ≥ 8).
 2. El **primer compte** del servidor és administrador (pot tancar/simular jornades).
-3. Al **dashboard**: afegeix 8 jugadors (2/3/3), tria capità, confirma alineació.
-4. Classificació **general** i d’**última jornada** a la pestanya Classificació.
+3. A **Equip**: afegeix 8 jugadors (qualsevol mix), tria capità, confirma alineació.
+4. Classificació **general** i d’**última jornada** a Classificació.
 
 ## Dades
 

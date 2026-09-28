@@ -56,7 +56,7 @@ export default async function Home() {
         </div>
         <ul className="animate-fade-up-delay mt-10 grid max-w-2xl gap-3 text-sm text-mute sm:grid-cols-3">
           <li className="border-l border-grana pl-3">
-            Plantilla 8 · 2/3/3
+            Plantilla 8 jugadors
           </li>
           <li className="border-l border-line pl-3">Jornada + general</li>
           <li className="border-l border-line pl-3">Dades FCBQ 2026-27</li>

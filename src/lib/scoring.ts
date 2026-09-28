@@ -12,7 +12,11 @@ import {
   type DbLineup,
 } from "@/lib/db";
 import type { RoundScore } from "@/lib/types";
-import { validateLineup } from "@/lib/game";
+import {
+  needsPlayerIdsMigration,
+  parsePlayerIds,
+  validateLineup,
+} from "@/lib/game";
 
 function seededRandom(seed: number) {
   let t = seed + 0x6d2b79f5;
@@ -94,13 +98,14 @@ export function getStandings(
   };
 }
 
+/** Read lineup row and flatten legacy position-keyed JSON to string[]. */
 export function ensureLineupRow(userId: string, round?: number) {
   const db = getDb();
   const r = round ?? getCurrentRound(db);
   const existing = db
     .prepare("SELECT * FROM lineups WHERE user_id = ? AND round = ?")
     .get(userId, r) as DbLineup | undefined;
-  if (existing) return existing;
+  if (existing) return migrateLineupRowIfNeeded(existing);
 
   db.prepare(
     `INSERT INTO lineups (user_id, round, player_ids, captain_id, confirmed, confirmed_at, budget)
@@ -110,6 +115,22 @@ export function ensureLineupRow(userId: string, round?: number) {
   return db
     .prepare("SELECT * FROM lineups WHERE user_id = ? AND round = ?")
     .get(userId, r) as DbLineup;
+}
+
+function migrateLineupRowIfNeeded(row: DbLineup): DbLineup {
+  if (!needsPlayerIdsMigration(row.player_ids)) return row;
+  const flat = parsePlayerIds(row.player_ids);
+  const captainId =
+    row.captain_id && flat.includes(row.captain_id) ? row.captain_id : null;
+  const db = getDb();
+  db.prepare(
+    `UPDATE lineups SET player_ids = ?, captain_id = ? WHERE user_id = ? AND round = ?`,
+  ).run(JSON.stringify(flat), captainId, row.user_id, row.round);
+  return {
+    ...row,
+    player_ids: JSON.stringify(flat),
+    captain_id: captainId,
+  };
 }
 
 export function saveLineup(
@@ -132,7 +153,7 @@ export function confirmLineup(userId: string): { ok: true } | { error: string } 
   const db = getDb();
   const round = getCurrentRound(db);
   const row = ensureLineupRow(userId, round);
-  const playerIds = JSON.parse(row.player_ids) as string[];
+  const playerIds = parsePlayerIds(row.player_ids);
   const lineup = {
     playerIds,
     captainId: row.captain_id,
@@ -145,7 +166,7 @@ export function confirmLineup(userId: string): { ok: true } | { error: string } 
       error:
         issues[0] === "captain"
           ? "Tria un capità abans de confirmar."
-          : "L'alineació no compleix les normes (2/3/3 i pressupost).",
+          : "L'alineació no compleix les normes (8 jugadors, pressupost i capità).",
     };
   }
   db.prepare(
@@ -173,7 +194,7 @@ export function simulateJornada(): {
 
   const tx = db.transaction(() => {
     for (const row of confirmed) {
-      const playerIds = JSON.parse(row.player_ids) as string[];
+      const playerIds = parsePlayerIds(row.player_ids);
       const seed =
         round * 997 +
         row.user_id

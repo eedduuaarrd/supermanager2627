@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { readSession } from "@/lib/auth";
 import { confirmLineup, ensureLineupRow } from "@/lib/scoring";
 import { getCurrentRound } from "@/lib/db";
+import { parsePlayerIds } from "@/lib/game";
 
 export const runtime = "nodejs";
 
@@ -20,7 +21,7 @@ export async function POST() {
     ok: true,
     round,
     lineup: {
-      playerIds: JSON.parse(row.player_ids) as string[],
+      playerIds: parsePlayerIds(row.player_ids),
       captainId: row.captain_id,
       confirmed: row.confirmed === 1,
       confirmedAt: row.confirmed_at,

@@ -1,5 +1,3 @@
-export type Position = "base" | "aler" | "pivot";
-
 export type PlayerSource = "fcbq" | "documentat" | "placeholder";
 
 /** Short keys for the four CB Balaguer senior sides on FCBQ. */
@@ -9,7 +7,6 @@ export interface Player {
   id: string;
   name: string;
   number: number | null;
-  position: Position;
   price: number;
   /** Mitjana de valoració (VAL FCBQ o estimada). */
   avgVal: number;

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { readSession } from "@/lib/auth";
-import { ROSTER, TEAMS, TEAM_ORDER, INITIAL_BUDGET, LINEUP_SLOTS } from "@/data/roster";
+import { ROSTER, TEAMS, TEAM_ORDER, INITIAL_BUDGET, LINEUP_SIZE } from "@/data/roster";
 
 export const runtime = "nodejs";
 
@@ -14,7 +14,7 @@ export async function GET() {
     teams: TEAM_ORDER.map((id) => TEAMS[id]),
     rules: {
       budget: INITIAL_BUDGET,
-      slots: LINEUP_SLOTS,
+      lineupSize: LINEUP_SIZE,
     },
   });
 }

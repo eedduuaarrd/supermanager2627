@@ -42,8 +42,7 @@ export default function ComptePage() {
           Regles ràpides
         </p>
         <ul className="mt-3 space-y-2 text-sm text-mute">
-          <li>8 jugadors per alineació</li>
-          <li>2 bases · 3 alers · 3 pivots</li>
+          <li>8 jugadors per alineació (qualsevol mix)</li>
           <li>Pressupost 100.000 €</li>
           <li>Capità ×2 als punts de jornada</li>
         </ul>

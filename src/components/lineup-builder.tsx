@@ -4,20 +4,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CourtBoard } from "@/components/court-board";
 import { MarketSheet } from "@/components/market-sheet";
+import { formatPrice, LINEUP_SIZE } from "@/data/roster";
 import {
-  formatPrice,
-  LINEUP_SIZE,
-  LINEUP_SLOTS,
-  POSITION_LABEL,
-} from "@/data/roster";
-import {
-  countByPosition,
   issueMessage,
   projectedPoints,
   remainingBudget,
   validateLineup,
 } from "@/lib/game";
-import type { Lineup, Player, Position } from "@/lib/types";
+import type { Lineup, Player } from "@/lib/types";
 import {
   AlertCircle,
   CheckCircle2,
@@ -39,22 +33,6 @@ interface LineupBuilderProps {
   error?: string | null;
 }
 
-function softProgressLabel(
-  counts: Record<Position, number>,
-  filled: number,
-): string {
-  const missing: string[] = [];
-  (Object.keys(LINEUP_SLOTS) as Position[]).forEach((pos) => {
-    const need = LINEUP_SLOTS[pos] - counts[pos];
-    if (need > 0) {
-      const label = POSITION_LABEL[pos].toLowerCase();
-      missing.push(need === 1 ? label : `${need} ${label}s`);
-    }
-  });
-  const miss = missing.length ? ` · falta ${missing.join(", ")}` : "";
-  return `${filled}/${LINEUP_SIZE}${miss}`;
-}
-
 export function LineupBuilder({
   roster,
   budget,
@@ -68,13 +46,9 @@ export function LineupBuilder({
 }: LineupBuilderProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [confirmAttempted, setConfirmAttempted] = useState(false);
-  const [pickerSlot, setPickerSlot] = useState<null | {
-    slotIndex: number;
-    position: Position;
-  }>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const remaining = remainingBudget(budget, lineup.playerIds);
-  const counts = countByPosition(lineup.playerIds);
   const validation = validateLineup(lineup, budget);
   const projected = projectedPoints(lineup);
   const spentPct = Math.min(
@@ -123,7 +97,6 @@ export function LineupBuilder({
     if (lineup.playerIds.length >= LINEUP_SIZE) return;
     const player = roster.find((p) => p.id === id);
     if (!player) return;
-    if (counts[player.position] >= LINEUP_SLOTS[player.position]) return;
     if (remaining < player.price) return;
     applyLineup([...lineup.playerIds, id], lineup.captainId);
     setSelectedId(null);
@@ -139,14 +112,14 @@ export function LineupBuilder({
     });
   }
 
-  function handleEmptySlot(slot: { slotIndex: number; position: Position }) {
+  function handleEmptySlot() {
     setSelectedId(null);
-    setPickerSlot(slot);
+    setPickerOpen(true);
   }
 
   function handlePickFromSheet(playerId: string) {
     addPlayer(playerId);
-    setPickerSlot(null);
+    setPickerOpen(false);
   }
 
   function handleConfirmClick() {
@@ -160,69 +133,55 @@ export function LineupBuilder({
   }
 
   return (
-    <div className="space-y-3 pb-8">
-      {/* Compact budget strip — single source of position counts */}
-      <section className="budget-strip sticky top-0 z-20 border border-line bg-panel/80 px-3 py-2.5 backdrop-blur-md">
+    <div className="flex h-full min-h-0 flex-col gap-2">
+      {/* Compact budget strip */}
+      <section className="budget-strip shrink-0 border border-line bg-panel/80 px-3 py-2 backdrop-blur-md">
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[10px] uppercase tracking-[0.18em] text-mute">
               J{currentRound}
               {saving ? " · Desant…" : ""} · restant
+              <span className="mx-1 text-white/25">·</span>
+              <span
+                className={
+                  filled === LINEUP_SIZE ? "text-grana-bright" : undefined
+                }
+              >
+                {filled}/{LINEUP_SIZE}
+              </span>
             </p>
-            <p className="font-display text-2xl leading-none text-bone tabular-nums">
+            <p className="font-display text-xl leading-none text-bone tabular-nums sm:text-2xl">
               {formatPrice(Math.max(0, remaining))}
             </p>
           </div>
           <div className="text-right">
             <p className="text-[10px] uppercase tracking-[0.14em] text-mute">
               Proj.
+              {lineup.confirmed ? (
+                <Badge className="ml-1.5 align-middle bg-emerald-700 text-[9px] text-white">
+                  OK
+                </Badge>
+              ) : (
+                <span className="ml-1.5 normal-case tracking-normal text-mute/80">
+                  · capità ×2
+                </span>
+              )}
             </p>
-            <p className="font-display text-xl leading-none text-grana-bright tabular-nums">
+            <p className="font-display text-lg leading-none text-grana-bright tabular-nums sm:text-xl">
               {projected}
             </p>
           </div>
         </div>
-        <div className="mt-2 h-1 overflow-hidden bg-white/10">
+        <div className="mt-1.5 h-1 overflow-hidden bg-white/10">
           <div
             className="h-full bg-grana transition-all duration-500"
             style={{ width: `${spentPct}%` }}
           />
         </div>
-        <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] tabular-nums text-mute">
-          {(Object.keys(LINEUP_SLOTS) as Position[]).map((pos) => (
-            <span
-              key={pos}
-              className={
-                counts[pos] === LINEUP_SLOTS[pos]
-                  ? "text-grana-bright"
-                  : "text-mute"
-              }
-            >
-              {POSITION_LABEL[pos]} {counts[pos]}/{LINEUP_SLOTS[pos]}
-            </span>
-          ))}
-          <span
-            className={
-              filled === LINEUP_SIZE ? "text-grana-bright" : "text-mute"
-            }
-          >
-            · {filled}/{LINEUP_SIZE}
-          </span>
-        </div>
       </section>
 
-      {/* Court-only view */}
-      <section className="overflow-hidden">
-        <header className="mb-1.5 flex items-center justify-between px-0.5">
-          <h2 className="font-display text-xl tracking-wide text-bone">
-            El teu equip
-          </h2>
-          {lineup.confirmed ? (
-            <Badge className="bg-emerald-700 text-white">Confirmada</Badge>
-          ) : (
-            <p className="text-[11px] text-mute">capità ×2</p>
-          )}
-        </header>
+      {/* Court fills remaining viewport height */}
+      <section className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <CourtBoard
           players={selectedPlayers}
           captainId={lineup.captainId}
@@ -230,25 +189,20 @@ export function LineupBuilder({
           selectedId={selectedId}
           onSelect={lineup.confirmed ? undefined : setSelectedId}
           onEmptySlot={lineup.confirmed ? undefined : handleEmptySlot}
+          fillHeight
         />
       </section>
 
-      {/* Soft progress (incomplete, before confirm attempt) */}
-      {!lineup.confirmed && incomplete && !showHarshValidation && filled > 0 && (
-        <p className="px-0.5 text-sm text-mute">
-          {softProgressLabel(counts, filled)}
-        </p>
-      )}
-      {!lineup.confirmed && filled === 0 && (
-        <p className="px-0.5 text-sm text-mute">
+      {!lineup.confirmed && incomplete && !showHarshValidation && filled === 0 && (
+        <p className="shrink-0 px-0.5 text-center text-xs text-mute">
           Toca + a la pista per afegir un jugador
         </p>
       )}
 
       {showHarshValidation && (
-        <div className="flex gap-2 border border-amber-500/30 bg-amber-500/10 px-3 py-3 text-sm text-amber-100">
-          <AlertCircle className="mt-0.5 size-4 shrink-0" />
-          <ul className="space-y-1">
+        <div className="flex shrink-0 gap-2 border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+          <AlertCircle className="mt-0.5 size-3.5 shrink-0" />
+          <ul className="space-y-0.5">
             {validation.issues.map((issue) => (
               <li key={issue}>{issueMessage(issue)}</li>
             ))}
@@ -257,8 +211,8 @@ export function LineupBuilder({
       )}
 
       {error && (
-        <div className="flex gap-2 border border-red-500/40 bg-red-500/10 px-3 py-3 text-sm text-red-100">
-          <AlertCircle className="mt-0.5 size-4 shrink-0" />
+        <div className="flex shrink-0 gap-2 border border-red-500/40 bg-red-500/10 px-3 py-2 text-xs text-red-100">
+          <AlertCircle className="mt-0.5 size-3.5 shrink-0" />
           <p>{error}</p>
         </div>
       )}
@@ -268,7 +222,7 @@ export function LineupBuilder({
         size="lg"
         disabled={confirming || lineup.confirmed}
         onClick={handleConfirmClick}
-        className="h-12 w-full bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright disabled:opacity-60"
+        className="h-11 w-full shrink-0 bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright disabled:opacity-60"
       >
         {confirming ? (
           <>
@@ -284,29 +238,23 @@ export function LineupBuilder({
       </Button>
 
       <MarketSheet
-        open={pickerSlot != null}
-        position={pickerSlot?.position ?? null}
+        open={pickerOpen}
         roster={roster}
         takenIds={lineup.playerIds}
         remainingBudget={remaining}
-        positionCounts={counts}
         lineupFull={filled >= LINEUP_SIZE}
         onPick={handlePickFromSheet}
-        onClose={() => setPickerSlot(null)}
+        onClose={() => setPickerOpen(false)}
       />
 
-      {/* Sticky selected-player actions — Fantasy LaLiga style */}
-      {selectedPlayer && !lineup.confirmed && pickerSlot == null && (
-        <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-40 border-t border-line bg-ink/95 px-4 py-3 backdrop-blur-md">
+      {selectedPlayer && !lineup.confirmed && !pickerOpen && (
+        <div className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-40 border-t border-line bg-ink/95 px-4 py-2.5 backdrop-blur-md">
           <div className="mx-auto flex w-full max-w-lg items-center gap-2">
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-bone">
                 {selectedPlayer.name}
               </p>
-              <p className="text-xs text-mute">
-                {POSITION_LABEL[selectedPlayer.position]} · VAL{" "}
-                {selectedPlayer.avgVal}
-              </p>
+              <p className="text-xs text-mute">VAL {selectedPlayer.avgVal}</p>
             </div>
             <Button
               type="button"
@@ -314,8 +262,8 @@ export function LineupBuilder({
               onClick={() => setCaptain(selectedPlayer.id)}
               className={
                 lineup.captainId === selectedPlayer.id
-                  ? "h-12 shrink-0 bg-grana text-bone hover:bg-grana-bright"
-                  : "h-12 shrink-0 border border-line bg-panel-2 text-bone hover:bg-white/10"
+                  ? "h-11 shrink-0 bg-grana text-bone hover:bg-grana-bright"
+                  : "h-11 shrink-0 border border-line bg-panel-2 text-bone hover:bg-white/10"
               }
             >
               <Crown className="size-4" /> Capità
@@ -324,7 +272,7 @@ export function LineupBuilder({
               type="button"
               size="lg"
               onClick={() => removePlayer(selectedPlayer.id)}
-              className="h-12 shrink-0 bg-bone text-ink hover:bg-white"
+              className="h-11 shrink-0 bg-bone text-ink hover:bg-white"
             >
               <UserMinus className="size-4" /> Treure
             </Button>

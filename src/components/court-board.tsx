@@ -1,36 +1,32 @@
 "use client";
 
 import { PlayerAvatar } from "@/components/player-avatar";
-import { formatPrice, POSITION_LABEL } from "@/data/roster";
-import type { Player, Position } from "@/lib/types";
+import { formatPrice, LINEUP_SIZE } from "@/data/roster";
+import type { Player } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Crown, Plus } from "lucide-react";
 import type { CSSProperties } from "react";
 
 type SlotDef = {
   key: string;
-  position: Position;
   left: string;
   top: string;
 };
 
 /**
  * Flat half-court grid (looking toward the hoop).
- * Each row shares one `top`; left/right symmetry via `left` only.
+ * 8 equal slots — any mix of players; no position labels.
  * left/top mark the CHIP CIRCLE center; labels sit below outside the circle.
  */
 const SLOTS: SlotDef[] = [
-  // pivots — one flat row below the hoop
-  { key: "pivot-0", position: "pivot", left: "18%", top: "22%" },
-  { key: "pivot-1", position: "pivot", left: "50%", top: "22%" },
-  { key: "pivot-2", position: "pivot", left: "82%", top: "22%" },
-  // alers
-  { key: "aler-0", position: "aler", left: "18%", top: "50%" },
-  { key: "aler-1", position: "aler", left: "50%", top: "50%" },
-  { key: "aler-2", position: "aler", left: "82%", top: "50%" },
-  // bases
-  { key: "base-0", position: "base", left: "32%", top: "78%" },
-  { key: "base-1", position: "base", left: "68%", top: "78%" },
+  { key: "s0", left: "18%", top: "22%" },
+  { key: "s1", left: "50%", top: "22%" },
+  { key: "s2", left: "82%", top: "22%" },
+  { key: "s3", left: "18%", top: "50%" },
+  { key: "s4", left: "50%", top: "50%" },
+  { key: "s5", left: "82%", top: "50%" },
+  { key: "s6", left: "32%", top: "78%" },
+  { key: "s7", left: "68%", top: "78%" },
 ];
 
 function shortName(name: string) {
@@ -41,13 +37,9 @@ function shortName(name: string) {
   return last.length > 9 ? `${last.slice(0, 8)}…` : last;
 }
 
+/** Dense playerIds map to slots in order; trailing slots stay empty. */
 function assignSlots(players: Player[]): (Player | null)[] {
-  const pools: Record<Position, Player[]> = {
-    pivot: players.filter((p) => p.position === "pivot"),
-    aler: players.filter((p) => p.position === "aler"),
-    base: players.filter((p) => p.position === "base"),
-  };
-  return SLOTS.map((slot) => pools[slot.position].shift() ?? null);
+  return SLOTS.map((_, i) => players[i] ?? null);
 }
 
 interface CourtBoardProps {
@@ -56,7 +48,9 @@ interface CourtBoardProps {
   confirmed?: boolean;
   selectedId?: string | null;
   onSelect?: (id: string | null) => void;
-  onEmptySlot?: (slot: { slotIndex: number; position: Position }) => void;
+  onEmptySlot?: (slot: { slotIndex: number }) => void;
+  /** Fill remaining flex height without forcing page scroll. */
+  fillHeight?: boolean;
 }
 
 export function CourtBoard({
@@ -66,13 +60,25 @@ export function CourtBoard({
   selectedId,
   onSelect,
   onEmptySlot,
+  fillHeight,
 }: CourtBoardProps) {
   const filled = assignSlots(players);
 
   return (
-    <div className="court-board relative overflow-hidden border border-line">
-      {/* Single aspect box owns BOTH markings and slots — same % coordinate system */}
-      <div className="relative mx-auto aspect-[3/4] w-full max-w-lg sm:max-w-xl">
+    <div
+      className={cn(
+        "court-board relative overflow-hidden border border-line",
+        fillHeight && "flex h-full min-h-0 w-full items-center justify-center",
+      )}
+    >
+      <div
+        className={cn(
+          "relative mx-auto",
+          fillHeight
+            ? "aspect-[3/4] h-full max-h-full w-auto max-w-full"
+            : "aspect-[3/4] w-full max-w-lg sm:max-w-xl",
+        )}
+      >
         <div className="court-board__surface absolute inset-0" aria-hidden />
 
         <svg
@@ -103,7 +109,6 @@ export function CourtBoard({
             stroke="rgba(236,232,225,0.42)"
             strokeWidth="0.75"
           />
-          {/* baseline */}
           <line
             x1="4"
             y1="4"
@@ -112,7 +117,6 @@ export function CourtBoard({
             stroke="rgba(236,232,225,0.42)"
             strokeWidth="0.7"
           />
-          {/* backboard — short thick board (hardware, not a slot) */}
           <rect
             x="40.5"
             y="3.0"
@@ -123,7 +127,6 @@ export function CourtBoard({
             stroke="rgba(255,255,255,0.35)"
             strokeWidth="0.25"
           />
-          {/* rim arm */}
           <line
             x1="50"
             y1="5.2"
@@ -132,17 +135,14 @@ export function CourtBoard({
             stroke="rgba(236,232,225,0.75)"
             strokeWidth="0.55"
           />
-          {/* solid orange ball only — no hollow red/orange ring that reads as empty chip */}
           <circle cx="50" cy="7.9" r="1.35" fill="#e87722" />
           <circle cx="49.55" cy="7.55" r="0.35" fill="rgba(255,220,160,0.55)" />
-          {/* tiny net suggestion */}
           <path
             d="M 48.7 8.9 Q 50 11.2 51.3 8.9"
             fill="none"
             stroke="rgba(236,232,225,0.4)"
             strokeWidth="0.3"
           />
-          {/* paint */}
           <rect
             x="32"
             y="4"
@@ -152,7 +152,6 @@ export function CourtBoard({
             stroke="rgba(236,232,225,0.4)"
             strokeWidth="0.7"
           />
-          {/* free-throw circle */}
           <path
             d="M 32 38 A 18 18 0 0 0 68 38"
             fill="none"
@@ -166,14 +165,12 @@ export function CourtBoard({
             strokeWidth="0.55"
             strokeDasharray="2 1.5"
           />
-          {/* 3pt arc */}
           <path
             d="M 8 4 L 8 26 A 42 42 0 0 0 92 26 L 92 4"
             fill="none"
             stroke="rgba(236,232,225,0.36)"
             strokeWidth="0.75"
           />
-          {/* half-court line */}
           <line
             x1="4"
             y1="122"
@@ -225,16 +222,12 @@ export function CourtBoard({
                   />
                 ) : (
                   <EmptySlot
-                    position={slot.position}
-                    disabled={confirmed}
+                    slotIndex={i}
+                    disabled={confirmed || players.length >= LINEUP_SIZE}
                     onClick={
                       confirmed || !onEmptySlot
                         ? undefined
-                        : () =>
-                            onEmptySlot({
-                              slotIndex: i,
-                              position: slot.position,
-                            })
+                        : () => onEmptySlot({ slotIndex: i })
                     }
                   />
                 )}
@@ -248,11 +241,11 @@ export function CourtBoard({
 }
 
 function EmptySlot({
-  position,
+  slotIndex,
   disabled,
   onClick,
 }: {
-  position: Position;
+  slotIndex: number;
   disabled?: boolean;
   onClick?: () => void;
 }) {
@@ -262,25 +255,22 @@ function EmptySlot({
       disabled={disabled || !onClick}
       onClick={onClick}
       className={cn(
-        "court-chip court-chip--empty relative flex h-16 w-16 flex-col items-center justify-center",
+        "court-chip court-chip--empty relative flex h-14 w-14 flex-col items-center justify-center sm:h-16 sm:w-16",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grana-bright",
         "disabled:cursor-default",
       )}
-      aria-label={`Afegir ${POSITION_LABEL[position]}`}
+      aria-label={`Afegir jugador (slot ${slotIndex + 1})`}
     >
       <div
         className={cn(
-          "flex h-16 w-16 items-center justify-center rounded-full",
+          "flex h-14 w-14 items-center justify-center rounded-full sm:h-16 sm:w-16",
           "border-2 border-dashed border-bone/50",
           "bg-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[2px]",
           !disabled && "transition active:scale-95",
         )}
       >
-        <Plus className="size-6 text-bone/90" strokeWidth={2.25} />
+        <Plus className="size-5 text-bone/90 sm:size-6" strokeWidth={2.25} />
       </div>
-      <span className="pointer-events-none absolute left-1/2 top-[calc(100%+0.35rem)] -translate-x-1/2 whitespace-nowrap text-center text-[9px] font-medium uppercase tracking-[0.16em] text-bone/75">
-        {POSITION_LABEL[position]}
-      </span>
     </button>
   );
 }
@@ -307,7 +297,7 @@ function FilledChip({
         onSelect(isSelected ? null : player.id);
       }}
       className={cn(
-        "court-chip group relative flex h-16 w-16 flex-col items-center justify-center",
+        "court-chip group relative flex h-14 w-14 flex-col items-center justify-center sm:h-16 sm:w-16",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grana-bright",
         "disabled:cursor-default",
         isCaptain && "court-chip--captain",
@@ -320,13 +310,13 @@ function FilledChip({
       }
       aria-pressed={isSelected}
     >
-      <div className="relative h-16 w-16">
+      <div className="relative h-14 w-14 sm:h-16 sm:w-16">
         <PlayerAvatar
           name={player.name}
           photoUrl={player.photoUrl}
           size="lg"
           className={cn(
-            "!h-16 !w-16 rounded-full ring-2",
+            "!h-14 !w-14 rounded-full ring-2 sm:!h-16 sm:!w-16",
             isSelected
               ? "ring-grana-bright shadow-[0_0_0_4px_rgba(194,49,66,0.35)]"
               : isCaptain
@@ -341,11 +331,11 @@ function FilledChip({
         )}
       </div>
 
-      <div className="pointer-events-none absolute left-1/2 top-[calc(100%+0.35rem)] w-[5.5rem] -translate-x-1/2 text-center">
-        <p className="truncate text-[11px] font-semibold leading-tight text-bone drop-shadow">
+      <div className="pointer-events-none absolute left-1/2 top-[calc(100%+0.25rem)] w-[5.25rem] -translate-x-1/2 text-center">
+        <p className="truncate text-[10px] font-semibold leading-tight text-bone drop-shadow sm:text-[11px]">
           {shortName(player.name)}
         </p>
-        <p className="text-[10px] tabular-nums text-bone/65">
+        <p className="text-[9px] tabular-nums text-bone/65 sm:text-[10px]">
           VAL {player.avgVal}
           <span className="mx-0.5 text-white/25">·</span>
           {formatPrice(player.price).replace(/\s/g, "")}

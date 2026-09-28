@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { readSession } from "@/lib/auth";
 import { getCurrentRound } from "@/lib/db";
 import { ensureLineupRow, saveLineup } from "@/lib/scoring";
-import { INITIAL_BUDGET } from "@/data/roster";
+import { INITIAL_BUDGET, LINEUP_SIZE } from "@/data/roster";
+import { parsePlayerIds } from "@/lib/game";
 
 export const runtime = "nodejs";
 
@@ -17,7 +18,7 @@ export async function GET() {
     round,
     budget: row.budget ?? INITIAL_BUDGET,
     lineup: {
-      playerIds: JSON.parse(row.player_ids) as string[],
+      playerIds: parsePlayerIds(row.player_ids),
       captainId: row.captain_id,
       confirmed: row.confirmed === 1,
       confirmedAt: row.confirmed_at,
@@ -34,7 +35,7 @@ export async function PUT(req: Request) {
     playerIds?: string[];
     captainId?: string | null;
   };
-  const playerIds = Array.isArray(body.playerIds) ? body.playerIds : [];
+  const playerIds = parsePlayerIds(body.playerIds ?? []).slice(0, LINEUP_SIZE);
   const captainId =
     typeof body.captainId === "string" || body.captainId === null
       ? body.captainId
@@ -54,7 +55,7 @@ export async function PUT(req: Request) {
     round,
     budget: row.budget,
     lineup: {
-      playerIds: JSON.parse(row.player_ids) as string[],
+      playerIds: parsePlayerIds(row.player_ids),
       captainId: row.captain_id,
       confirmed: row.confirmed === 1,
       confirmedAt: row.confirmed_at,

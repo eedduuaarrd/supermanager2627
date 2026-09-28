@@ -31,7 +31,7 @@ export function OnboardingClient() {
         que es tanqui la jornada i disputa la classificació.
       </p>
       <ul className="mt-6 space-y-3 border-l border-grana pl-4 text-sm text-bone">
-        <li>8 jugadors · 2 bases · 3 alers · 3 pivots</li>
+        <li>8 jugadors (qualsevol mix)</li>
         <li>Pressupost 100.000 €</li>
         <li>Capità ×2</li>
         <li>Toca + a la pista per triar per equip del club</li>
