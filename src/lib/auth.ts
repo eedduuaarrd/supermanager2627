@@ -3,6 +3,7 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { randomUUID } from "node:crypto";
 import { getDb, type DbUser } from "@/lib/db";
+import { createTeamForUser, getActiveTeam, listTeams } from "@/lib/teams";
 import type { SessionUser } from "@/lib/types";
 
 export type { SessionUser };
@@ -34,6 +35,7 @@ export async function createSessionToken(user: SessionUser) {
     email: user.email,
     displayName: user.displayName,
     teamName: user.teamName,
+    activeTeamId: user.activeTeamId,
     isAdmin: user.isAdmin,
   })
     .setProtectedHeader({ alg: "HS256" })
@@ -50,11 +52,18 @@ export async function readSession(): Promise<SessionUser | null> {
   try {
     const { payload } = await jwtVerify(token, secretKey());
     if (!payload.sub || typeof payload.email !== "string") return null;
+
+    // Prefer live DB state (active team can change without re-login).
+    const row = findUserById(payload.sub);
+    if (row) return toSessionUser(row);
+
     return {
       id: payload.sub,
       email: payload.email,
       displayName: String(payload.displayName ?? ""),
       teamName: String(payload.teamName ?? ""),
+      activeTeamId:
+        typeof payload.activeTeamId === "string" ? payload.activeTeamId : null,
       isAdmin: Boolean(payload.isAdmin),
     };
   } catch {
@@ -86,11 +95,13 @@ export async function clearSessionCookie() {
 }
 
 export function toSessionUser(row: DbUser): SessionUser {
+  const active = getActiveTeam(row.id);
   return {
     id: row.id,
     email: row.email,
     displayName: row.display_name,
-    teamName: row.team_name,
+    teamName: active?.name ?? row.team_name,
+    activeTeamId: active?.id ?? row.active_team_id,
     isAdmin: row.is_admin === 1,
   };
 }
@@ -145,17 +156,38 @@ export async function registerUser(input: {
   const password_hash = await hashPassword(password);
   const created_at = new Date().toISOString();
 
-  db.prepare(
-    `INSERT INTO users (id, email, password_hash, display_name, team_name, is_admin, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-  ).run(id, email, password_hash, displayName, teamName, isAdmin, created_at);
+  const tx = db.transaction(() => {
+    db.prepare(
+      `INSERT INTO users (id, email, password_hash, display_name, team_name, is_admin, created_at, active_team_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, NULL)`,
+    ).run(
+      id,
+      email,
+      password_hash,
+      displayName,
+      teamName,
+      isAdmin,
+      created_at,
+    );
+  });
+  tx();
+
+  const teamResult = createTeamForUser(id, teamName, {
+    setActive: true,
+    createdAt: created_at,
+  });
+  if (!teamResult.ok) {
+    db.prepare(`DELETE FROM users WHERE id = ?`).run(id);
+    return { error: teamResult.error };
+  }
 
   return {
     user: {
       id,
       email,
       displayName,
-      teamName,
+      teamName: teamResult.team.name,
+      activeTeamId: teamResult.team.id,
       isAdmin: isAdmin === 1,
     },
   };
@@ -169,5 +201,12 @@ export async function loginUser(
   if (!row) return { error: "Correu o contrasenya incorrectes." };
   const ok = await verifyPassword(password, row.password_hash);
   if (!ok) return { error: "Correu o contrasenya incorrectes." };
-  return { user: toSessionUser(row) };
+  // Ensure migrated users have at least one team.
+  if (listTeams(row.id).length === 0) {
+    createTeamForUser(row.id, row.team_name || row.display_name || "Equip 1", {
+      setActive: true,
+    });
+  }
+  const fresh = findUserById(row.id)!;
+  return { user: toSessionUser(fresh) };
 }

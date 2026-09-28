@@ -6,6 +6,7 @@ import { useEffect, useState, useTransition } from "react";
 import { AlertCircle, Loader2, Trophy } from "lucide-react";
 
 type StandingRow = {
+  teamId: string;
   userId: string;
   displayName: string;
   teamName: string;
@@ -118,13 +119,13 @@ export function StandingsPanel({
           </div>
         ) : rows.length === 0 ? (
           <div className="px-4 py-10 text-center text-sm text-mute">
-            Encara no hi ha mànagers a la lliga.
+            Encara no hi ha equips a la lliga.
           </div>
         ) : (
           <ol>
             {rows.map((row) => (
               <li
-                key={row.userId}
+                key={row.teamId}
                 className={cn(
                   "flex items-center gap-3 border-b border-line px-4 py-3 last:border-b-0",
                   row.isYou && "bg-grana/10",
@@ -154,7 +155,7 @@ export function StandingsPanel({
           </p>
           <p className="mt-2 text-sm text-mute">
             Tanca la jornada actual: puntua l&apos;última alineació desada de
-            cada mànager i obre la següent.
+            cada equip i obre la següent.
           </p>
           <Button
             type="button"

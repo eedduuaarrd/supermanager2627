@@ -67,10 +67,18 @@ export interface GameState {
   version: number;
 }
 
+export interface FantasyTeamInfo {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
 export interface SessionUser {
   id: string;
   email: string;
   displayName: string;
+  /** Active fantasy team name (kept for JWT / UI). */
   teamName: string;
+  activeTeamId: string | null;
   isAdmin: boolean;
 }

@@ -13,10 +13,8 @@ import {
   type DbLineup,
 } from "@/lib/db";
 import type { RoundScore } from "@/lib/types";
-import {
-  parsePlayerIds,
-  validateLineupSave,
-} from "@/lib/game";
+import { parsePlayerIds, validateLineupSave } from "@/lib/game";
+import { requireActiveTeamId } from "@/lib/teams";
 
 function seededRandom(seed: number) {
   let t = seed + 0x6d2b79f5;
@@ -40,6 +38,7 @@ function simulatePlayerScore(
 }
 
 export type StandingRow = {
+  teamId: string;
   userId: string;
   displayName: string;
   teamName: string;
@@ -59,11 +58,12 @@ export function getStandings(
     const targetRound = Math.max(1, currentRound - 1);
     const rows = db
       .prepare(
-        `SELECT u.id AS userId, u.display_name AS displayName, u.team_name AS teamName,
-                COALESCE(rs.points, 0) AS points
-         FROM users u
-         LEFT JOIN round_scores rs ON rs.user_id = u.id AND rs.round = ?
-         ORDER BY points DESC, u.team_name ASC`,
+        `SELECT t.id AS teamId, u.id AS userId, u.display_name AS displayName,
+                t.name AS teamName, COALESCE(rs.points, 0) AS points
+         FROM fantasy_teams t
+         JOIN users u ON u.id = t.user_id
+         LEFT JOIN round_scores rs ON rs.team_id = t.id AND rs.round = ?
+         ORDER BY points DESC, t.name ASC`,
       )
       .all(targetRound) as Omit<StandingRow, "rank" | "isYou">[];
 
@@ -79,12 +79,13 @@ export function getStandings(
 
   const rows = db
     .prepare(
-      `SELECT u.id AS userId, u.display_name AS displayName, u.team_name AS teamName,
-              COALESCE(SUM(rs.points), 0) AS points
-       FROM users u
-       LEFT JOIN round_scores rs ON rs.user_id = u.id
-       GROUP BY u.id
-       ORDER BY points DESC, u.team_name ASC`,
+      `SELECT t.id AS teamId, u.id AS userId, u.display_name AS displayName,
+              t.name AS teamName, COALESCE(SUM(rs.points), 0) AS points
+       FROM fantasy_teams t
+       JOIN users u ON u.id = t.user_id
+       LEFT JOIN round_scores rs ON rs.team_id = t.id
+       GROUP BY t.id
+       ORDER BY points DESC, t.name ASC`,
     )
     .all() as Omit<StandingRow, "rank" | "isYou">[];
 
@@ -98,23 +99,28 @@ export function getStandings(
   };
 }
 
-/** Read lineup row and flatten legacy position-keyed JSON to string[]. */
-export function ensureLineupRow(userId: string, round?: number) {
+/** Read lineup row for a fantasy team and flatten legacy JSON if needed. */
+export function ensureLineupRow(teamId: string, round?: number) {
   const db = getDb();
   const r = round ?? getCurrentRound(db);
   const existing = db
-    .prepare("SELECT * FROM lineups WHERE user_id = ? AND round = ?")
-    .get(userId, r) as DbLineup | undefined;
+    .prepare("SELECT * FROM lineups WHERE team_id = ? AND round = ?")
+    .get(teamId, r) as DbLineup | undefined;
   if (existing) return migrateLineupRowIfNeeded(existing);
 
   db.prepare(
-    `INSERT INTO lineups (user_id, round, player_ids, captain_id, confirmed, confirmed_at, budget)
+    `INSERT INTO lineups (team_id, round, player_ids, captain_id, confirmed, confirmed_at, budget)
      VALUES (?, ?, '[]', NULL, 0, NULL, ?)`,
-  ).run(userId, r, INITIAL_BUDGET);
+  ).run(teamId, r, INITIAL_BUDGET);
 
   return db
-    .prepare("SELECT * FROM lineups WHERE user_id = ? AND round = ?")
-    .get(userId, r) as DbLineup;
+    .prepare("SELECT * FROM lineups WHERE team_id = ? AND round = ?")
+    .get(teamId, r) as DbLineup;
+}
+
+/** Convenience: ensure lineup for the user's active team. */
+export function ensureActiveLineup(userId: string, round?: number) {
+  return ensureLineupRow(requireActiveTeamId(userId), round);
 }
 
 function migrateLineupRowIfNeeded(row: DbLineup): DbLineup {
@@ -136,8 +142,8 @@ function migrateLineupRowIfNeeded(row: DbLineup): DbLineup {
 
   const db = getDb();
   db.prepare(
-    `UPDATE lineups SET player_ids = ?, captain_id = ? WHERE user_id = ? AND round = ?`,
-  ).run(JSON.stringify(flat), captainId, row.user_id, row.round);
+    `UPDATE lineups SET player_ids = ?, captain_id = ? WHERE team_id = ? AND round = ?`,
+  ).run(JSON.stringify(flat), captainId, row.team_id, row.round);
   return {
     ...row,
     player_ids: JSON.stringify(flat),
@@ -156,26 +162,25 @@ function resolveCaptainId(
 }
 
 export function saveLineup(
-  userId: string,
+  teamId: string,
   playerIds: string[],
   captainId: string | null,
 ): { ok: true; row: DbLineup } | { ok: false; error: string } {
   const db = getDb();
   const round = getCurrentRound(db);
-  const existing = ensureLineupRow(userId, round);
+  const existing = ensureLineupRow(teamId, round);
   const check = validateLineupSave(playerIds, captainId, existing.budget);
   if (!check.ok) return check;
 
-  // Managers never confirm; scoring uses last saved playerIds at admin close.
   db.prepare(
     `UPDATE lineups
      SET player_ids = ?, captain_id = ?, confirmed = 0, confirmed_at = NULL
-     WHERE user_id = ? AND round = ?`,
-  ).run(JSON.stringify(playerIds), captainId, userId, round);
-  return { ok: true, row: ensureLineupRow(userId, round) };
+     WHERE team_id = ? AND round = ?`,
+  ).run(JSON.stringify(playerIds), captainId, teamId, round);
+  return { ok: true, row: ensureLineupRow(teamId, round) };
 }
 
-/** Admin closes jornada: score every saved lineup, then advance. */
+/** Admin closes jornada: score every saved team lineup, then advance. */
 export function simulateJornada(): {
   round: number;
   scored: number;
@@ -197,9 +202,7 @@ export function simulateJornada(): {
       const playerIds = parsePlayerIds(row.player_ids);
       const seed =
         round * 997 +
-        row.user_id
-          .split("")
-          .reduce((a, c) => a + c.charCodeAt(0), 0) +
+        row.team_id.split("").reduce((a, c) => a + c.charCodeAt(0), 0) +
         playerIds.reduce((a, id) => a + id.charCodeAt(0), 0);
       const rand = seededRandom(seed);
       const won = rand() > 0.42;
@@ -220,9 +223,9 @@ export function simulateJornada(): {
       const teamPoints = scores.reduce((s, x) => s + x.points, 0);
 
       db.prepare(
-        `INSERT INTO round_scores (user_id, round, points, opponent, won, scores_json, captain_id, played_at)
+        `INSERT INTO round_scores (team_id, round, points, opponent, won, scores_json, captain_id, played_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-         ON CONFLICT(user_id, round) DO UPDATE SET
+         ON CONFLICT(team_id, round) DO UPDATE SET
            points = excluded.points,
            opponent = excluded.opponent,
            won = excluded.won,
@@ -230,7 +233,7 @@ export function simulateJornada(): {
            captain_id = excluded.captain_id,
            played_at = excluded.played_at`,
       ).run(
-        row.user_id,
+        row.team_id,
         round,
         teamPoints,
         opponent,
@@ -240,18 +243,19 @@ export function simulateJornada(): {
         closedAt,
       );
 
-      // Historical lock after admin close (not a manager confirm).
       db.prepare(
-        `UPDATE lineups SET confirmed = 1, confirmed_at = ? WHERE user_id = ? AND round = ?`,
-      ).run(closedAt, row.user_id, round);
+        `UPDATE lineups SET confirmed = 1, confirmed_at = ? WHERE team_id = ? AND round = ?`,
+      ).run(closedAt, row.team_id, round);
     }
 
     const next = round + 1;
     setCurrentRound(next, db);
 
-    const users = db.prepare("SELECT id FROM users").all() as { id: string }[];
-    for (const u of users) {
-      ensureLineupRow(u.id, next);
+    const teams = db.prepare("SELECT id FROM fantasy_teams").all() as {
+      id: string;
+    }[];
+    for (const t of teams) {
+      ensureLineupRow(t.id, next);
     }
   });
 

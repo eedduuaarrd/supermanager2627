@@ -3,6 +3,7 @@
 import { BootGate } from "@/components/boot-gate";
 import { LineupBuilder } from "@/components/lineup-builder";
 import { useManager } from "@/components/manager-provider";
+import { TeamSwitcher } from "@/components/team-switcher";
 
 function EquipContent() {
   const {
@@ -14,19 +15,30 @@ function EquipContent() {
     saving,
     saveStatus,
     actionError,
+    user,
   } = useManager();
 
   return (
-    <LineupBuilder
-      roster={roster!}
-      budget={budget}
-      lineup={lineup}
-      currentRound={round}
-      onChange={persistLineup}
-      saving={saving}
-      saveStatus={saveStatus}
-      error={actionError}
-    />
+    <div className="flex h-full min-h-0 flex-col gap-2">
+      <div className="flex shrink-0 items-center justify-between gap-2">
+        <p className="truncate text-[10px] uppercase tracking-[0.16em] text-mute">
+          {user.teamName}
+        </p>
+        <TeamSwitcher />
+      </div>
+      <div className="min-h-0 flex-1">
+        <LineupBuilder
+          roster={roster!}
+          budget={budget}
+          lineup={lineup}
+          currentRound={round}
+          onChange={persistLineup}
+          saving={saving}
+          saveStatus={saveStatus}
+          error={actionError}
+        />
+      </div>
+    </div>
   );
 }
 

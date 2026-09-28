@@ -1,6 +1,10 @@
 import Database from "better-sqlite3";
 import fs from "node:fs";
 import path from "node:path";
+import { randomUUID } from "node:crypto";
+
+export const MAX_TEAMS_PER_USER = 5;
+export const SCHEMA_VERSION = "2";
 
 export type DbUser = {
   id: string;
@@ -10,10 +14,18 @@ export type DbUser = {
   team_name: string;
   is_admin: number;
   created_at: string;
+  active_team_id: string | null;
+};
+
+export type DbFantasyTeam = {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
 };
 
 export type DbLineup = {
-  user_id: string;
+  team_id: string;
   round: number;
   player_ids: string;
   captain_id: string | null;
@@ -24,7 +36,7 @@ export type DbLineup = {
 
 export type DbRoundScore = {
   id: number;
-  user_id: string;
+  team_id: string;
   round: number;
   points: number;
   opponent: string;
@@ -47,6 +59,221 @@ function resolveDbPath() {
   return path.join(dir, "supermanager.db");
 }
 
+function tableColumns(db: Database.Database, table: string): string[] {
+  return (
+    db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[]
+  ).map((c) => c.name);
+}
+
+function migrateToMultiTeams(db: Database.Database) {
+  const current = db
+    .prepare("SELECT value FROM meta WHERE key = ?")
+    .get("schema_version") as DbMeta | undefined;
+  if (current?.value === SCHEMA_VERSION) return;
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS fantasy_teams (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+  `);
+
+  const userCols = tableColumns(db, "users");
+  if (!userCols.includes("active_team_id")) {
+    db.exec(`ALTER TABLE users ADD COLUMN active_team_id TEXT`);
+  }
+
+  const lineupCols = tableColumns(db, "lineups");
+  const scoreCols = tableColumns(db, "round_scores");
+  const lineupsNeedMigrate = lineupCols.includes("user_id");
+  const scoresNeedMigrate = scoreCols.includes("user_id");
+
+  const migrateTx = db.transaction(() => {
+    const users = db
+      .prepare(
+        `SELECT id, display_name, team_name, active_team_id, created_at FROM users`,
+      )
+      .all() as {
+      id: string;
+      display_name: string;
+      team_name: string;
+      active_team_id: string | null;
+      created_at: string;
+    }[];
+
+    const teamByUser = new Map<string, string>();
+
+    for (const u of users) {
+      const existing = db
+        .prepare(
+          `SELECT id FROM fantasy_teams WHERE user_id = ? ORDER BY created_at ASC LIMIT 1`,
+        )
+        .get(u.id) as { id: string } | undefined;
+
+      if (existing) {
+        teamByUser.set(u.id, existing.id);
+        if (!u.active_team_id) {
+          db.prepare(`UPDATE users SET active_team_id = ? WHERE id = ?`).run(
+            existing.id,
+            u.id,
+          );
+        }
+        continue;
+      }
+
+      const teamId = randomUUID();
+      const name =
+        (u.team_name && u.team_name.trim()) ||
+        (u.display_name && u.display_name.trim()) ||
+        "Equip 1";
+      db.prepare(
+        `INSERT INTO fantasy_teams (id, user_id, name, created_at) VALUES (?, ?, ?, ?)`,
+      ).run(teamId, u.id, name, u.created_at || new Date().toISOString());
+      db.prepare(
+        `UPDATE users SET active_team_id = ?, team_name = ? WHERE id = ?`,
+      ).run(teamId, name, u.id);
+      teamByUser.set(u.id, teamId);
+    }
+
+    if (lineupsNeedMigrate) {
+      db.exec(`
+        CREATE TABLE lineups_v2 (
+          team_id TEXT NOT NULL REFERENCES fantasy_teams(id) ON DELETE CASCADE,
+          round INTEGER NOT NULL,
+          player_ids TEXT NOT NULL,
+          captain_id TEXT,
+          confirmed INTEGER NOT NULL DEFAULT 0,
+          confirmed_at TEXT,
+          budget INTEGER NOT NULL,
+          PRIMARY KEY (team_id, round)
+        );
+      `);
+
+      const oldRows = db.prepare(`SELECT * FROM lineups`).all() as {
+        user_id: string;
+        round: number;
+        player_ids: string;
+        captain_id: string | null;
+        confirmed: number;
+        confirmed_at: string | null;
+        budget: number;
+      }[];
+
+      const insert = db.prepare(
+        `INSERT OR IGNORE INTO lineups_v2
+         (team_id, round, player_ids, captain_id, confirmed, confirmed_at, budget)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      );
+
+      for (const row of oldRows) {
+        const teamId = teamByUser.get(row.user_id);
+        if (!teamId) continue;
+        insert.run(
+          teamId,
+          row.round,
+          row.player_ids,
+          row.captain_id,
+          row.confirmed,
+          row.confirmed_at,
+          row.budget,
+        );
+      }
+
+      db.exec(`DROP TABLE lineups; ALTER TABLE lineups_v2 RENAME TO lineups;`);
+    } else if (!lineupCols.includes("team_id")) {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS lineups (
+          team_id TEXT NOT NULL REFERENCES fantasy_teams(id) ON DELETE CASCADE,
+          round INTEGER NOT NULL,
+          player_ids TEXT NOT NULL,
+          captain_id TEXT,
+          confirmed INTEGER NOT NULL DEFAULT 0,
+          confirmed_at TEXT,
+          budget INTEGER NOT NULL,
+          PRIMARY KEY (team_id, round)
+        );
+      `);
+    }
+
+    if (scoresNeedMigrate) {
+      db.exec(`
+        CREATE TABLE round_scores_v2 (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          team_id TEXT NOT NULL REFERENCES fantasy_teams(id) ON DELETE CASCADE,
+          round INTEGER NOT NULL,
+          points INTEGER NOT NULL,
+          opponent TEXT NOT NULL,
+          won INTEGER NOT NULL DEFAULT 0,
+          scores_json TEXT NOT NULL,
+          captain_id TEXT,
+          played_at TEXT NOT NULL,
+          UNIQUE(team_id, round)
+        );
+      `);
+
+      const oldScores = db.prepare(`SELECT * FROM round_scores`).all() as {
+        user_id: string;
+        round: number;
+        points: number;
+        opponent: string;
+        won: number;
+        scores_json: string;
+        captain_id: string | null;
+        played_at: string;
+      }[];
+
+      const insertScore = db.prepare(
+        `INSERT OR IGNORE INTO round_scores_v2
+         (team_id, round, points, opponent, won, scores_json, captain_id, played_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      );
+
+      for (const row of oldScores) {
+        const teamId = teamByUser.get(row.user_id);
+        if (!teamId) continue;
+        insertScore.run(
+          teamId,
+          row.round,
+          row.points,
+          row.opponent,
+          row.won,
+          row.scores_json,
+          row.captain_id,
+          row.played_at,
+        );
+      }
+
+      db.exec(
+        `DROP TABLE round_scores; ALTER TABLE round_scores_v2 RENAME TO round_scores;`,
+      );
+    } else if (!scoreCols.includes("team_id")) {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS round_scores (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          team_id TEXT NOT NULL REFERENCES fantasy_teams(id) ON DELETE CASCADE,
+          round INTEGER NOT NULL,
+          points INTEGER NOT NULL,
+          opponent TEXT NOT NULL,
+          won INTEGER NOT NULL DEFAULT 0,
+          scores_json TEXT NOT NULL,
+          captain_id TEXT,
+          played_at TEXT NOT NULL,
+          UNIQUE(team_id, round)
+        );
+      `);
+    }
+
+    db.prepare(
+      `INSERT INTO meta (key, value) VALUES (?, ?)
+       ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+    ).run("schema_version", SCHEMA_VERSION);
+  });
+
+  migrateTx();
+}
+
 export function getDb(): Database.Database {
   if (globalForDb.__smDb) return globalForDb.__smDb;
 
@@ -62,23 +289,31 @@ export function getDb(): Database.Database {
       display_name TEXT NOT NULL,
       team_name TEXT NOT NULL,
       is_admin INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      active_team_id TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS fantasy_teams (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
       created_at TEXT NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS lineups (
-      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      team_id TEXT NOT NULL REFERENCES fantasy_teams(id) ON DELETE CASCADE,
       round INTEGER NOT NULL,
       player_ids TEXT NOT NULL,
       captain_id TEXT,
       confirmed INTEGER NOT NULL DEFAULT 0,
       confirmed_at TEXT,
       budget INTEGER NOT NULL,
-      PRIMARY KEY (user_id, round)
+      PRIMARY KEY (team_id, round)
     );
 
     CREATE TABLE IF NOT EXISTS round_scores (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      team_id TEXT NOT NULL REFERENCES fantasy_teams(id) ON DELETE CASCADE,
       round INTEGER NOT NULL,
       points INTEGER NOT NULL,
       opponent TEXT NOT NULL,
@@ -86,7 +321,7 @@ export function getDb(): Database.Database {
       scores_json TEXT NOT NULL,
       captain_id TEXT,
       played_at TEXT NOT NULL,
-      UNIQUE(user_id, round)
+      UNIQUE(team_id, round)
     );
 
     CREATE TABLE IF NOT EXISTS meta (
@@ -104,6 +339,8 @@ export function getDb(): Database.Database {
       "1",
     );
   }
+
+  migrateToMultiTeams(db);
 
   globalForDb.__smDb = db;
   return db;

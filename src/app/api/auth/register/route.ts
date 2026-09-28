@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { registerUser, setSessionCookie } from "@/lib/auth";
-import { ensureLineupRow } from "@/lib/scoring";
 
 export const runtime = "nodejs";
 
@@ -22,7 +21,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
     await setSessionCookie(result.user);
-    ensureLineupRow(result.user.id);
+    // Lineup row is created with the fantasy team in registerUser/createTeamForUser.
     return NextResponse.json({ user: result.user });
   } catch {
     return NextResponse.json(

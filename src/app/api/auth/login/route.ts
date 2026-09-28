@@ -12,7 +12,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: result.error }, { status: 401 });
     }
     await setSessionCookie(result.user);
-    ensureLineupRow(result.user.id);
+    if (result.user.activeTeamId) {
+      ensureLineupRow(result.user.activeTeamId);
+    }
     return NextResponse.json({ user: result.user });
   } catch {
     return NextResponse.json(

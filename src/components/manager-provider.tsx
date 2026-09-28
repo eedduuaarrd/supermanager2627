@@ -1,6 +1,6 @@
 "use client";
 
-import type { Lineup, Player, SessionUser } from "@/lib/types";
+import type { FantasyTeamInfo, Lineup, Player, SessionUser } from "@/lib/types";
 import {
   createContext,
   useCallback,
@@ -13,11 +13,15 @@ import {
 } from "react";
 
 const AUTOSAVE_MS = 300;
+export const MAX_TEAMS = 5;
 
 export type SaveStatus = "idle" | "saving" | "saved" | "error";
 
 type ManagerContextValue = {
   user: SessionUser;
+  teams: FantasyTeamInfo[];
+  activeTeamId: string | null;
+  maxTeams: number;
   roster: Player[] | null;
   budget: number;
   round: number;
@@ -29,13 +33,22 @@ type ManagerContextValue = {
   saveStatus: SaveStatus;
   reload: () => Promise<void>;
   persistLineup: (next: Lineup) => void;
+  switchTeam: (teamId: string) => Promise<void>;
+  createTeam: (name: string) => Promise<{ ok: true } | { ok: false; error: string }>;
+  renameTeam: (
+    teamId: string,
+    name: string,
+  ) => Promise<{ ok: true } | { ok: false; error: string }>;
+  deleteTeam: (
+    teamId: string,
+  ) => Promise<{ ok: true } | { ok: false; error: string }>;
   clearActionError: () => void;
 };
 
 const ManagerContext = createContext<ManagerContextValue | null>(null);
 
 export function ManagerProvider({
-  user,
+  user: initialUser,
   initialRound,
   children,
 }: {
@@ -43,6 +56,12 @@ export function ManagerProvider({
   initialRound: number;
   children: ReactNode;
 }) {
+  const [user, setUser] = useState<SessionUser>(initialUser);
+  const [teams, setTeams] = useState<FantasyTeamInfo[]>([]);
+  const [activeTeamId, setActiveTeamId] = useState<string | null>(
+    initialUser.activeTeamId,
+  );
+  const [maxTeams, setMaxTeams] = useState(MAX_TEAMS);
   const [roster, setRoster] = useState<Player[] | null>(null);
   const [budget, setBudget] = useState(100_000);
   const [round, setRound] = useState(initialRound);
@@ -63,23 +82,28 @@ export function ManagerProvider({
   const pendingRef = useRef<Lineup | null>(null);
 
   const reload = useCallback(async () => {
-    const [rosterRes, lineupRes] = await Promise.all([
+    const [rosterRes, lineupRes, teamsRes] = await Promise.all([
       fetch("/api/roster"),
       fetch("/api/lineup"),
+      fetch("/api/teams"),
     ]);
-    if (!rosterRes.ok || !lineupRes.ok) {
+    if (!rosterRes.ok || !lineupRes.ok || !teamsRes.ok) {
       throw new Error("boot");
     }
     const rosterData = await rosterRes.json();
     const lineupData = await lineupRes.json();
+    const teamsData = await teamsRes.json();
     setRoster(rosterData.players);
     setBudget(lineupData.budget);
     setRound(lineupData.round);
     setLineup(lineupData.lineup);
+    setTeams(teamsData.teams ?? []);
+    setActiveTeamId(teamsData.activeTeamId ?? null);
+    setMaxTeams(teamsData.maxTeams ?? MAX_TEAMS);
   }, []);
 
   useEffect(() => {
-    // Boot roster + lineup from API once on mount.
+    // Boot roster + lineup + teams from API once on mount.
     // eslint-disable-next-line react-hooks/set-state-in-effect -- async fetch boot
     reload()
       .catch(() =>
@@ -116,7 +140,6 @@ export function ManagerProvider({
           await reload();
           return;
         }
-        // Avoid clobbering newer local edits while a save was in flight.
         if (pendingRef.current === null) {
           setLineup(data.lineup);
         }
@@ -159,9 +182,116 @@ export function ManagerProvider({
     [flushSave],
   );
 
+  const applyTeamsResponse = useCallback(
+    (data: {
+      teams?: FantasyTeamInfo[];
+      activeTeamId?: string | null;
+      user?: SessionUser;
+      maxTeams?: number;
+    }) => {
+      if (data.teams) setTeams(data.teams);
+      if (data.activeTeamId !== undefined) setActiveTeamId(data.activeTeamId);
+      if (data.user) setUser(data.user);
+      if (data.maxTeams) setMaxTeams(data.maxTeams);
+    },
+    [],
+  );
+
+  const switchTeam = useCallback(
+    async (teamId: string) => {
+      if (teamId === activeTeamId) return;
+      if (saveTimer.current) {
+        clearTimeout(saveTimer.current);
+        saveTimer.current = null;
+      }
+      pendingRef.current = null;
+      setActionError(null);
+      setReady(false);
+      try {
+        const res = await fetch("/api/teams", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ activeTeamId: teamId }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setActionError(data.error ?? "No s'ha pogut canviar d'equip.");
+          return;
+        }
+        applyTeamsResponse(data);
+        await reload();
+      } catch {
+        setActionError("No s'ha pogut canviar d'equip.");
+      } finally {
+        setReady(true);
+      }
+    },
+    [activeTeamId, applyTeamsResponse, reload],
+  );
+
+  const createTeam = useCallback(
+    async (name: string) => {
+      try {
+        const res = await fetch("/api/teams", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name }),
+        });
+        const data = await res.json();
+        if (!res.ok) return { ok: false as const, error: data.error ?? "Error" };
+        applyTeamsResponse(data);
+        await reload();
+        return { ok: true as const };
+      } catch {
+        return { ok: false as const, error: "No s'ha pogut crear l'equip." };
+      }
+    },
+    [applyTeamsResponse, reload],
+  );
+
+  const renameTeamFn = useCallback(
+    async (teamId: string, name: string) => {
+      try {
+        const res = await fetch("/api/teams", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ teamId, name }),
+        });
+        const data = await res.json();
+        if (!res.ok) return { ok: false as const, error: data.error ?? "Error" };
+        applyTeamsResponse(data);
+        return { ok: true as const };
+      } catch {
+        return { ok: false as const, error: "No s'ha pogut canviar el nom." };
+      }
+    },
+    [applyTeamsResponse],
+  );
+
+  const deleteTeamFn = useCallback(
+    async (teamId: string) => {
+      try {
+        const res = await fetch(`/api/teams?teamId=${encodeURIComponent(teamId)}`, {
+          method: "DELETE",
+        });
+        const data = await res.json();
+        if (!res.ok) return { ok: false as const, error: data.error ?? "Error" };
+        applyTeamsResponse(data);
+        await reload();
+        return { ok: true as const };
+      } catch {
+        return { ok: false as const, error: "No s'ha pogut eliminar l'equip." };
+      }
+    },
+    [applyTeamsResponse, reload],
+  );
+
   const value = useMemo<ManagerContextValue>(
     () => ({
       user,
+      teams,
+      activeTeamId,
+      maxTeams,
       roster,
       budget,
       round,
@@ -173,10 +303,17 @@ export function ManagerProvider({
       saveStatus,
       reload,
       persistLineup,
+      switchTeam,
+      createTeam,
+      renameTeam: renameTeamFn,
+      deleteTeam: deleteTeamFn,
       clearActionError: () => setActionError(null),
     }),
     [
       user,
+      teams,
+      activeTeamId,
+      maxTeams,
       roster,
       budget,
       round,
@@ -188,6 +325,10 @@ export function ManagerProvider({
       saveStatus,
       reload,
       persistLineup,
+      switchTeam,
+      createTeam,
+      renameTeamFn,
+      deleteTeamFn,
     ],
   );
 

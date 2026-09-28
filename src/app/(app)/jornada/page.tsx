@@ -2,6 +2,7 @@
 
 import { BootGate } from "@/components/boot-gate";
 import { useManager } from "@/components/manager-provider";
+import { TeamSwitcher } from "@/components/team-switcher";
 import { LINEUP_SIZE } from "@/data/roster";
 import { projectedPoints } from "@/lib/game";
 import Link from "next/link";
@@ -34,16 +35,20 @@ function JornadaContent() {
   return (
     <div className="space-y-6">
       <section>
-        <p className="text-xs uppercase tracking-[0.22em] text-mute">
-          {user.teamName}
-        </p>
-        <h1 className="mt-1 font-display text-4xl tracking-wide text-bone">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs uppercase tracking-[0.22em] text-mute">
+            Equip actiu
+          </p>
+          <TeamSwitcher />
+        </div>
+        <h1 className="mt-2 font-display text-4xl tracking-wide text-bone">
           Jornada {round}
         </h1>
+        <p className="mt-1 text-sm text-mute">{user.teamName}</p>
         <p className="mt-3 max-w-md text-sm leading-relaxed text-mute">
           Configura fins a 8 jugadors (qualsevol mix) i tria capità (×2).
-          L&apos;alineació es desa sola; es puntua quan l&apos;admin tanca la
-          jornada.
+          L&apos;alineació es desa sola per equip; es puntua quan l&apos;admin
+          tanca la jornada.
         </p>
       </section>
 
