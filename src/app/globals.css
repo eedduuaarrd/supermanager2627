@@ -208,19 +208,32 @@
   }
 }
 
+/* Opacity/scale only — keep inline translate(-50%, -50%) for grid centering */
 @keyframes court-slot-in {
   from {
     opacity: 0;
-    transform: translate(-50%, -42%) scale(0.72);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes court-chip-pop {
+  from {
+    transform: scale(0.72);
+  }
+  to {
+    transform: scale(1);
   }
 }
 
 .court-slot {
   animation: court-slot-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--slot-i, 0) * 45ms + 80ms);
+}
+
+.court-slot > .court-chip {
+  animation: court-chip-pop 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: calc(var(--slot-i, 0) * 45ms + 80ms);
 }
 
@@ -241,6 +254,7 @@
 @media (prefers-reduced-motion: reduce) {
   .court-board,
   .court-slot,
+  .court-slot > .court-chip,
   .court-chip--captain .captain-badge {
     animation: none !important;
   }
