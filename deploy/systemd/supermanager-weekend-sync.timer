@@ -2,9 +2,8 @@
 Description=Run Supermanager weekend sync Sat/Sun 23:59 Europe/Madrid
 
 [Timer]
-OnCalendar=Sat *-*-* 23:59:00
-OnCalendar=Sun *-*-* 23:59:00
-Timezone=Europe/Madrid
+OnCalendar=Sat *-*-* 23:59:00 Europe/Madrid
+OnCalendar=Sun *-*-* 23:59:00 Europe/Madrid
 Persistent=true
 Unit=supermanager-weekend-sync.service
 
