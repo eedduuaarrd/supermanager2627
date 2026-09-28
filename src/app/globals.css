@@ -166,25 +166,35 @@
 /* ── Court board (El teu equip) ── */
 
 .court-board {
-  background: #141820;
+  background: #2a2118;
   isolation: isolate;
   animation: court-board-load 0.55s ease-out both;
 }
 
 .court-board__surface {
   background:
-    radial-gradient(ellipse 70% 45% at 50% 8%, rgb(155 32 48 / 18%), transparent 55%),
+    radial-gradient(ellipse 65% 40% at 50% 6%, rgb(194 49 66 / 22%), transparent 55%),
     repeating-linear-gradient(
-      92deg,
-      rgb(42 34 24 / 45%) 0px,
-      rgb(26 22 18 / 35%) 14px,
-      rgb(18 21 26 / 50%) 28px
+      94deg,
+      rgb(120 90 55 / 55%) 0px,
+      rgb(95 70 42 / 45%) 12px,
+      rgb(72 52 32 / 50%) 24px,
+      rgb(110 82 48 / 48%) 36px
     ),
-    linear-gradient(180deg, #1a1612 0%, #12151a 55%, #0b0d10 100%);
+    linear-gradient(180deg, #6a4e32 0%, #3d2c1c 52%, #1a1410 100%);
 }
 
 .budget-strip {
   box-shadow: 0 8px 28px rgb(0 0 0 / 35%);
+}
+
+.court-chip--selected {
+  z-index: 2;
+}
+
+.court-chip--empty:not(:disabled):active .rounded-full {
+  border-color: rgb(194 49 66 / 70%);
+  background: rgb(255 255 255 / 14%);
 }
 
 @keyframes court-board-load {

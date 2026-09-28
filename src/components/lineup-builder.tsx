@@ -19,8 +19,14 @@ import {
   validateLineup,
 } from "@/lib/game";
 import type { Lineup, Player, Position, TeamId } from "@/lib/types";
-import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  Crown,
+  Loader2,
+  UserMinus,
+} from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 import { PlayerRow } from "@/components/player-row";
 
 interface LineupBuilderProps {
@@ -33,6 +39,22 @@ interface LineupBuilderProps {
   confirming?: boolean;
   saving?: boolean;
   error?: string | null;
+}
+
+function softProgressLabel(
+  counts: Record<Position, number>,
+  filled: number,
+): string {
+  const missing: string[] = [];
+  (Object.keys(LINEUP_SLOTS) as Position[]).forEach((pos) => {
+    const need = LINEUP_SLOTS[pos] - counts[pos];
+    if (need > 0) {
+      const label = POSITION_LABEL[pos].toLowerCase();
+      missing.push(need === 1 ? label : `${need} ${label}s`);
+    }
+  });
+  const miss = missing.length ? ` · falta ${missing.join(", ")}` : "";
+  return `${filled}/${LINEUP_SIZE}${miss}`;
 }
 
 export function LineupBuilder({
@@ -48,6 +70,10 @@ export function LineupBuilder({
 }: LineupBuilderProps) {
   const [filter, setFilter] = useState<Position | "all">("all");
   const [teamFilter, setTeamFilter] = useState<TeamId | "all">("all");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [confirmAttempted, setConfirmAttempted] = useState(false);
+  const marketRef = useRef<HTMLElement | null>(null);
+
   const remaining = remainingBudget(budget, lineup.playerIds);
   const counts = countByPosition(lineup.playerIds);
   const validation = validateLineup(lineup, budget);
@@ -56,6 +82,14 @@ export function LineupBuilder({
     100,
     Math.round(((budget - remaining) / budget) * 100),
   );
+  const filled = lineup.playerIds.length;
+  const incomplete = filled < LINEUP_SIZE;
+  const overBudget = remaining < 0;
+  const showHarshValidation =
+    !lineup.confirmed &&
+    (confirmAttempted ||
+      overBudget ||
+      (filled === LINEUP_SIZE && !validation.ok));
 
   const market = useMemo(() => {
     return roster
@@ -72,6 +106,9 @@ export function LineupBuilder({
     .map((id) => roster.find((p) => p.id === id))
     .filter(Boolean) as Player[];
 
+  const selectedPlayer =
+    selectedPlayers.find((p) => p.id === selectedId) ?? null;
+
   function togglePlayer(id: string) {
     if (lineup.confirmed) return;
     const exists = lineup.playerIds.includes(id);
@@ -81,6 +118,7 @@ export function LineupBuilder({
     if (exists) {
       playerIds = lineup.playerIds.filter((x) => x !== id);
       if (captainId === id) captainId = null;
+      if (selectedId === id) setSelectedId(null);
     } else {
       if (lineup.playerIds.length >= LINEUP_SIZE) return;
       const player = roster.find((p) => p.id === id);
@@ -88,8 +126,10 @@ export function LineupBuilder({
       if (counts[player.position] >= LINEUP_SLOTS[player.position]) return;
       if (remaining < player.price) return;
       playerIds = [...lineup.playerIds, id];
+      setSelectedId(null);
     }
 
+    setConfirmAttempted(false);
     onChange({
       ...lineup,
       playerIds,
@@ -109,90 +149,111 @@ export function LineupBuilder({
     });
   }
 
+  function handleEmptySlot(position: Position) {
+    setFilter(position);
+    setSelectedId(null);
+    requestAnimationFrame(() => {
+      marketRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  function handleConfirmClick() {
+    if (lineup.confirmed || confirming) return;
+    if (!validation.ok) {
+      setConfirmAttempted(true);
+      return;
+    }
+    setConfirmAttempted(false);
+    onConfirm();
+  }
+
   return (
-    <div className="space-y-4">
-      {/* Premium glass budget strip */}
-      <section className="budget-strip sticky top-0 z-20 border border-line bg-panel/75 px-4 py-3 backdrop-blur-md">
+    <div className="space-y-3 pb-24">
+      {/* Compact budget strip — single source of position counts */}
+      <section className="budget-strip sticky top-0 z-20 border border-line bg-panel/80 px-3 py-2.5 backdrop-blur-md">
         <div className="flex items-end justify-between gap-3">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.22em] text-mute">
-              Mercat · Jornada {currentRound}
-              {saving ? " · Desant…" : ""}
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-mute">
+              J{currentRound}
+              {saving ? " · Desant…" : ""} · restant
             </p>
-            <p className="mt-0.5 font-display text-3xl leading-none text-bone">
+            <p className="font-display text-2xl leading-none text-bone tabular-nums">
               {formatPrice(Math.max(0, remaining))}
             </p>
-            <p className="mt-1 text-xs text-mute">pressupost restant</p>
           </div>
           <div className="text-right">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-mute">
-              Proj. jornada
+            <p className="text-[10px] uppercase tracking-[0.14em] text-mute">
+              Proj.
             </p>
-            <p className="font-display text-2xl leading-none text-grana-bright">
+            <p className="font-display text-xl leading-none text-grana-bright tabular-nums">
               {projected}
             </p>
           </div>
         </div>
-        <div className="mt-3 h-1 overflow-hidden bg-white/10">
+        <div className="mt-2 h-1 overflow-hidden bg-white/10">
           <div
             className="h-full bg-grana transition-all duration-500"
             style={{ width: `${spentPct}%` }}
           />
         </div>
-        <div className="mt-2.5 flex flex-wrap gap-1.5">
+        <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] tabular-nums text-mute">
           {(Object.keys(LINEUP_SLOTS) as Position[]).map((pos) => (
-            <Badge
+            <span
               key={pos}
-              variant="outline"
               className={
                 counts[pos] === LINEUP_SLOTS[pos]
-                  ? "border-grana/60 text-grana-bright"
-                  : "border-line text-mute"
+                  ? "text-grana-bright"
+                  : "text-mute"
               }
             >
               {POSITION_LABEL[pos]} {counts[pos]}/{LINEUP_SLOTS[pos]}
-            </Badge>
+            </span>
           ))}
-          <Badge
-            variant="outline"
+          <span
             className={
-              lineup.playerIds.length === LINEUP_SIZE
-                ? "border-grana/60 text-grana-bright"
-                : "border-line text-mute"
+              filled === LINEUP_SIZE ? "text-grana-bright" : "text-mute"
             }
           >
-            {lineup.playerIds.length}/{LINEUP_SIZE} jugadors
-          </Badge>
+            · {filled}/{LINEUP_SIZE}
+          </span>
         </div>
       </section>
 
-      {/* Court board hero — El teu equip */}
+      {/* Court */}
       <section className="overflow-hidden">
-        <header className="mb-2 flex items-center justify-between px-0.5">
-          <div>
-            <h2 className="font-display text-2xl tracking-wide text-bone">
-              El teu equip
-            </h2>
-            <p className="mt-0.5 text-xs text-mute">
-              2 bases · 3 alers · 3 pivots · el capità suma el doble
-            </p>
-          </div>
-          {lineup.confirmed && (
+        <header className="mb-1.5 flex items-center justify-between px-0.5">
+          <h2 className="font-display text-xl tracking-wide text-bone">
+            El teu equip
+          </h2>
+          {lineup.confirmed ? (
             <Badge className="bg-emerald-700 text-white">Confirmada</Badge>
+          ) : (
+            <p className="text-[11px] text-mute">capità ×2</p>
           )}
         </header>
         <CourtBoard
           players={selectedPlayers}
           captainId={lineup.captainId}
           confirmed={lineup.confirmed}
-          onRemove={
-            lineup.confirmed ? undefined : (id) => togglePlayer(id)
-          }
-          onCaptain={lineup.confirmed ? undefined : setCaptain}
+          selectedId={selectedId}
+          onSelect={lineup.confirmed ? undefined : setSelectedId}
+          onEmptySlot={lineup.confirmed ? undefined : handleEmptySlot}
         />
       </section>
 
-      {!validation.ok && selectedPlayers.length > 0 && (
+      {/* Soft progress (incomplete, before confirm attempt) */}
+      {!lineup.confirmed && incomplete && !showHarshValidation && filled > 0 && (
+        <p className="px-0.5 text-sm text-mute">
+          {softProgressLabel(counts, filled)}
+        </p>
+      )}
+      {!lineup.confirmed && filled === 0 && (
+        <p className="px-0.5 text-sm text-mute">
+          Toca + a la pista o afegeix des del mercat
+        </p>
+      )}
+
+      {showHarshValidation && (
         <div className="flex gap-2 border border-amber-500/30 bg-amber-500/10 px-3 py-3 text-sm text-amber-100">
           <AlertCircle className="mt-0.5 size-4 shrink-0" />
           <ul className="space-y-1">
@@ -213,9 +274,9 @@ export function LineupBuilder({
       <Button
         type="button"
         size="lg"
-        disabled={!validation.ok || confirming || lineup.confirmed}
-        onClick={onConfirm}
-        className="h-12 w-full bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
+        disabled={confirming || lineup.confirmed}
+        onClick={handleConfirmClick}
+        className="h-12 w-full bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright disabled:opacity-60"
       >
         {confirming ? (
           <>
@@ -230,14 +291,19 @@ export function LineupBuilder({
         )}
       </Button>
 
-      <section className="overflow-hidden border border-line bg-panel/80">
-        <header className="space-y-3 border-b border-line px-4 py-3">
-          <h2 className="font-display text-xl tracking-wide text-bone">
-            Mercat CBB
-          </h2>
-          <p className="text-xs text-mute">
-            {roster.length} jugadors FCBQ · toca per afegir a la pista
-          </p>
+      <section
+        ref={marketRef}
+        className="overflow-hidden border border-line bg-panel/80"
+      >
+        <header className="space-y-2.5 border-b border-line px-4 py-3">
+          <div>
+            <h2 className="font-display text-xl tracking-wide text-bone">
+              Mercat CBB
+            </h2>
+            <p className="mt-0.5 text-xs text-mute">
+              Toca un jugador per omplir el següent slot lliure
+            </p>
+          </div>
           <div className="flex flex-wrap gap-2">
             {(["all", "base", "aler", "pivot"] as const).map((key) => (
               <Button
@@ -322,6 +388,43 @@ export function LineupBuilder({
           </div>
         )}
       </section>
+
+      {/* Sticky selected-player actions — Fantasy LaLiga style */}
+      {selectedPlayer && !lineup.confirmed && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ink/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-md">
+          <div className="mx-auto flex w-full max-w-lg items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-bone">
+                {selectedPlayer.name}
+              </p>
+              <p className="text-xs text-mute">
+                {POSITION_LABEL[selectedPlayer.position]} · VAL{" "}
+                {selectedPlayer.avgVal}
+              </p>
+            </div>
+            <Button
+              type="button"
+              size="lg"
+              onClick={() => setCaptain(selectedPlayer.id)}
+              className={
+                lineup.captainId === selectedPlayer.id
+                  ? "h-12 shrink-0 bg-grana text-bone hover:bg-grana-bright"
+                  : "h-12 shrink-0 border border-line bg-panel-2 text-bone hover:bg-white/10"
+              }
+            >
+              <Crown className="size-4" /> Capità
+            </Button>
+            <Button
+              type="button"
+              size="lg"
+              onClick={() => togglePlayer(selectedPlayer.id)}
+              className="h-12 shrink-0 bg-bone text-ink hover:bg-white"
+            >
+              <UserMinus className="size-4" /> Treure
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

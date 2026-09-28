@@ -27,12 +27,29 @@ export function PlayerRow({
   onAction,
   onCaptain,
 }: PlayerRowProps) {
+  const canTapRow = action === "add" && !disabled && onAction;
+
   return (
     <div
+      role={canTapRow ? "button" : undefined}
+      tabIndex={canTapRow ? 0 : undefined}
+      onClick={canTapRow ? onAction : undefined}
+      onKeyDown={
+        canTapRow
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onAction?.();
+              }
+            }
+          : undefined
+      }
       className={cn(
         "flex items-center gap-3 border-b border-line px-3 py-3 transition-colors",
         selected && "bg-grana/10",
         isCaptain && "bg-white/[0.04]",
+        canTapRow && "cursor-pointer active:bg-white/[0.06]",
+        disabled && action === "add" && "opacity-45",
       )}
     >
       <PlayerAvatar name={player.name} photoUrl={player.photoUrl} />
@@ -70,7 +87,10 @@ export function PlayerRow({
               "text-mute hover:bg-white/10 hover:text-bone",
               isCaptain && "text-grana-bright",
             )}
-            onClick={onCaptain}
+            onClick={(e) => {
+              e.stopPropagation();
+              onCaptain();
+            }}
             aria-label="Marcar com a capità"
           >
             <Crown className="size-4" />
@@ -81,8 +101,12 @@ export function PlayerRow({
             type="button"
             size="sm"
             disabled={disabled}
-            onClick={onAction}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAction?.();
+            }}
             className="bg-grana text-bone hover:bg-grana-bright"
+            aria-label={`Afegir ${player.name}`}
           >
             <Plus className="size-4" />
           </Button>
@@ -92,7 +116,10 @@ export function PlayerRow({
             type="button"
             size="sm"
             variant="ghost"
-            onClick={onAction}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAction?.();
+            }}
             className="text-mute hover:bg-white/10 hover:text-bone"
           >
             <X className="size-4" />
