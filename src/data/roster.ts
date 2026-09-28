@@ -3,7 +3,7 @@ import type { Player, TeamId } from "@/lib/types";
 /**
  * Mercat fantasy — sèniors CB Balaguer (FCBQ temporada 2026-27).
  *
- * Fonts (basquetcatala.cat, extracció 2026-09-28):
+ * Fonts (basquetcatala.cat Plantilla live 2026-09-28, Chrome CDP + reCAPTCHA):
  * - TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A
  *   https://www.basquetcatala.cat/estadistica/equip/5f55017e-893e-4323-8b41-b58323ea8f73
  * - LO SIFONET CB BALAGUER B (sense estadístiques encara)
@@ -15,9 +15,11 @@ import type { Player, TeamId } from "@/lib/types";
  *
  * Regla Balaguer: persona × equip = jugador fantasy distint (no es deduplica).
  * Ids: `slug` per un sol equip; `slug__equip` quan la mateixa persona juga a dos.
- * Noms = title-case de la Plantilla / API OptimalWay (accents només si surten a Fede).
- * L'FCBQ no mostra dorsal a la UI web; l'API sí (opcional). Sense posicions: 8 slots lliures.
- * Preus derivats de PTS + VAL + MIN de la mostra FCBQ (1 partit a la captura).
+ * Noms = title-case de la Plantilla FCBQ (accents només si surten a Fede).
+ * Dorsal = número de samarreta a la Plantilla (badge / columna).
+ * VAL FCBQ surt "—" a la Plantilla; `avgVal` / preu usen +/- (PM) publicat, no s'inventa VAL.
+ * Sense posicions: alineació de 8 lliures.
+ * Preus: PTS + max(PM,0) + MIN de la mostra FCBQ (PJ=1).
  *
  * Regles: plantilla 8, pressupost 100.000 € (mercat multi-equip, 29 entrades).
  */
@@ -82,6 +84,7 @@ function priceFrom(pts: number, val: number, min: number): number {
   return Math.min(16_500, Math.max(4_500, Math.round(raw / 500) * 500));
 }
 
+/** Fantasy avg seed: prefer published +/- (PM) when VAL is unpublished on FCBQ. */
 function avgFrom(val: number, pts: number): number {
   if (val > 0) return Math.round(val);
   return Math.max(1, Math.round(pts * 0.7));
@@ -92,10 +95,10 @@ export const ROSTER: Player[] = [
   {
     id: "hector-lozano",
     name: "Hector Lozano Martinez",
-    number: null,
-    pts: 16,
-    avgVal: avgFrom(-3, 16),
-    price: priceFrom(16, -3, 23.5),
+    number: 19,
+    pts: 15,
+    avgVal: avgFrom(-3, 15),
+    price: priceFrom(15, -3, 23.5),
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
@@ -104,7 +107,7 @@ export const ROSTER: Player[] = [
   {
     id: "eduard-bernat",
     name: "Eduard Bernat Sucarrat",
-    number: null,
+    number: 20,
     pts: 10,
     avgVal: avgFrom(-6, 10),
     price: priceFrom(10, -6, 27.1),
@@ -114,9 +117,33 @@ export const ROSTER: Player[] = [
     photoUrl: "/players/eduard-bernat.png",
   },
   {
+    id: "toni-salud",
+    name: "Toni Salud Garcia",
+    number: 43,
+    pts: 9,
+    avgVal: avgFrom(4, 9),
+    price: priceFrom(9, 4, 24.2),
+    source: "fcbq",
+    teamId: "masc-a",
+    teamIds: ["masc-a"],
+    photoUrl: "/players/toni-salud.jpg",
+  },
+  {
+    id: "ivan-franco",
+    name: "Ivan Franco Guerrero",
+    number: 6,
+    pts: 9,
+    avgVal: avgFrom(-15, 9),
+    price: priceFrom(9, -15, 27.5),
+    source: "fcbq",
+    teamId: "masc-a",
+    teamIds: ["masc-a"],
+    photoUrl: "/players/ivan-franco.png",
+  },
+  {
     id: "gerard-garcia",
     name: "Gerard Garcia Rosauro",
-    number: null,
+    number: 0,
     pts: 8,
     avgVal: avgFrom(-3, 8),
     price: priceFrom(8, -3, 26.4),
@@ -126,45 +153,9 @@ export const ROSTER: Player[] = [
     photoUrl: "/players/gerard-garcia.jpg",
   },
   {
-    id: "ivan-franco",
-    name: "Ivan Franco Guerrero",
-    number: null,
-    pts: 8,
-    avgVal: avgFrom(-15, 8),
-    price: priceFrom(8, -15, 27.5),
-    source: "fcbq",
-    teamId: "masc-a",
-    teamIds: ["masc-a"],
-    photoUrl: "/players/ivan-franco.png",
-  },
-  {
-    id: "toni-salud",
-    name: "Toni Salud Garcia",
-    number: null,
-    pts: 8,
-    avgVal: avgFrom(4, 8),
-    price: priceFrom(8, 4, 24.2),
-    source: "fcbq",
-    teamId: "masc-a",
-    teamIds: ["masc-a"],
-    photoUrl: "/players/toni-salud.jpg",
-  },
-  {
-    id: "babacar-toure",
-    name: "Babacar Toure Gassama",
-    number: null,
-    pts: 6,
-    avgVal: avgFrom(-15, 6),
-    price: priceFrom(6, -15, 23.0),
-    source: "fcbq",
-    teamId: "masc-a",
-    teamIds: ["masc-a"],
-    photoUrl: "/players/babacar-toure.jpg",
-  },
-  {
     id: "marc-escoda",
     name: "Marc Escoda Angerri",
-    number: null,
+    number: 24,
     pts: 6,
     avgVal: avgFrom(4, 6),
     price: priceFrom(6, 4, 18.0),
@@ -174,9 +165,21 @@ export const ROSTER: Player[] = [
     photoUrl: "/players/marc-escoda.jpg",
   },
   {
+    id: "babacar-toure",
+    name: "Babacar Toure Gassama",
+    number: 68,
+    pts: 6,
+    avgVal: avgFrom(-15, 6),
+    price: priceFrom(6, -15, 23.0),
+    source: "fcbq",
+    teamId: "masc-a",
+    teamIds: ["masc-a"],
+    photoUrl: "/players/babacar-toure.jpg",
+  },
+  {
     id: "gerard-soldevila",
     name: "Gerard Soldevila Casas",
-    number: null,
+    number: 26,
     pts: 0,
     avgVal: avgFrom(-2, 0),
     price: priceFrom(0, -2, 16.1),
@@ -188,7 +191,7 @@ export const ROSTER: Player[] = [
   {
     id: "roger-companys",
     name: "Roger Companys Solà",
-    number: null,
+    number: 8,
     pts: 0,
     avgVal: avgFrom(1, 0),
     price: priceFrom(0, 1, 14.1),
@@ -201,10 +204,10 @@ export const ROSTER: Player[] = [
   {
     id: "ares-bunol",
     name: "Ares Buñol Perelló",
-    number: null,
-    pts: 16,
-    avgVal: avgFrom(24, 16),
-    price: priceFrom(16, 24, 26.4),
+    number: 11,
+    pts: 15,
+    avgVal: avgFrom(24, 15),
+    price: priceFrom(15, 24, 28.4),
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
@@ -213,7 +216,7 @@ export const ROSTER: Player[] = [
   {
     id: "julia-pla__cudos-a",
     name: "Júlia Pla Pla",
-    number: null,
+    number: 13,
     pts: 13,
     avgVal: avgFrom(18, 13),
     price: priceFrom(13, 18, 29.4),
@@ -226,10 +229,10 @@ export const ROSTER: Player[] = [
   {
     id: "andrea-perat",
     name: "Andrea Perat Gracia",
-    number: null,
+    number: 21,
     pts: 8,
-    avgVal: avgFrom(18, 8),
-    price: priceFrom(8, 18, 27.4),
+    avgVal: avgFrom(19, 8),
+    price: priceFrom(8, 19, 27.4),
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
@@ -238,7 +241,7 @@ export const ROSTER: Player[] = [
   {
     id: "neus-escoda",
     name: "Neus Escoda Angerri",
-    number: null,
+    number: 88,
     pts: 8,
     avgVal: avgFrom(15, 8),
     price: priceFrom(8, 15, 26.8),
@@ -250,7 +253,7 @@ export const ROSTER: Player[] = [
   {
     id: "monica-fontanet",
     name: "Monica Fontanet Mallol",
-    number: null,
+    number: 95,
     pts: 6,
     avgVal: avgFrom(13, 6),
     price: priceFrom(6, 13, 19.4),
@@ -262,23 +265,23 @@ export const ROSTER: Player[] = [
   {
     id: "queralt-sole__cudos-a",
     name: "Queralt Sole Torres",
-    number: null,
+    number: 23,
     pts: 5,
     avgVal: avgFrom(-13, 5),
-    price: priceFrom(5, -13, 10.8),
+    price: priceFrom(5, -13, 10.9),
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
-    photoUrl: "/players/gueralt-sole.jpg",
+    photoUrl: "/players/queralt-sole.jpg",
     note: "També al mercat com a queralt-sole__farratges-b (Farratges La Noguera CB Balaguer B).",
   },
   {
     id: "clara-paniagua",
     name: "Clara Paniagua Marvà",
-    number: null,
+    number: 10,
     pts: 2,
     avgVal: avgFrom(-2, 2),
-    price: priceFrom(2, -2, 16.3),
+    price: priceFrom(2, -2, 18.3),
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
@@ -287,20 +290,20 @@ export const ROSTER: Player[] = [
   {
     id: "mariama-mballo__cudos-a",
     name: "Mariama Mballo Diallo",
-    number: null,
+    number: 27,
     pts: 1,
     avgVal: avgFrom(-12, 1),
     price: priceFrom(1, -12, 10.6),
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
-    photoUrl: "/players/mariana-mballo.jpg",
+    photoUrl: "/players/mariama-mballo.jpg",
     note: "També al mercat com a mariama-mballo__farratges-b (Farratges La Noguera CB Balaguer B).",
   },
   {
     id: "martina-benitez",
     name: "Martina Benítez Farrando",
-    number: null,
+    number: 79,
     pts: 1,
     avgVal: avgFrom(-15, 1),
     price: priceFrom(1, -15, 15.7),
@@ -312,33 +315,33 @@ export const ROSTER: Player[] = [
   {
     id: "ada-domene",
     name: "Ada Domene Moraleda",
-    number: null,
+    number: 24,
     pts: 0,
     avgVal: avgFrom(-17, 0),
     price: priceFrom(0, -17, 13.0),
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
-    photoUrl: "/players/ada-dorienie.jpg",
+    photoUrl: "/players/ada-domene.jpg",
   },
   // —— Farratges La Noguera CB Balaguer B (femení) ——
   {
     id: "queralt-sole__farratges-b",
     name: "Queralt Sole Torres",
-    number: null,
-    pts: 23,
-    avgVal: avgFrom(-1, 23),
-    price: priceFrom(23, -1, 37.5),
+    number: 23,
+    pts: 29,
+    avgVal: avgFrom(-1, 29),
+    price: priceFrom(29, -1, 37.5),
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
-    photoUrl: "/players/gueralt-sole.jpg",
+    photoUrl: "/players/queralt-sole.jpg",
     note: "També al mercat com a queralt-sole__cudos-a (Cudos Consultors CB Balaguer A).",
   },
   {
     id: "julia-pla__farratges-b",
     name: "Júlia Pla Pla",
-    number: null,
+    number: 13,
     pts: 15,
     avgVal: avgFrom(7, 15),
     price: priceFrom(15, 7, 24.4),
@@ -351,7 +354,7 @@ export const ROSTER: Player[] = [
   {
     id: "jana-roldan",
     name: "Jana Roldan Arandilla",
-    number: null,
+    number: 8,
     pts: 5,
     avgVal: avgFrom(0, 5),
     price: priceFrom(5, 0, 19.3),
@@ -361,9 +364,34 @@ export const ROSTER: Player[] = [
     photoUrl: "/players/jana-roldan.jpg",
   },
   {
+    id: "nuria-jimenez",
+    name: "Núria Jiménez Aran",
+    number: 30,
+    pts: 2,
+    avgVal: avgFrom(1, 2),
+    price: priceFrom(2, 1, 29.0),
+    source: "fcbq",
+    teamId: "fem-b",
+    teamIds: ["fem-b"],
+    photoUrl: "/players/nuria-jimenez.jpg",
+  },
+  {
+    id: "mariama-mballo__farratges-b",
+    name: "Mariama Mballo Diallo",
+    number: 27,
+    pts: 2,
+    avgVal: avgFrom(12, 2),
+    price: priceFrom(2, 12, 29.7),
+    source: "fcbq",
+    teamId: "fem-b",
+    teamIds: ["fem-b"],
+    photoUrl: "/players/mariama-mballo.jpg",
+    note: "També al mercat com a mariama-mballo__cudos-a (Cudos Consultors CB Balaguer A).",
+  },
+  {
     id: "abril-gracia",
     name: "Abril Gràcia Palacín",
-    number: null,
+    number: 33,
     pts: 2,
     avgVal: avgFrom(-3, 2),
     price: priceFrom(2, -3, 8.6),
@@ -373,37 +401,12 @@ export const ROSTER: Player[] = [
     photoUrl: "/players/abril-gracia.jpg",
   },
   {
-    id: "mariama-mballo__farratges-b",
-    name: "Mariama Mballo Diallo",
-    number: null,
-    pts: 2,
-    avgVal: avgFrom(12, 2),
-    price: priceFrom(2, 12, 23.7),
-    source: "fcbq",
-    teamId: "fem-b",
-    teamIds: ["fem-b"],
-    photoUrl: "/players/mariana-mballo.jpg",
-    note: "També al mercat com a mariama-mballo__cudos-a (Cudos Consultors CB Balaguer A).",
-  },
-  {
-    id: "nuria-jimenez",
-    name: "Núria Jiménez Aran",
-    number: null,
-    pts: 2,
-    avgVal: avgFrom(1, 2),
-    price: priceFrom(2, 1, 23.0),
-    source: "fcbq",
-    teamId: "fem-b",
-    teamIds: ["fem-b"],
-    photoUrl: "/players/nuria-jimenez.jpg",
-  },
-  {
     id: "xenia-andreu",
     name: "Xenia Andreu Monell",
-    number: null,
+    number: 93,
     pts: 1,
-    avgVal: avgFrom(-8, 1),
-    price: priceFrom(1, -8, 11.1),
+    avgVal: avgFrom(-9, 1),
+    price: priceFrom(1, -9, 11.1),
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
@@ -412,7 +415,7 @@ export const ROSTER: Player[] = [
   {
     id: "gina-betbese",
     name: "Gina Betbesé Sánchez",
-    number: null,
+    number: 11,
     pts: 0,
     avgVal: avgFrom(-6, 0),
     price: priceFrom(0, -6, 2.7),
@@ -424,7 +427,7 @@ export const ROSTER: Player[] = [
   {
     id: "gina-trilla",
     name: "Gina Trilla Piniés",
-    number: null,
+    number: 25,
     pts: 0,
     avgVal: avgFrom(11, 0),
     price: priceFrom(0, 11, 33.5),
@@ -436,7 +439,7 @@ export const ROSTER: Player[] = [
   {
     id: "jana-alarcon",
     name: "Jana Alarcon Solanes",
-    number: null,
+    number: 24,
     pts: 0,
     avgVal: avgFrom(-2, 0),
     price: priceFrom(0, -2, 4.2),
@@ -470,10 +473,10 @@ export const OPPONENTS = [
 /**
  * Map collapsed / legacy fantasy ids → current primary-team variant.
  * Dual-roster people previously shared one id; now person×team.
+ * Also maps spelling fixes (Gueralt→Queralt, Mariana→Mariama, Doriene→Domene).
  */
 export const LEGACY_PLAYER_ID_MAP: Record<string, string> = {
   "julia-pla": "julia-pla__cudos-a",
-  // Spelling fixes (Fede 2026-09-28): Gueralt→Queralt, Mariana→Mariama, Doriene→Domene
   "gueralt-sole": "queralt-sole__farratges-b",
   "gueralt-sole__cudos-a": "queralt-sole__cudos-a",
   "gueralt-sole__farratges-b": "queralt-sole__farratges-b",

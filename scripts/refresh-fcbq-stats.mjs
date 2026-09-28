@@ -83,6 +83,7 @@ function buildFromRosters(rosters) {
       });
       if (pj === 1) {
         if (entry.games.some((g) => g.teamId === teamId)) continue;
+        entry.number = p.number ?? null;
         entry.games.push({
           date: null, round: null, opponent: null, teamId, fcbqTeamId: t.id,
           competition: t.competition ?? null,
@@ -90,8 +91,13 @@ function buildFromRosters(rosters) {
           t2c: stats.T2C ?? null, t2i: stats.T2I ?? null,
           t3c: stats.T3C ?? null, t3i: stats.T3I ?? null,
           tlc: stats.TLC ?? null, tli: stats.TLI ?? null,
+          // FCBQ Plantilla often leaves VAL as "—"; PM is +/-.
           val: stats.VAL ?? null,
-          note: "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit).",
+          pm: stats.PM ?? null,
+          note:
+            stats.VAL == null
+              ? "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+              : "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit).",
         });
       } else if (pj > 1) {
         entry.seasonNote = `FCBQ mostra PJ=${pj} (mitjanes); cal scrape per partit.`;

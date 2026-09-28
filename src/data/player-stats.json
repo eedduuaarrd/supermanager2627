@@ -27,14 +27,14 @@
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
           "competition": "TEMPORADA 2026-27 - 1A TERRITORIAL SENIOR MASCULÍ - 1A TERRITORIAL SENIOR MASCULÍ - JA FASE - GRUP 01",
           "min": 23.5,
-          "pts": 16,
+          "pts": 15,
           "t2c": 2,
           "t2i": 2,
           "t3c": 3,
           "t3i": 3,
           "tlc": 2,
           "tli": 2,
-          "val": -3,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -61,7 +61,7 @@
           "t3i": 2,
           "tlc": 2,
           "tli": 3,
-          "val": -6,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -81,14 +81,14 @@
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
           "competition": "TEMPORADA 2026-27 - 1A TERRITORIAL SENIOR MASCULÍ - 1A TERRITORIAL SENIOR MASCULÍ - JA FASE - GRUP 01",
           "min": 24.2,
-          "pts": 8,
+          "pts": 9,
           "t2c": 4,
           "t2i": 4,
           "t3c": 0,
           "t3i": 0,
           "tlc": 1,
           "tli": 4,
-          "val": 4,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -108,14 +108,14 @@
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
           "competition": "TEMPORADA 2026-27 - 1A TERRITORIAL SENIOR MASCULÍ - 1A TERRITORIAL SENIOR MASCULÍ - JA FASE - GRUP 01",
           "min": 27.5,
-          "pts": 8,
+          "pts": 9,
           "t2c": 1,
           "t2i": 1,
           "t3c": 1,
           "t3i": 1,
           "tlc": 4,
           "tli": 5,
-          "val": -15,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -142,7 +142,7 @@
           "t3i": 2,
           "tlc": 2,
           "tli": 4,
-          "val": -3,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -169,7 +169,7 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 0,
-          "val": 4,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -196,7 +196,7 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 1,
-          "val": -15,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -223,7 +223,7 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 0,
-          "val": -2,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -250,7 +250,7 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 2,
-          "val": 1,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -269,15 +269,15 @@
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
           "competition": "TEMPORADA 2026-27 - COPA CATALUNYA FEMENINA - FASE PRÈVIA - 01",
-          "min": 26.4,
-          "pts": 16,
+          "min": 28.4,
+          "pts": 15,
           "t2c": 1,
           "t2i": 2,
           "t3c": 3,
           "t3i": 4,
           "tlc": 4,
           "tli": 6,
-          "val": 24,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -304,7 +304,7 @@
           "t3i": 2,
           "tlc": 2,
           "tli": 2,
-          "val": 18,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -331,7 +331,7 @@
           "t3i": 3,
           "tlc": 2,
           "tli": 3,
-          "val": 18,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -358,7 +358,7 @@
           "t3i": 2,
           "tlc": 2,
           "tli": 4,
-          "val": 15,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -385,7 +385,7 @@
           "t3i": 3,
           "tlc": 0,
           "tli": 0,
-          "val": 13,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -404,7 +404,7 @@
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
           "competition": "TEMPORADA 2026-27 - COPA CATALUNYA FEMENINA - FASE PRÈVIA - 01",
-          "min": 10.8,
+          "min": 10.9,
           "pts": 5,
           "t2c": 2,
           "t2i": 8,
@@ -412,7 +412,7 @@
           "t3i": 0,
           "tlc": 1,
           "tli": 2,
-          "val": -13,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -431,7 +431,7 @@
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
           "competition": "TEMPORADA 2026-27 - COPA CATALUNYA FEMENINA - FASE PRÈVIA - 01",
-          "min": 16.3,
+          "min": 18.3,
           "pts": 2,
           "t2c": 1,
           "t2i": 4,
@@ -439,7 +439,7 @@
           "t3i": 2,
           "tlc": 0,
           "tli": 0,
-          "val": -2,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -466,7 +466,7 @@
           "t3i": 0,
           "tlc": 1,
           "tli": 2,
-          "val": -12,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -493,7 +493,7 @@
           "t3i": 0,
           "tlc": 1,
           "tli": 2,
-          "val": -15,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -520,7 +520,7 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 0,
-          "val": -17,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -540,14 +540,14 @@
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
           "competition": "TEMPORADA 2026-27 - C.C. SEGONA CATEGORIA FEMENINA - FASE PRÈVIA - 01",
           "min": 37.5,
-          "pts": 23,
+          "pts": 29,
           "t2c": 11,
           "t2i": 11,
           "t3c": 0,
           "t3i": 0,
           "tlc": 7,
           "tli": 12,
-          "val": -1,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -574,7 +574,7 @@
           "t3i": 2,
           "tlc": 3,
           "tli": 5,
-          "val": 7,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -601,7 +601,7 @@
           "t3i": 0,
           "tlc": 5,
           "tli": 5,
-          "val": 0,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -620,7 +620,7 @@
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
           "competition": "TEMPORADA 2026-27 - C.C. SEGONA CATEGORIA FEMENINA - FASE PRÈVIA - 01",
-          "min": 23,
+          "min": 29,
           "pts": 2,
           "t2c": 1,
           "t2i": 1,
@@ -628,7 +628,7 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 0,
-          "val": 1,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -647,7 +647,7 @@
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
           "competition": "TEMPORADA 2026-27 - C.C. SEGONA CATEGORIA FEMENINA - FASE PRÈVIA - 01",
-          "min": 23.7,
+          "min": 29.7,
           "pts": 2,
           "t2c": 1,
           "t2i": 1,
@@ -655,7 +655,7 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 0,
-          "val": 12,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -682,7 +682,7 @@
           "t3i": 0,
           "tlc": 2,
           "tli": 2,
-          "val": -3,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -709,7 +709,7 @@
           "t3i": 0,
           "tlc": 1,
           "tli": 2,
-          "val": -8,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -736,7 +736,7 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 0,
-          "val": -6,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -763,7 +763,7 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 4,
-          "val": 11,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],
@@ -790,7 +790,7 @@
           "t3i": 0,
           "tlc": 0,
           "tli": 0,
-          "val": -2,
+          "val": null,
           "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
         }
       ],

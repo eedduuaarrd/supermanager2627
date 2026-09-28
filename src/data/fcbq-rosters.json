@@ -1,4 +1,12 @@
 {
+  "extractedAt": "2026-09-28",
+  "source": "basquetcatala.cat estadistica/equip Plantilla (live Chrome CDP, reCAPTCHA passed)",
+  "notes": [
+    "Jersey numbers from Plantilla photo badges / table.",
+    "VAL column is unpublished (dashes) on Plantilla; PM is +/-.",
+    "Do not invent VAL; fantasy avgVal seeds from PM with explicit note.",
+    "Lo Sifonet B: No hi ha estadístiques disponibles."
+  ],
   "teams": [
     {
       "id": "5f55017e-893e-4323-8b41-b58323ea8f73",
@@ -9,10 +17,11 @@
         {
           "number": 19,
           "name": "HECTOR LOZANO MARTINEZ",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_0_54c7a3b9-226b-40ed-bb83-8cb8a5062797.jpeg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 23.5,
-            "PTS": 16.0,
+            "PTS": 15.0,
             "T2C": 2.0,
             "T2I": 2.0,
             "T2%": 100.0,
@@ -22,14 +31,17 @@
             "TLC": 2.0,
             "TLI": 2.0,
             "TL%": 100.0,
-            "VAL": -3.0
+            "FC": 3.0,
+            "VAL": null,
+            "PM": -3.0
           }
         },
         {
           "number": 20,
           "name": "EDUARD BERNAT SUCARRAT",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_331863_54ac98ed-45a2-47ad-8ffa-5f222ccb4913.",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 27.1,
             "PTS": 10.0,
             "T2C": 1.0,
@@ -41,16 +53,19 @@
             "TLC": 2.0,
             "TLI": 3.0,
             "TL%": 66.7,
-            "VAL": -6.0
+            "FC": 4.0,
+            "VAL": null,
+            "PM": -6.0
           }
         },
         {
           "number": 43,
           "name": "TONI SALUD GARCIA",
+          "photoUrl": "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_0637491b1-35a9-4ca9-86d7-2323df5404e3.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 24.2,
-            "PTS": 8.0,
+            "PTS": 9.0,
             "T2C": 4.0,
             "T2I": 4.0,
             "T2%": 100.0,
@@ -60,16 +75,19 @@
             "TLC": 1.0,
             "TLI": 4.0,
             "TL%": 25.0,
-            "VAL": 4.0
+            "FC": 2.0,
+            "VAL": null,
+            "PM": 4.0
           }
         },
         {
           "number": 6,
           "name": "IVAN FRANCO GUERRERO",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_466700_2d99d5bb-2ed4-4b0e-979f-d2766cb091e2.png",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 27.5,
-            "PTS": 8.0,
+            "PTS": 9.0,
             "T2C": 1.0,
             "T2I": 1.0,
             "T2%": 100.0,
@@ -79,14 +97,17 @@
             "TLC": 4.0,
             "TLI": 5.0,
             "TL%": 80.0,
-            "VAL": -15.0
+            "FC": 1.0,
+            "VAL": null,
+            "PM": -15.0
           }
         },
         {
-          "number": null,
+          "number": 0,
           "name": "GERARD GARCIA ROSAURO",
+          "photoUrl": "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_074b432d0-55fc-45d5-9335-5ea7ce569baa.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 26.4,
             "PTS": 8.0,
             "T2C": 0.0,
@@ -98,14 +119,17 @@
             "TLC": 2.0,
             "TLI": 4.0,
             "TL%": 50.0,
-            "VAL": -3.0
+            "FC": 2.0,
+            "VAL": null,
+            "PM": -3.0
           }
         },
         {
           "number": 24,
           "name": "MARC ESCODA ANGERRI",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_227692_ec30a116-abce-4144-9f16-6573f8e178c7.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 18.0,
             "PTS": 6.0,
             "T2C": 3.0,
@@ -117,14 +141,17 @@
             "TLC": 0.0,
             "TLI": 0.0,
             "TL%": 0.0,
-            "VAL": 4.0
+            "FC": 3.0,
+            "VAL": null,
+            "PM": 4.0
           }
         },
         {
           "number": 68,
           "name": "BABACAR TOURE GASSAMA",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_383137_ad007b3a-1b53-4616-9dad-713002f13d3c.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 23.0,
             "PTS": 6.0,
             "T2C": 3.0,
@@ -136,14 +163,17 @@
             "TLC": 0.0,
             "TLI": 1.0,
             "TL%": 0.0,
-            "VAL": -15.0
+            "FC": 2.0,
+            "VAL": null,
+            "PM": -15.0
           }
         },
         {
           "number": 26,
           "name": "GERARD SOLDEVILA CASAS",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_45890_caec6ef8-213e-413c-bf4c-c334a2c5845f.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 16.1,
             "PTS": 0.0,
             "T2C": 0.0,
@@ -155,14 +185,17 @@
             "TLC": 0.0,
             "TLI": 0.0,
             "TL%": 0.0,
-            "VAL": -2.0
+            "FC": 3.0,
+            "VAL": null,
+            "PM": -2.0
           }
         },
         {
           "number": 8,
           "name": "ROGER COMPANYS SOLÀ",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_293807_dd8246e8-6ad4-4f66-b36e-8ea2708a878d.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 14.1,
             "PTS": 0.0,
             "T2C": 0.0,
@@ -174,7 +207,9 @@
             "TLC": 0.0,
             "TLI": 2.0,
             "TL%": 0.0,
-            "VAL": 1.0
+            "FC": 4.0,
+            "VAL": null,
+            "PM": 1.0
           }
         }
       ]
@@ -182,11 +217,9 @@
     {
       "id": "c057eeae-3aae-4e33-b2ab-54fabb2700ae",
       "name": "LO SIFONET CB BALAGUER B",
-      "competition": "2A. TERRITORIAL SENIOR MASCULÍ - 1A FASE-GRUP 01",
+      "competition": "TEMPORADA 2026-27 - 2A TERRITORIAL SENIOR MASCULÍ - 1A FASE - GRUP 01",
       "url": "https://www.basquetcatala.cat/estadistica/equip/c057eeae-3aae-4e33-b2ab-54fabb2700ae",
-      "players": [],
-      "club": "Club Basquet Balaguer",
-      "team_page": "https://www.basquetcatala.cat/equip/94248"
+      "players": []
     },
     {
       "id": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
@@ -197,10 +230,11 @@
         {
           "number": 11,
           "name": "ARES BUÑOL PERELLÓ",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_329267_85505692-5d90-43c4-b5c1-03e7cd74437e.jpg",
           "stats": {
-            "PJ": 1,
-            "MIN": 26.4,
-            "PTS": 16.0,
+            "PJ": 1.0,
+            "MIN": 28.4,
+            "PTS": 15.0,
             "T2C": 1.0,
             "T2I": 2.0,
             "T2%": 50.0,
@@ -210,14 +244,17 @@
             "TLC": 4.0,
             "TLI": 6.0,
             "TL%": 66.7,
-            "VAL": 24.0
+            "FC": 3.0,
+            "VAL": null,
+            "PM": 24.0
           }
         },
         {
           "number": 13,
           "name": "JÚLIA PLA PLA",
+          "photoUrl": "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_012cb9cdd-c129-4346-9ea6-7aee03c4f29a.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 29.4,
             "PTS": 13.0,
             "T2C": 4.0,
@@ -229,14 +266,17 @@
             "TLC": 2.0,
             "TLI": 2.0,
             "TL%": 100.0,
-            "VAL": 18.0
+            "FC": 4.0,
+            "VAL": null,
+            "PM": 18.0
           }
         },
         {
           "number": 21,
           "name": "ANDREA PERAT GRACIA",
+          "photoUrl": "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_0e63a3f12-bfe0-4240-8602-bbec0df1b7de.jpeg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 27.4,
             "PTS": 8.0,
             "T2C": 3.0,
@@ -248,14 +288,17 @@
             "TLC": 2.0,
             "TLI": 3.0,
             "TL%": 66.7,
-            "VAL": 18.0
+            "FC": 4.0,
+            "VAL": null,
+            "PM": 19.0
           }
         },
         {
           "number": 88,
           "name": "NEUS ESCODA ANGERRI",
+          "photoUrl": "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_09958ef53-48ee-42c1-96be-80493b36c5ec.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 26.8,
             "PTS": 8.0,
             "T2C": 3.0,
@@ -267,14 +310,17 @@
             "TLC": 2.0,
             "TLI": 4.0,
             "TL%": 50.0,
-            "VAL": 15.0
+            "FC": 1.0,
+            "VAL": null,
+            "PM": 15.0
           }
         },
         {
           "number": 95,
           "name": "MONICA FONTANET MALLOL",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_361373_44327862-1395-4f87-87d8-03562bc8483b.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 19.4,
             "PTS": 6.0,
             "T2C": 0.0,
@@ -286,15 +332,18 @@
             "TLC": 0.0,
             "TLI": 0.0,
             "TL%": 0.0,
-            "VAL": 13.0
+            "FC": 2.0,
+            "VAL": null,
+            "PM": 13.0
           }
         },
         {
-          "number": null,
+          "number": 23,
           "name": "QUERALT SOLE TORRES",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_332647_8d29bda3-c7a2-40b2-bf88-6f035e592415.jpg",
           "stats": {
-            "PJ": 1,
-            "MIN": 10.8,
+            "PJ": 1.0,
+            "MIN": 10.9,
             "PTS": 5.0,
             "T2C": 2.0,
             "T2I": 8.0,
@@ -305,15 +354,18 @@
             "TLC": 1.0,
             "TLI": 2.0,
             "TL%": 50.0,
-            "VAL": -13.0
+            "FC": 2.0,
+            "VAL": null,
+            "PM": -13.0
           }
         },
         {
           "number": 10,
           "name": "CLARA PANIAGUA MARVÀ",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_269827_b9c8396e-3b72-48d2-911a-4c993eef56d5.png",
           "stats": {
-            "PJ": 1,
-            "MIN": 16.3,
+            "PJ": 1.0,
+            "MIN": 18.3,
             "PTS": 2.0,
             "T2C": 1.0,
             "T2I": 4.0,
@@ -324,14 +376,17 @@
             "TLC": 0.0,
             "TLI": 0.0,
             "TL%": 0.0,
-            "VAL": -2.0
+            "FC": 5.0,
+            "VAL": null,
+            "PM": -2.0
           }
         },
         {
-          "number": null,
+          "number": 27,
           "name": "MARIAMA MBALLO DIALLO",
+          "photoUrl": "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_0eacea48f-fafe-49ed-8a1e-6a419c064096.jpeg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 10.6,
             "PTS": 1.0,
             "T2C": 0.0,
@@ -343,14 +398,17 @@
             "TLC": 1.0,
             "TLI": 2.0,
             "TL%": 50.0,
-            "VAL": -12.0
+            "FC": 0.0,
+            "VAL": null,
+            "PM": -12.0
           }
         },
         {
           "number": 79,
           "name": "MARTINA BENÍTEZ FARRANDO",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_337373_4d33f03a-b1cd-4ec4-8eed-e21d6d115f70.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 15.7,
             "PTS": 1.0,
             "T2C": 0.0,
@@ -362,14 +420,17 @@
             "TLC": 1.0,
             "TLI": 2.0,
             "TL%": 50.0,
-            "VAL": -15.0
+            "FC": 1.0,
+            "VAL": null,
+            "PM": -15.0
           }
         },
         {
-          "number": null,
+          "number": 24,
           "name": "ADA DOMENE MORALEDA",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_374656_6d535a3b-dced-4e68-8646-f08e8cd24978.jpeg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 13.0,
             "PTS": 0.0,
             "T2C": 0.0,
@@ -381,7 +442,9 @@
             "TLC": 0.0,
             "TLI": 0.0,
             "TL%": 0.0,
-            "VAL": -17.0
+            "FC": 0.0,
+            "VAL": null,
+            "PM": -17.0
           }
         }
       ]
@@ -393,12 +456,13 @@
       "url": "https://www.basquetcatala.cat/estadistica/equip/a5c75f3f-ca35-4553-9eb6-a29780eb2007",
       "players": [
         {
-          "number": null,
+          "number": 23,
           "name": "QUERALT SOLE TORRES",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_332647_8d29bda3-c7a2-40b2-bf88-6f035e592415.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 37.5,
-            "PTS": 23.0,
+            "PTS": 29.0,
             "T2C": 11.0,
             "T2I": 11.0,
             "T2%": 100.0,
@@ -408,14 +472,17 @@
             "TLC": 7.0,
             "TLI": 12.0,
             "TL%": 58.3,
-            "VAL": -1.0
+            "FC": 3.0,
+            "VAL": null,
+            "PM": -1.0
           }
         },
         {
           "number": 13,
           "name": "JÚLIA PLA PLA",
+          "photoUrl": "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_012cb9cdd-c129-4346-9ea6-7aee03c4f29a.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 24.4,
             "PTS": 15.0,
             "T2C": 3.0,
@@ -427,14 +494,17 @@
             "TLC": 3.0,
             "TLI": 5.0,
             "TL%": 60.0,
-            "VAL": 7.0
+            "FC": 4.0,
+            "VAL": null,
+            "PM": 7.0
           }
         },
         {
           "number": 8,
           "name": "JANA ROLDAN ARANDILLA",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_352802_c6406ff0-012b-4691-810b-3082a9018d1b.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 19.3,
             "PTS": 5.0,
             "T2C": 0.0,
@@ -446,15 +516,18 @@
             "TLC": 5.0,
             "TLI": 5.0,
             "TL%": 100.0,
-            "VAL": 0.0
+            "FC": 1.0,
+            "VAL": null,
+            "PM": 0.0
           }
         },
         {
           "number": 30,
           "name": "NÚRIA JIMÉNEZ ARAN",
+          "photoUrl": "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_0bba2ba64-94e1-44f0-bfa5-b441eee44573.jpeg",
           "stats": {
-            "PJ": 1,
-            "MIN": 23.0,
+            "PJ": 1.0,
+            "MIN": 29.0,
             "PTS": 2.0,
             "T2C": 1.0,
             "T2I": 1.0,
@@ -465,15 +538,18 @@
             "TLC": 0.0,
             "TLI": 0.0,
             "TL%": 0.0,
-            "VAL": 1.0
+            "FC": 2.0,
+            "VAL": null,
+            "PM": 1.0
           }
         },
         {
-          "number": null,
+          "number": 27,
           "name": "MARIAMA MBALLO DIALLO",
+          "photoUrl": "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_0eacea48f-fafe-49ed-8a1e-6a419c064096.jpeg",
           "stats": {
-            "PJ": 1,
-            "MIN": 23.7,
+            "PJ": 1.0,
+            "MIN": 29.7,
             "PTS": 2.0,
             "T2C": 1.0,
             "T2I": 1.0,
@@ -484,14 +560,17 @@
             "TLC": 0.0,
             "TLI": 0.0,
             "TL%": 0.0,
-            "VAL": 12.0
+            "FC": 4.0,
+            "VAL": null,
+            "PM": 12.0
           }
         },
         {
           "number": 33,
           "name": "ABRIL GRÀCIA PALACÍN",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_362772_d3e3c61a-da18-4d2b-b21e-dec63b10543d.jpeg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 8.6,
             "PTS": 2.0,
             "T2C": 0.0,
@@ -503,14 +582,17 @@
             "TLC": 2.0,
             "TLI": 2.0,
             "TL%": 100.0,
-            "VAL": -3.0
+            "FC": 1.0,
+            "VAL": null,
+            "PM": -3.0
           }
         },
         {
           "number": 93,
           "name": "XENIA ANDREU MONELL",
+          "photoUrl": "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_0_3a38f87b-57f2-4720-85d9-044331505379.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 11.1,
             "PTS": 1.0,
             "T2C": 0.0,
@@ -522,14 +604,17 @@
             "TLC": 1.0,
             "TLI": 2.0,
             "TL%": 50.0,
-            "VAL": -8.0
+            "FC": 1.0,
+            "VAL": null,
+            "PM": -9.0
           }
         },
         {
           "number": 11,
           "name": "GINA BETBESÉ SÁNCHEZ",
+          "photoUrl": "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_01f6a9dc4-8527-4389-a112-0c50d40a6af8.jpeg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 2.7,
             "PTS": 0.0,
             "T2C": 0.0,
@@ -541,14 +626,17 @@
             "TLC": 0.0,
             "TLI": 0.0,
             "TL%": 0.0,
-            "VAL": -6.0
+            "FC": 1.0,
+            "VAL": null,
+            "PM": -6.0
           }
         },
         {
           "number": 25,
           "name": "GINA TRILLA PINIÉS",
+          "photoUrl": "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_0d1b4bcd5-3781-4bc2-a1e6-9b1bfd28d6e0.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 33.5,
             "PTS": 0.0,
             "T2C": 0.0,
@@ -560,14 +648,17 @@
             "TLC": 0.0,
             "TLI": 4.0,
             "TL%": 0.0,
-            "VAL": 11.0
+            "FC": 0.0,
+            "VAL": null,
+            "PM": 11.0
           }
         },
         {
           "number": 24,
           "name": "JANA ALARCON SOLANES",
+          "photoUrl": "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_0fc175a7e-6f7a-4ae5-ac9d-5acbea3a61ea.jpg",
           "stats": {
-            "PJ": 1,
+            "PJ": 1.0,
             "MIN": 4.2,
             "PTS": 0.0,
             "T2C": 0.0,
@@ -579,18 +670,12 @@
             "TLC": 0.0,
             "TLI": 0.0,
             "TL%": 0.0,
-            "VAL": -2.0
+            "FC": 1.0,
+            "VAL": null,
+            "PM": -2.0
           }
         }
       ]
     }
-  ],
-  "metadata": {
-    "extracted_date": "2026-09-28",
-    "source": "Federació Catalana de Bàsquet (basquetcatala.cat)",
-    "api_endpoint_pattern": "https://mastats.optimalway.consulting.com/VITbcqhearngir{team-id}/stats",
-    "notes": "Jersey numbers not displayed on the website. Positions not shown. Team 2 (c057eeae-3aae-4e33-b2ab-54fabb2700ae) has no statistics available."
-  },
-  "extractedAt": "2026-09-28",
-  "notes": "Live OptimalWay msstats roster names (Plantilla source). Jersey from API dorsal when non-zero. Positions not used in fantasy."
+  ]
 }
