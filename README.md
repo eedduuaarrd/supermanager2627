@@ -100,6 +100,11 @@ Unitats a `deploy/systemd/`. Log: `/var/log/supermanager-weekend-sync.log`.
 Sense tip-off publicat → alineació oberta (no s'inventen hores; msstats porta data/local-visitant/rival).
 `PUT /api/lineup` → 403 en català si bloquejada. `/api/round` exposa `lockAt`, `locked`, `nextMatches`.
 
+### Equips nous (plantilla inicial)
+
+`fantasy_teams.transfer_phase = 'initial'` al crear → canvis **il·limitats** fins al primer tip-off de la jornada.
+Quan `lineup_lock_at` s’assoleix, tots els equips `initial` passen a `normal` (màx. 3 canvis). El tip-off bloqueja tothom.
+
 ## Dades
 
 Plantilles FCBQ 2026-27 a `src/data/roster.ts` (snapshot `fcbq-rosters.json`).
