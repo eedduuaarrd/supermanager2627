@@ -13,151 +13,6 @@
     "Refresh: node scripts/refresh-fcbq-stats.mjs [--from path | --live]"
   ],
   "players": {
-    "hector-lozano": {
-      "playerId": "hector-lozano",
-      "fcbqName": "HECTOR LOZANO MARTINEZ",
-      "fcbqPersonId": null,
-      "teamId": "masc-a",
-      "games": [
-        {
-          "date": null,
-          "round": null,
-          "opponent": null,
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "TEMPORADA 2026-27 - 1A TERRITORIAL SENIOR MASCULÍ - 1A TERRITORIAL SENIOR MASCULÍ - JA FASE - GRUP 01",
-          "min": 23.5,
-          "pts": 15,
-          "t2c": 2,
-          "t2i": 2,
-          "t3c": 3,
-          "t3i": 3,
-          "tlc": 2,
-          "tli": 2,
-          "val": null,
-          "pm": -3,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
-        }
-      ],
-      "source": "fcbq-team-page-aggregate",
-      "number": 19
-    },
-    "eduard-bernat": {
-      "playerId": "eduard-bernat",
-      "fcbqName": "EDUARD BERNAT SUCARRAT",
-      "fcbqPersonId": null,
-      "teamId": "masc-a",
-      "games": [
-        {
-          "date": null,
-          "round": null,
-          "opponent": null,
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "TEMPORADA 2026-27 - 1A TERRITORIAL SENIOR MASCULÍ - 1A TERRITORIAL SENIOR MASCULÍ - JA FASE - GRUP 01",
-          "min": 27.1,
-          "pts": 10,
-          "t2c": 1,
-          "t2i": 1,
-          "t3c": 2,
-          "t3i": 2,
-          "tlc": 2,
-          "tli": 3,
-          "val": null,
-          "pm": -6,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
-        }
-      ],
-      "source": "fcbq-team-page-aggregate",
-      "number": 20
-    },
-    "toni-salud": {
-      "playerId": "toni-salud",
-      "fcbqName": "TONI SALUD GARCIA",
-      "fcbqPersonId": null,
-      "teamId": "masc-a",
-      "games": [
-        {
-          "date": null,
-          "round": null,
-          "opponent": null,
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "TEMPORADA 2026-27 - 1A TERRITORIAL SENIOR MASCULÍ - 1A TERRITORIAL SENIOR MASCULÍ - JA FASE - GRUP 01",
-          "min": 24.2,
-          "pts": 9,
-          "t2c": 4,
-          "t2i": 4,
-          "t3c": 0,
-          "t3i": 0,
-          "tlc": 1,
-          "tli": 4,
-          "val": null,
-          "pm": 4,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
-        }
-      ],
-      "source": "fcbq-team-page-aggregate",
-      "number": 43
-    },
-    "ivan-franco": {
-      "playerId": "ivan-franco",
-      "fcbqName": "IVAN FRANCO GUERRERO",
-      "fcbqPersonId": null,
-      "teamId": "masc-a",
-      "games": [
-        {
-          "date": null,
-          "round": null,
-          "opponent": null,
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "TEMPORADA 2026-27 - 1A TERRITORIAL SENIOR MASCULÍ - 1A TERRITORIAL SENIOR MASCULÍ - JA FASE - GRUP 01",
-          "min": 27.5,
-          "pts": 9,
-          "t2c": 1,
-          "t2i": 1,
-          "t3c": 1,
-          "t3i": 1,
-          "tlc": 4,
-          "tli": 5,
-          "val": null,
-          "pm": -15,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
-        }
-      ],
-      "source": "fcbq-team-page-aggregate",
-      "number": 6
-    },
-    "gerard-garcia": {
-      "playerId": "gerard-garcia",
-      "fcbqName": "GERARD GARCIA ROSAURO",
-      "fcbqPersonId": null,
-      "teamId": "masc-a",
-      "games": [
-        {
-          "date": null,
-          "round": null,
-          "opponent": null,
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "TEMPORADA 2026-27 - 1A TERRITORIAL SENIOR MASCULÍ - 1A TERRITORIAL SENIOR MASCULÍ - JA FASE - GRUP 01",
-          "min": 26.4,
-          "pts": 8,
-          "t2c": 0,
-          "t2i": 0,
-          "t3c": 2,
-          "t3i": 2,
-          "tlc": 2,
-          "tli": 4,
-          "val": null,
-          "pm": -3,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
-        }
-      ],
-      "source": "fcbq-team-page-aggregate",
-      "number": 0
-    },
     "marc-escoda": {
       "playerId": "marc-escoda",
       "fcbqName": "MARC ESCODA ANGERRI",
@@ -170,7 +25,7 @@
           "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "TEMPORADA 2026-27 - 1A TERRITORIAL SENIOR MASCULÍ - 1A TERRITORIAL SENIOR MASCULÍ - JA FASE - GRUP 01",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
           "min": 18,
           "pts": 6,
           "t2c": 3,
@@ -187,35 +42,6 @@
       "source": "fcbq-team-page-aggregate",
       "number": 24
     },
-    "babacar-toure": {
-      "playerId": "babacar-toure",
-      "fcbqName": "BABACAR TOURE GASSAMA",
-      "fcbqPersonId": null,
-      "teamId": "masc-a",
-      "games": [
-        {
-          "date": null,
-          "round": null,
-          "opponent": null,
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "TEMPORADA 2026-27 - 1A TERRITORIAL SENIOR MASCULÍ - 1A TERRITORIAL SENIOR MASCULÍ - JA FASE - GRUP 01",
-          "min": 23,
-          "pts": 6,
-          "t2c": 3,
-          "t2i": 3,
-          "t3c": 0,
-          "t3i": 0,
-          "tlc": 0,
-          "tli": 1,
-          "val": null,
-          "pm": -15,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
-        }
-      ],
-      "source": "fcbq-team-page-aggregate",
-      "number": 68
-    },
     "gerard-soldevila": {
       "playerId": "gerard-soldevila",
       "fcbqName": "GERARD SOLDEVILA CASAS",
@@ -228,7 +54,7 @@
           "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "TEMPORADA 2026-27 - 1A TERRITORIAL SENIOR MASCULÍ - 1A TERRITORIAL SENIOR MASCULÍ - JA FASE - GRUP 01",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
           "min": 16.1,
           "pts": 0,
           "t2c": 0,
@@ -245,6 +71,122 @@
       "source": "fcbq-team-page-aggregate",
       "number": 26
     },
+    "toni-salud": {
+      "playerId": "toni-salud",
+      "fcbqName": "TONI SALUD GARCIA",
+      "fcbqPersonId": null,
+      "teamId": "masc-a",
+      "games": [
+        {
+          "date": null,
+          "round": null,
+          "opponent": null,
+          "teamId": "masc-a",
+          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
+          "min": 24.2,
+          "pts": 9,
+          "t2c": 4,
+          "t2i": 4,
+          "t3c": 0,
+          "t3i": 0,
+          "tlc": 1,
+          "tli": 4,
+          "val": null,
+          "pm": 4,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+        }
+      ],
+      "source": "fcbq-team-page-aggregate",
+      "number": 43
+    },
+    "gerard-garcia": {
+      "playerId": "gerard-garcia",
+      "fcbqName": "GERARD GARCIA ROSAURO",
+      "fcbqPersonId": null,
+      "teamId": "masc-a",
+      "games": [
+        {
+          "date": null,
+          "round": null,
+          "opponent": null,
+          "teamId": "masc-a",
+          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
+          "min": 26.4,
+          "pts": 8,
+          "t2c": 0,
+          "t2i": 0,
+          "t3c": 2,
+          "t3i": 2,
+          "tlc": 2,
+          "tli": 4,
+          "val": null,
+          "pm": -3,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+        }
+      ],
+      "source": "fcbq-team-page-aggregate",
+      "number": 0
+    },
+    "ivan-franco": {
+      "playerId": "ivan-franco",
+      "fcbqName": "IVAN FRANCO GUERRERO",
+      "fcbqPersonId": null,
+      "teamId": "masc-a",
+      "games": [
+        {
+          "date": null,
+          "round": null,
+          "opponent": null,
+          "teamId": "masc-a",
+          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
+          "min": 27.5,
+          "pts": 9,
+          "t2c": 1,
+          "t2i": 1,
+          "t3c": 1,
+          "t3i": 1,
+          "tlc": 4,
+          "tli": 5,
+          "val": null,
+          "pm": -15,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+        }
+      ],
+      "source": "fcbq-team-page-aggregate",
+      "number": 6
+    },
+    "hector-lozano": {
+      "playerId": "hector-lozano",
+      "fcbqName": "HECTOR LOZANO MARTINEZ",
+      "fcbqPersonId": null,
+      "teamId": "masc-a",
+      "games": [
+        {
+          "date": null,
+          "round": null,
+          "opponent": null,
+          "teamId": "masc-a",
+          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
+          "min": 23.5,
+          "pts": 15,
+          "t2c": 2,
+          "t2i": 2,
+          "t3c": 3,
+          "t3i": 3,
+          "tlc": 2,
+          "tli": 2,
+          "val": null,
+          "pm": -3,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+        }
+      ],
+      "source": "fcbq-team-page-aggregate",
+      "number": 19
+    },
     "roger-companys": {
       "playerId": "roger-companys",
       "fcbqName": "ROGER COMPANYS SOLÀ",
@@ -257,7 +199,7 @@
           "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "TEMPORADA 2026-27 - 1A TERRITORIAL SENIOR MASCULÍ - 1A TERRITORIAL SENIOR MASCULÍ - JA FASE - GRUP 01",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
           "min": 14.1,
           "pts": 0,
           "t2c": 0,
@@ -274,179 +216,63 @@
       "source": "fcbq-team-page-aggregate",
       "number": 8
     },
-    "ares-bunol": {
-      "playerId": "ares-bunol",
-      "fcbqName": "ARES BUÑOL PERELLÓ",
+    "babacar-toure": {
+      "playerId": "babacar-toure",
+      "fcbqName": "BABACAR TOURE GASSAMA",
       "fcbqPersonId": null,
-      "teamId": "fem-a",
+      "teamId": "masc-a",
       "games": [
         {
           "date": null,
           "round": null,
           "opponent": null,
-          "teamId": "fem-a",
-          "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "TEMPORADA 2026-27 - COPA CATALUNYA FEMENINA - FASE PRÈVIA - 01",
-          "min": 28.4,
-          "pts": 15,
-          "t2c": 1,
-          "t2i": 2,
-          "t3c": 3,
-          "t3i": 4,
-          "tlc": 4,
-          "tli": 6,
-          "val": null,
-          "pm": 24,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
-        }
-      ],
-      "source": "fcbq-team-page-aggregate",
-      "number": 11
-    },
-    "julia-pla__cudos-a": {
-      "playerId": "julia-pla__cudos-a",
-      "fcbqName": "JÚLIA PLA PLA",
-      "fcbqPersonId": null,
-      "teamId": "fem-a",
-      "games": [
-        {
-          "date": null,
-          "round": null,
-          "opponent": null,
-          "teamId": "fem-a",
-          "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "TEMPORADA 2026-27 - COPA CATALUNYA FEMENINA - FASE PRÈVIA - 01",
-          "min": 29.4,
-          "pts": 13,
-          "t2c": 4,
-          "t2i": 11,
-          "t3c": 1,
-          "t3i": 2,
-          "tlc": 2,
-          "tli": 2,
-          "val": null,
-          "pm": 18,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
-        }
-      ],
-      "source": "fcbq-team-page-aggregate",
-      "number": 13
-    },
-    "andrea-perat": {
-      "playerId": "andrea-perat",
-      "fcbqName": "ANDREA PERAT GRACIA",
-      "fcbqPersonId": null,
-      "teamId": "fem-a",
-      "games": [
-        {
-          "date": null,
-          "round": null,
-          "opponent": null,
-          "teamId": "fem-a",
-          "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "TEMPORADA 2026-27 - COPA CATALUNYA FEMENINA - FASE PRÈVIA - 01",
-          "min": 27.4,
-          "pts": 8,
+          "teamId": "masc-a",
+          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
+          "min": 23,
+          "pts": 6,
           "t2c": 3,
-          "t2i": 11,
+          "t2i": 3,
           "t3c": 0,
-          "t3i": 3,
+          "t3i": 0,
+          "tlc": 0,
+          "tli": 1,
+          "val": null,
+          "pm": -15,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+        }
+      ],
+      "source": "fcbq-team-page-aggregate",
+      "number": 68
+    },
+    "eduard-bernat": {
+      "playerId": "eduard-bernat",
+      "fcbqName": "EDUARD BERNAT SUCARRAT",
+      "fcbqPersonId": null,
+      "teamId": "masc-a",
+      "games": [
+        {
+          "date": null,
+          "round": null,
+          "opponent": null,
+          "teamId": "masc-a",
+          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
+          "min": 27.1,
+          "pts": 10,
+          "t2c": 1,
+          "t2i": 1,
+          "t3c": 2,
+          "t3i": 2,
           "tlc": 2,
           "tli": 3,
           "val": null,
-          "pm": 19,
+          "pm": -6,
           "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
       "source": "fcbq-team-page-aggregate",
-      "number": 21
-    },
-    "neus-escoda": {
-      "playerId": "neus-escoda",
-      "fcbqName": "NEUS ESCODA ANGERRI",
-      "fcbqPersonId": null,
-      "teamId": "fem-a",
-      "games": [
-        {
-          "date": null,
-          "round": null,
-          "opponent": null,
-          "teamId": "fem-a",
-          "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "TEMPORADA 2026-27 - COPA CATALUNYA FEMENINA - FASE PRÈVIA - 01",
-          "min": 26.8,
-          "pts": 8,
-          "t2c": 3,
-          "t2i": 9,
-          "t3c": 0,
-          "t3i": 2,
-          "tlc": 2,
-          "tli": 4,
-          "val": null,
-          "pm": 15,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
-        }
-      ],
-      "source": "fcbq-team-page-aggregate",
-      "number": 88
-    },
-    "monica-fontanet": {
-      "playerId": "monica-fontanet",
-      "fcbqName": "MONICA FONTANET MALLOL",
-      "fcbqPersonId": null,
-      "teamId": "fem-a",
-      "games": [
-        {
-          "date": null,
-          "round": null,
-          "opponent": null,
-          "teamId": "fem-a",
-          "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "TEMPORADA 2026-27 - COPA CATALUNYA FEMENINA - FASE PRÈVIA - 01",
-          "min": 19.4,
-          "pts": 6,
-          "t2c": 0,
-          "t2i": 0,
-          "t3c": 2,
-          "t3i": 3,
-          "tlc": 0,
-          "tli": 0,
-          "val": null,
-          "pm": 13,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
-        }
-      ],
-      "source": "fcbq-team-page-aggregate",
-      "number": 95
-    },
-    "queralt-sole__cudos-a": {
-      "playerId": "queralt-sole__cudos-a",
-      "fcbqName": "QUERALT SOLE TORRES",
-      "fcbqPersonId": null,
-      "teamId": "fem-a",
-      "games": [
-        {
-          "date": null,
-          "round": null,
-          "opponent": null,
-          "teamId": "fem-a",
-          "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "TEMPORADA 2026-27 - COPA CATALUNYA FEMENINA - FASE PRÈVIA - 01",
-          "min": 10.9,
-          "pts": 5,
-          "t2c": 2,
-          "t2i": 8,
-          "t3c": 0,
-          "t3i": 0,
-          "tlc": 1,
-          "tli": 2,
-          "val": null,
-          "pm": -13,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
-        }
-      ],
-      "source": "fcbq-team-page-aggregate",
-      "number": 23
+      "number": 20
     },
     "clara-paniagua": {
       "playerId": "clara-paniagua",
@@ -460,7 +286,7 @@
           "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "TEMPORADA 2026-27 - COPA CATALUNYA FEMENINA - FASE PRÈVIA - 01",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 18.3,
           "pts": 2,
           "t2c": 1,
@@ -477,6 +303,151 @@
       "source": "fcbq-team-page-aggregate",
       "number": 10
     },
+    "andrea-perat": {
+      "playerId": "andrea-perat",
+      "fcbqName": "ANDREA PERAT GRACIA",
+      "fcbqPersonId": null,
+      "teamId": "fem-a",
+      "games": [
+        {
+          "date": null,
+          "round": null,
+          "opponent": null,
+          "teamId": "fem-a",
+          "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
+          "min": 27.4,
+          "pts": 8,
+          "t2c": 3,
+          "t2i": 11,
+          "t3c": 0,
+          "t3i": 3,
+          "tlc": 2,
+          "tli": 3,
+          "val": null,
+          "pm": 19,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+        }
+      ],
+      "source": "fcbq-team-page-aggregate",
+      "number": 21
+    },
+    "julia-pla__cudos-a": {
+      "playerId": "julia-pla__cudos-a",
+      "fcbqName": "JÚLIA PLA PLA",
+      "fcbqPersonId": null,
+      "teamId": "fem-a",
+      "games": [
+        {
+          "date": null,
+          "round": null,
+          "opponent": null,
+          "teamId": "fem-a",
+          "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
+          "min": 29.4,
+          "pts": 13,
+          "t2c": 4,
+          "t2i": 11,
+          "t3c": 1,
+          "t3i": 2,
+          "tlc": 2,
+          "tli": 2,
+          "val": null,
+          "pm": 18,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+        }
+      ],
+      "source": "fcbq-team-page-aggregate",
+      "number": 13
+    },
+    "ares-bunol": {
+      "playerId": "ares-bunol",
+      "fcbqName": "ARES BUÑOL PERELLÓ",
+      "fcbqPersonId": null,
+      "teamId": "fem-a",
+      "games": [
+        {
+          "date": null,
+          "round": null,
+          "opponent": null,
+          "teamId": "fem-a",
+          "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
+          "min": 28.4,
+          "pts": 15,
+          "t2c": 1,
+          "t2i": 2,
+          "t3c": 3,
+          "t3i": 4,
+          "tlc": 4,
+          "tli": 6,
+          "val": null,
+          "pm": 24,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+        }
+      ],
+      "source": "fcbq-team-page-aggregate",
+      "number": 11
+    },
+    "queralt-sole__cudos-a": {
+      "playerId": "queralt-sole__cudos-a",
+      "fcbqName": "QUERALT SOLE TORRES",
+      "fcbqPersonId": null,
+      "teamId": "fem-a",
+      "games": [
+        {
+          "date": null,
+          "round": null,
+          "opponent": null,
+          "teamId": "fem-a",
+          "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
+          "min": 10.9,
+          "pts": 5,
+          "t2c": 2,
+          "t2i": 8,
+          "t3c": 0,
+          "t3i": 0,
+          "tlc": 1,
+          "tli": 2,
+          "val": null,
+          "pm": -13,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+        }
+      ],
+      "source": "fcbq-team-page-aggregate",
+      "number": 23
+    },
+    "monica-fontanet": {
+      "playerId": "monica-fontanet",
+      "fcbqName": "MONICA FONTANET MALLOL",
+      "fcbqPersonId": null,
+      "teamId": "fem-a",
+      "games": [
+        {
+          "date": null,
+          "round": null,
+          "opponent": null,
+          "teamId": "fem-a",
+          "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
+          "min": 19.4,
+          "pts": 6,
+          "t2c": 0,
+          "t2i": 0,
+          "t3c": 2,
+          "t3i": 3,
+          "tlc": 0,
+          "tli": 0,
+          "val": null,
+          "pm": 13,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+        }
+      ],
+      "source": "fcbq-team-page-aggregate",
+      "number": 95
+    },
     "mariama-mballo__cudos-a": {
       "playerId": "mariama-mballo__cudos-a",
       "fcbqName": "MARIAMA MBALLO DIALLO",
@@ -489,7 +460,7 @@
           "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "TEMPORADA 2026-27 - COPA CATALUNYA FEMENINA - FASE PRÈVIA - 01",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 10.6,
           "pts": 1,
           "t2c": 0,
@@ -506,35 +477,6 @@
       "source": "fcbq-team-page-aggregate",
       "number": 27
     },
-    "martina-benitez": {
-      "playerId": "martina-benitez",
-      "fcbqName": "MARTINA BENÍTEZ FARRANDO",
-      "fcbqPersonId": null,
-      "teamId": "fem-a",
-      "games": [
-        {
-          "date": null,
-          "round": null,
-          "opponent": null,
-          "teamId": "fem-a",
-          "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "TEMPORADA 2026-27 - COPA CATALUNYA FEMENINA - FASE PRÈVIA - 01",
-          "min": 15.7,
-          "pts": 1,
-          "t2c": 0,
-          "t2i": 1,
-          "t3c": 0,
-          "t3i": 0,
-          "tlc": 1,
-          "tli": 2,
-          "val": null,
-          "pm": -15,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
-        }
-      ],
-      "source": "fcbq-team-page-aggregate",
-      "number": 79
-    },
     "ada-domene": {
       "playerId": "ada-domene",
       "fcbqName": "ADA DOMENE MORALEDA",
@@ -547,7 +489,7 @@
           "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "TEMPORADA 2026-27 - COPA CATALUNYA FEMENINA - FASE PRÈVIA - 01",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 13,
           "pts": 0,
           "t2c": 0,
@@ -564,34 +506,63 @@
       "source": "fcbq-team-page-aggregate",
       "number": 24
     },
-    "queralt-sole__farratges-b": {
-      "playerId": "queralt-sole__farratges-b",
-      "fcbqName": "QUERALT SOLE TORRES",
+    "martina-benitez": {
+      "playerId": "martina-benitez",
+      "fcbqName": "MARTINA BENÍTEZ FARRANDO",
       "fcbqPersonId": null,
-      "teamId": "fem-b",
+      "teamId": "fem-a",
       "games": [
         {
           "date": null,
           "round": null,
           "opponent": null,
-          "teamId": "fem-b",
-          "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "TEMPORADA 2026-27 - C.C. SEGONA CATEGORIA FEMENINA - FASE PRÈVIA - 01",
-          "min": 37.5,
-          "pts": 29,
-          "t2c": 11,
-          "t2i": 11,
+          "teamId": "fem-a",
+          "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
+          "min": 15.7,
+          "pts": 1,
+          "t2c": 0,
+          "t2i": 1,
           "t3c": 0,
           "t3i": 0,
-          "tlc": 7,
-          "tli": 12,
+          "tlc": 1,
+          "tli": 2,
           "val": null,
-          "pm": -1,
+          "pm": -15,
           "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
       "source": "fcbq-team-page-aggregate",
-      "number": 23
+      "number": 79
+    },
+    "neus-escoda": {
+      "playerId": "neus-escoda",
+      "fcbqName": "NEUS ESCODA ANGERRI",
+      "fcbqPersonId": null,
+      "teamId": "fem-a",
+      "games": [
+        {
+          "date": null,
+          "round": null,
+          "opponent": null,
+          "teamId": "fem-a",
+          "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
+          "min": 26.8,
+          "pts": 8,
+          "t2c": 3,
+          "t2i": 9,
+          "t3c": 0,
+          "t3i": 2,
+          "tlc": 2,
+          "tli": 4,
+          "val": null,
+          "pm": 15,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+        }
+      ],
+      "source": "fcbq-team-page-aggregate",
+      "number": 88
     },
     "julia-pla__farratges-b": {
       "playerId": "julia-pla__farratges-b",
@@ -605,7 +576,7 @@
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "TEMPORADA 2026-27 - C.C. SEGONA CATEGORIA FEMENINA - FASE PRÈVIA - 01",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 24.4,
           "pts": 15,
           "t2c": 3,
@@ -622,35 +593,6 @@
       "source": "fcbq-team-page-aggregate",
       "number": 13
     },
-    "jana-roldan": {
-      "playerId": "jana-roldan",
-      "fcbqName": "JANA ROLDAN ARANDILLA",
-      "fcbqPersonId": null,
-      "teamId": "fem-b",
-      "games": [
-        {
-          "date": null,
-          "round": null,
-          "opponent": null,
-          "teamId": "fem-b",
-          "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "TEMPORADA 2026-27 - C.C. SEGONA CATEGORIA FEMENINA - FASE PRÈVIA - 01",
-          "min": 19.3,
-          "pts": 5,
-          "t2c": 0,
-          "t2i": 0,
-          "t3c": 0,
-          "t3i": 0,
-          "tlc": 5,
-          "tli": 5,
-          "val": null,
-          "pm": 0,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
-        }
-      ],
-      "source": "fcbq-team-page-aggregate",
-      "number": 8
-    },
     "nuria-jimenez": {
       "playerId": "nuria-jimenez",
       "fcbqName": "NÚRIA JIMÉNEZ ARAN",
@@ -663,7 +605,7 @@
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "TEMPORADA 2026-27 - C.C. SEGONA CATEGORIA FEMENINA - FASE PRÈVIA - 01",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 29,
           "pts": 2,
           "t2c": 1,
@@ -680,6 +622,35 @@
       "source": "fcbq-team-page-aggregate",
       "number": 30
     },
+    "queralt-sole__farratges-b": {
+      "playerId": "queralt-sole__farratges-b",
+      "fcbqName": "QUERALT SOLE TORRES",
+      "fcbqPersonId": null,
+      "teamId": "fem-b",
+      "games": [
+        {
+          "date": null,
+          "round": null,
+          "opponent": null,
+          "teamId": "fem-b",
+          "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
+          "min": 37.5,
+          "pts": 29,
+          "t2c": 11,
+          "t2i": 11,
+          "t3c": 0,
+          "t3i": 0,
+          "tlc": 7,
+          "tli": 12,
+          "val": null,
+          "pm": -1,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+        }
+      ],
+      "source": "fcbq-team-page-aggregate",
+      "number": 23
+    },
     "mariama-mballo__farratges-b": {
       "playerId": "mariama-mballo__farratges-b",
       "fcbqName": "MARIAMA MBALLO DIALLO",
@@ -692,7 +663,7 @@
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "TEMPORADA 2026-27 - C.C. SEGONA CATEGORIA FEMENINA - FASE PRÈVIA - 01",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 29.7,
           "pts": 2,
           "t2c": 1,
@@ -709,9 +680,9 @@
       "source": "fcbq-team-page-aggregate",
       "number": 27
     },
-    "abril-gracia": {
-      "playerId": "abril-gracia",
-      "fcbqName": "ABRIL GRÀCIA PALACÍN",
+    "jana-roldan": {
+      "playerId": "jana-roldan",
+      "fcbqName": "JANA ROLDAN ARANDILLA",
       "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
@@ -721,22 +692,22 @@
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "TEMPORADA 2026-27 - C.C. SEGONA CATEGORIA FEMENINA - FASE PRÈVIA - 01",
-          "min": 8.6,
-          "pts": 2,
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
+          "min": 19.3,
+          "pts": 5,
           "t2c": 0,
           "t2i": 0,
           "t3c": 0,
           "t3i": 0,
-          "tlc": 2,
-          "tli": 2,
+          "tlc": 5,
+          "tli": 5,
           "val": null,
-          "pm": -3,
+          "pm": 0,
           "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
       "source": "fcbq-team-page-aggregate",
-      "number": 33
+      "number": 8
     },
     "xenia-andreu": {
       "playerId": "xenia-andreu",
@@ -750,7 +721,7 @@
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "TEMPORADA 2026-27 - C.C. SEGONA CATEGORIA FEMENINA - FASE PRÈVIA - 01",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 11.1,
           "pts": 1,
           "t2c": 0,
@@ -767,6 +738,35 @@
       "source": "fcbq-team-page-aggregate",
       "number": 93
     },
+    "abril-gracia": {
+      "playerId": "abril-gracia",
+      "fcbqName": "ABRIL GRÀCIA PALACÍN",
+      "fcbqPersonId": null,
+      "teamId": "fem-b",
+      "games": [
+        {
+          "date": null,
+          "round": null,
+          "opponent": null,
+          "teamId": "fem-b",
+          "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
+          "min": 8.6,
+          "pts": 2,
+          "t2c": 0,
+          "t2i": 0,
+          "t3c": 0,
+          "t3i": 0,
+          "tlc": 2,
+          "tli": 2,
+          "val": null,
+          "pm": -3,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+        }
+      ],
+      "source": "fcbq-team-page-aggregate",
+      "number": 33
+    },
     "gina-betbese": {
       "playerId": "gina-betbese",
       "fcbqName": "GINA BETBESÉ SÁNCHEZ",
@@ -779,7 +779,7 @@
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "TEMPORADA 2026-27 - C.C. SEGONA CATEGORIA FEMENINA - FASE PRÈVIA - 01",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 2.7,
           "pts": 0,
           "t2c": 0,
@@ -808,7 +808,7 @@
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "TEMPORADA 2026-27 - C.C. SEGONA CATEGORIA FEMENINA - FASE PRÈVIA - 01",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 33.5,
           "pts": 0,
           "t2c": 0,
@@ -837,7 +837,7 @@
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "TEMPORADA 2026-27 - C.C. SEGONA CATEGORIA FEMENINA - FASE PRÈVIA - 01",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 4.2,
           "pts": 0,
           "t2c": 0,

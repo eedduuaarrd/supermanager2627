@@ -17,7 +17,7 @@ import type { Player, TeamId } from "@/lib/types";
  * Ids: `slug` per un sol equip; `slug__equip` quan la mateixa persona juga a dos.
  * Noms = title-case de la Plantilla FCBQ (accents només si surten a Fede).
  * Dorsal = número de samarreta a la Plantilla (badge / columna).
- * VAL FCBQ surt "—" a la Plantilla; `avgVal` / preu usen +/- (PM) publicat, no s'inventa VAL.
+ * VAL FCBQ surt "—" a la Plantilla/API; `avgVal` = +/- (onCourtPlusMinus) publicat — sense inventar.
  * Sense posicions: alineació de 8 lliures.
  * Preus: PTS + max(PM,0) + MIN de la mostra FCBQ (PJ=1).
  *
@@ -79,15 +79,14 @@ export const TEAM_ID_SLUG: Record<TeamId, string> = {
   "fem-b": "farratges-b",
 };
 
-function priceFrom(pts: number, val: number, min: number): number {
-  const raw = 5_000 + pts * 700 + Math.max(val, 0) * 450 + min * 120;
+function priceFrom(pts: number, pm: number, min: number): number {
+  const raw = 5_000 + pts * 700 + Math.max(pm, 0) * 450 + min * 120;
   return Math.min(16_500, Math.max(4_500, Math.round(raw / 500) * 500));
 }
 
-/** Fantasy avg seed: prefer published +/- (PM) when VAL is unpublished on FCBQ. */
-function avgFrom(val: number, pts: number): number {
-  if (val > 0) return Math.round(val);
-  return Math.max(1, Math.round(pts * 0.7));
+/** Fantasy avg seed = published FCBQ +/- (PM). VAL is unpublished — never invent from PTS. */
+function avgFromPm(pm: number): number {
+  return Math.round(pm);
 }
 
 export const ROSTER: Player[] = [
@@ -97,7 +96,7 @@ export const ROSTER: Player[] = [
     name: "Hector Lozano Martinez",
     number: 19,
     pts: 15,
-    avgVal: avgFrom(-3, 15),
+    avgVal: avgFromPm(-3),
     price: priceFrom(15, -3, 23.5),
     source: "fcbq",
     teamId: "masc-a",
@@ -109,7 +108,7 @@ export const ROSTER: Player[] = [
     name: "Eduard Bernat Sucarrat",
     number: 20,
     pts: 10,
-    avgVal: avgFrom(-6, 10),
+    avgVal: avgFromPm(-6),
     price: priceFrom(10, -6, 27.1),
     source: "fcbq",
     teamId: "masc-a",
@@ -121,7 +120,7 @@ export const ROSTER: Player[] = [
     name: "Toni Salud Garcia",
     number: 43,
     pts: 9,
-    avgVal: avgFrom(4, 9),
+    avgVal: avgFromPm(4),
     price: priceFrom(9, 4, 24.2),
     source: "fcbq",
     teamId: "masc-a",
@@ -133,7 +132,7 @@ export const ROSTER: Player[] = [
     name: "Ivan Franco Guerrero",
     number: 6,
     pts: 9,
-    avgVal: avgFrom(-15, 9),
+    avgVal: avgFromPm(-15),
     price: priceFrom(9, -15, 27.5),
     source: "fcbq",
     teamId: "masc-a",
@@ -145,7 +144,7 @@ export const ROSTER: Player[] = [
     name: "Gerard Garcia Rosauro",
     number: 0,
     pts: 8,
-    avgVal: avgFrom(-3, 8),
+    avgVal: avgFromPm(-3),
     price: priceFrom(8, -3, 26.4),
     source: "fcbq",
     teamId: "masc-a",
@@ -157,7 +156,7 @@ export const ROSTER: Player[] = [
     name: "Marc Escoda Angerri",
     number: 24,
     pts: 6,
-    avgVal: avgFrom(4, 6),
+    avgVal: avgFromPm(4),
     price: priceFrom(6, 4, 18.0),
     source: "fcbq",
     teamId: "masc-a",
@@ -169,7 +168,7 @@ export const ROSTER: Player[] = [
     name: "Babacar Toure Gassama",
     number: 68,
     pts: 6,
-    avgVal: avgFrom(-15, 6),
+    avgVal: avgFromPm(-15),
     price: priceFrom(6, -15, 23.0),
     source: "fcbq",
     teamId: "masc-a",
@@ -181,7 +180,7 @@ export const ROSTER: Player[] = [
     name: "Gerard Soldevila Casas",
     number: 26,
     pts: 0,
-    avgVal: avgFrom(-2, 0),
+    avgVal: avgFromPm(-2),
     price: priceFrom(0, -2, 16.1),
     source: "fcbq",
     teamId: "masc-a",
@@ -193,7 +192,7 @@ export const ROSTER: Player[] = [
     name: "Roger Companys Solà",
     number: 8,
     pts: 0,
-    avgVal: avgFrom(1, 0),
+    avgVal: avgFromPm(1),
     price: priceFrom(0, 1, 14.1),
     source: "fcbq",
     teamId: "masc-a",
@@ -206,7 +205,7 @@ export const ROSTER: Player[] = [
     name: "Ares Buñol Perelló",
     number: 11,
     pts: 15,
-    avgVal: avgFrom(24, 15),
+    avgVal: avgFromPm(24),
     price: priceFrom(15, 24, 28.4),
     source: "fcbq",
     teamId: "fem-a",
@@ -218,7 +217,7 @@ export const ROSTER: Player[] = [
     name: "Júlia Pla Pla",
     number: 13,
     pts: 13,
-    avgVal: avgFrom(18, 13),
+    avgVal: avgFromPm(18),
     price: priceFrom(13, 18, 29.4),
     source: "fcbq",
     teamId: "fem-a",
@@ -231,7 +230,7 @@ export const ROSTER: Player[] = [
     name: "Andrea Perat Gracia",
     number: 21,
     pts: 8,
-    avgVal: avgFrom(19, 8),
+    avgVal: avgFromPm(19),
     price: priceFrom(8, 19, 27.4),
     source: "fcbq",
     teamId: "fem-a",
@@ -243,7 +242,7 @@ export const ROSTER: Player[] = [
     name: "Neus Escoda Angerri",
     number: 88,
     pts: 8,
-    avgVal: avgFrom(15, 8),
+    avgVal: avgFromPm(15),
     price: priceFrom(8, 15, 26.8),
     source: "fcbq",
     teamId: "fem-a",
@@ -255,7 +254,7 @@ export const ROSTER: Player[] = [
     name: "Monica Fontanet Mallol",
     number: 95,
     pts: 6,
-    avgVal: avgFrom(13, 6),
+    avgVal: avgFromPm(13),
     price: priceFrom(6, 13, 19.4),
     source: "fcbq",
     teamId: "fem-a",
@@ -267,7 +266,7 @@ export const ROSTER: Player[] = [
     name: "Queralt Sole Torres",
     number: 23,
     pts: 5,
-    avgVal: avgFrom(-13, 5),
+    avgVal: avgFromPm(-13),
     price: priceFrom(5, -13, 10.9),
     source: "fcbq",
     teamId: "fem-a",
@@ -280,7 +279,7 @@ export const ROSTER: Player[] = [
     name: "Clara Paniagua Marvà",
     number: 10,
     pts: 2,
-    avgVal: avgFrom(-2, 2),
+    avgVal: avgFromPm(-2),
     price: priceFrom(2, -2, 18.3),
     source: "fcbq",
     teamId: "fem-a",
@@ -292,7 +291,7 @@ export const ROSTER: Player[] = [
     name: "Mariama Mballo Diallo",
     number: 27,
     pts: 1,
-    avgVal: avgFrom(-12, 1),
+    avgVal: avgFromPm(-12),
     price: priceFrom(1, -12, 10.6),
     source: "fcbq",
     teamId: "fem-a",
@@ -305,7 +304,7 @@ export const ROSTER: Player[] = [
     name: "Martina Benítez Farrando",
     number: 79,
     pts: 1,
-    avgVal: avgFrom(-15, 1),
+    avgVal: avgFromPm(-15),
     price: priceFrom(1, -15, 15.7),
     source: "fcbq",
     teamId: "fem-a",
@@ -317,7 +316,7 @@ export const ROSTER: Player[] = [
     name: "Ada Domene Moraleda",
     number: 24,
     pts: 0,
-    avgVal: avgFrom(-17, 0),
+    avgVal: avgFromPm(-17),
     price: priceFrom(0, -17, 13.0),
     source: "fcbq",
     teamId: "fem-a",
@@ -330,7 +329,7 @@ export const ROSTER: Player[] = [
     name: "Queralt Sole Torres",
     number: 23,
     pts: 29,
-    avgVal: avgFrom(-1, 29),
+    avgVal: avgFromPm(-1),
     price: priceFrom(29, -1, 37.5),
     source: "fcbq",
     teamId: "fem-b",
@@ -343,7 +342,7 @@ export const ROSTER: Player[] = [
     name: "Júlia Pla Pla",
     number: 13,
     pts: 15,
-    avgVal: avgFrom(7, 15),
+    avgVal: avgFromPm(7),
     price: priceFrom(15, 7, 24.4),
     source: "fcbq",
     teamId: "fem-b",
@@ -356,7 +355,7 @@ export const ROSTER: Player[] = [
     name: "Jana Roldan Arandilla",
     number: 8,
     pts: 5,
-    avgVal: avgFrom(0, 5),
+    avgVal: avgFromPm(0),
     price: priceFrom(5, 0, 19.3),
     source: "fcbq",
     teamId: "fem-b",
@@ -368,7 +367,7 @@ export const ROSTER: Player[] = [
     name: "Núria Jiménez Aran",
     number: 30,
     pts: 2,
-    avgVal: avgFrom(1, 2),
+    avgVal: avgFromPm(1),
     price: priceFrom(2, 1, 29.0),
     source: "fcbq",
     teamId: "fem-b",
@@ -380,7 +379,7 @@ export const ROSTER: Player[] = [
     name: "Mariama Mballo Diallo",
     number: 27,
     pts: 2,
-    avgVal: avgFrom(12, 2),
+    avgVal: avgFromPm(12),
     price: priceFrom(2, 12, 29.7),
     source: "fcbq",
     teamId: "fem-b",
@@ -393,7 +392,7 @@ export const ROSTER: Player[] = [
     name: "Abril Gràcia Palacín",
     number: 33,
     pts: 2,
-    avgVal: avgFrom(-3, 2),
+    avgVal: avgFromPm(-3),
     price: priceFrom(2, -3, 8.6),
     source: "fcbq",
     teamId: "fem-b",
@@ -405,7 +404,7 @@ export const ROSTER: Player[] = [
     name: "Xenia Andreu Monell",
     number: 93,
     pts: 1,
-    avgVal: avgFrom(-9, 1),
+    avgVal: avgFromPm(-9),
     price: priceFrom(1, -9, 11.1),
     source: "fcbq",
     teamId: "fem-b",
@@ -417,7 +416,7 @@ export const ROSTER: Player[] = [
     name: "Gina Betbesé Sánchez",
     number: 11,
     pts: 0,
-    avgVal: avgFrom(-6, 0),
+    avgVal: avgFromPm(-6),
     price: priceFrom(0, -6, 2.7),
     source: "fcbq",
     teamId: "fem-b",
@@ -429,7 +428,7 @@ export const ROSTER: Player[] = [
     name: "Gina Trilla Piniés",
     number: 25,
     pts: 0,
-    avgVal: avgFrom(11, 0),
+    avgVal: avgFromPm(11),
     price: priceFrom(0, 11, 33.5),
     source: "fcbq",
     teamId: "fem-b",
@@ -441,7 +440,7 @@ export const ROSTER: Player[] = [
     name: "Jana Alarcon Solanes",
     number: 24,
     pts: 0,
-    avgVal: avgFrom(-2, 0),
+    avgVal: avgFromPm(-2),
     price: priceFrom(0, -2, 4.2),
     source: "fcbq",
     teamId: "fem-b",
@@ -457,7 +456,7 @@ export const CAPTAIN_MULTIPLIER = 2;
 export const WIN_BONUS = 0.2;
 
 /** GameState.version — bump when roster ids / dual-team rule change. */
-export const GAME_VERSION = 6;
+export const GAME_VERSION = 7;
 
 export const OPPONENTS = [
   "CB Cervera",
