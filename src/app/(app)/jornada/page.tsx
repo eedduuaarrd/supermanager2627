@@ -288,12 +288,12 @@ function JornadaContent() {
               return (
                 <li
                   key={m.shortName}
-                  className="flex flex-col gap-1 border-b border-line/60 pb-2 last:border-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3"
+                  className="flex flex-col gap-0.5 border-b border-line/60 pb-2 last:border-0"
                 >
-                  <p className="min-w-0 text-sm font-medium leading-snug break-words text-bone">
+                  <p className="w-full whitespace-normal text-sm font-medium leading-snug break-words text-bone">
                     {line ?? "Sense proper partit al calendari FCBQ"}
                   </p>
-                  <p className="shrink-0 text-xs tabular-nums text-mute">
+                  <p className="text-xs tabular-nums text-mute">
                     {line ? formatMatchWhen(m) : "—"}
                   </p>
                 </li>

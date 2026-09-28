@@ -157,11 +157,6 @@ export function TeamManager() {
                     >
                       <p className="truncate font-medium text-bone">
                         {t.name}
-                        {active ? (
-                          <span className="ml-2 text-[10px] uppercase tracking-wider text-grana-bright">
-                            actiu
-                          </span>
-                        ) : null}
                       </p>
                     </button>
                     <button

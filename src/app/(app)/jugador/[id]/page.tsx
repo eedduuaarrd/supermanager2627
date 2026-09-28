@@ -151,11 +151,11 @@ export default async function JugadorPage({
             Proper partit · {nextMatch.fullName || nextMatch.shortName}
           </p>
           {nextLine ? (
-            <div className="mt-1.5 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
-              <p className="min-w-0 text-sm leading-snug break-words text-bone">
+            <div className="mt-1.5 flex flex-col gap-0.5">
+              <p className="w-full whitespace-normal text-sm leading-snug break-words text-bone">
                 {nextLine}
               </p>
-              <p className="shrink-0 text-xs tabular-nums text-mute">
+              <p className="text-xs tabular-nums text-mute">
                 {formatNextWhen(nextMatch.tipOff, nextMatch.date)}
               </p>
             </div>
