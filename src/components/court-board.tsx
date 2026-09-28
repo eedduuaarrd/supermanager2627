@@ -56,7 +56,7 @@ interface CourtBoardProps {
   confirmed?: boolean;
   selectedId?: string | null;
   onSelect?: (id: string | null) => void;
-  onEmptySlot?: (slot: { slotIndex: number; position: Position }) => void;
+  onEmptySlot?: (position: Position) => void;
 }
 
 export function CourtBoard({
@@ -112,42 +112,35 @@ export function CourtBoard({
             stroke="rgba(236,232,225,0.42)"
             strokeWidth="0.7"
           />
-          {/* backboard — thick board so hoop reads as hardware, not a slot */}
+          {/* backboard — short thick board (hardware, not a slot) */}
           <rect
-            x="42"
-            y="3.2"
-            width="16"
-            height="1.8"
-            rx="0.25"
-            fill="rgba(236,232,225,0.72)"
-            stroke="rgba(236,232,225,0.9)"
-            strokeWidth="0.35"
+            x="40.5"
+            y="3.0"
+            width="19"
+            height="2.2"
+            rx="0.3"
+            fill="rgba(236,232,225,0.82)"
+            stroke="rgba(255,255,255,0.35)"
+            strokeWidth="0.25"
           />
-          {/* rim support */}
+          {/* rim arm */}
           <line
             x1="50"
-            y1="5"
+            y1="5.2"
             x2="50"
-            y2="6.6"
-            stroke="rgba(236,232,225,0.7)"
+            y2="7.0"
+            stroke="rgba(236,232,225,0.75)"
             strokeWidth="0.55"
           />
-          {/* hoop: tiny orange rim + ball — never reads as empty player chip */}
-          <ellipse
-            cx="50"
-            cy="7.4"
-            rx="2.1"
-            ry="0.85"
-            fill="none"
-            stroke="#e87722"
-            strokeWidth="0.7"
-          />
-          <circle cx="50" cy="7.15" r="0.95" fill="#e87722" opacity="0.95" />
+          {/* solid orange ball only — no hollow red/orange ring that reads as empty chip */}
+          <circle cx="50" cy="7.9" r="1.35" fill="#e87722" />
+          <circle cx="49.55" cy="7.55" r="0.35" fill="rgba(255,220,160,0.55)" />
+          {/* tiny net suggestion */}
           <path
-            d="M 48.2 7.6 Q 50 10.2 51.8 7.6"
+            d="M 48.7 8.9 Q 50 11.2 51.3 8.9"
             fill="none"
-            stroke="rgba(236,232,225,0.35)"
-            strokeWidth="0.35"
+            stroke="rgba(236,232,225,0.4)"
+            strokeWidth="0.3"
           />
           {/* paint */}
           <rect
@@ -237,11 +230,7 @@ export function CourtBoard({
                     onClick={
                       confirmed || !onEmptySlot
                         ? undefined
-                        : () =>
-                            onEmptySlot({
-                              slotIndex: i,
-                              position: slot.position,
-                            })
+                        : () => onEmptySlot(slot.position)
                     }
                   />
                 )}
