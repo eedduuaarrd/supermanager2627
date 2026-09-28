@@ -164,6 +164,7 @@ export function buildTransferState(opts: {
     snapshotIds: opts.snapshotIds,
     nextWindowAt: null,
     lockAt: opts.lockAt,
-    message: changesRemainingLabelCa(changesUsed),
+    // No permanent “Et queden X/3” banner — surface maxChangesExceededCa only on save reject.
+    message: null,
   };
 }

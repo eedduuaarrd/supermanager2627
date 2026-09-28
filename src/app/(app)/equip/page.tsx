@@ -23,11 +23,6 @@ function EquipContent() {
   } = useManager();
 
   const readOnly = lineupLocked || transfer?.windowOpen === false;
-  const changesLabel =
-    !readOnly && transfer?.windowOpen
-      ? transfer.message ??
-        `Et queden ${transfer.changesRemaining}/${transfer.maxChanges} canvis`
-      : null;
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-2">
@@ -50,8 +45,6 @@ function EquipContent() {
           error={actionError}
           readOnly={readOnly}
           lockMessage={lockMessage ?? transfer?.message}
-          changesLabel={changesLabel}
-          changesRemaining={transfer?.changesRemaining ?? null}
         />
       </div>
     </div>

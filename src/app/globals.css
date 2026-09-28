@@ -260,10 +260,6 @@
     linear-gradient(180deg, #a07850 0%, #745538 50%, #4e3a28 100%);
 }
 
-.budget-strip {
-  box-shadow: 0 8px 28px rgb(0 0 0 / 35%);
-}
-
 .market-sheet {
   animation: market-sheet-up 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }

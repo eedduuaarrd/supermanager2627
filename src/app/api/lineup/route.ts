@@ -12,6 +12,7 @@ import { INITIAL_BUDGET, LINEUP_SIZE, resolvePlayerId } from "@/data/roster";
 import { parsePlayerIds } from "@/lib/game";
 import {
   buildTransferState,
+  maxChangesExceededCa,
   parseSnapshotIds,
 } from "@/lib/transfers";
 
@@ -140,7 +141,11 @@ export async function PUT(req: Request) {
 
   const result = saveLineup(teamId, playerIds, captainId);
   if (!result.ok) {
-    return NextResponse.json({ error: result.error }, { status: 400 });
+    const isLimit = result.error === maxChangesExceededCa();
+    return NextResponse.json(
+      { error: result.error },
+      { status: isLimit ? 403 : 400 },
+    );
   }
 
   const round = getCurrentRound();
