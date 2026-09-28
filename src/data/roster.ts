@@ -1,4 +1,6 @@
 import type { Player, TeamId } from "@/lib/types";
+import { computeMarketPrice } from "@/lib/market-price";
+import marketPricesJson from "@/data/market-prices.json";
 
 /**
  * Mercat fantasy — sèniors CB Balaguer (FCBQ temporada 2026-27).
@@ -19,7 +21,8 @@ import type { Player, TeamId } from "@/lib/types";
  * Dorsal = número de samarreta a la Plantilla (badge / columna).
  * VAL fantasy = PTS − FC − max(0, TLI−TLC) + PM (FCBQ Plantilla VAL ignora).
  * Sense posicions: alineació de 8 lliures.
- * Preus: PTS + max(VAL,0) + MIN de la mostra FCBQ (PJ=1) — no deriven només de avgVal.
+ * Preus broker: theoretical = max(0, avgVal) × 5.000 €; actualització ±15%/jornada
+ *   (rodona a 500 €). Compra/venda al preu de mercat actual. Veure market-prices.json.
  *
  * Regles: plantilla 8, pressupost 100.000 € (mercat multi-equip, 29 entrades).
  */
@@ -79,17 +82,17 @@ export const TEAM_ID_SLUG: Record<TeamId, string> = {
   "fem-b": "farratges-b",
 };
 
-function priceFrom(pts: number, val: number, min: number): number {
-  const raw = 5_000 + pts * 700 + Math.max(val, 0) * 450 + min * 120;
-  return Math.min(16_500, Math.max(4_500, Math.round(raw / 500) * 500));
-}
-
 /** Fantasy avg seed = Balaguer VAL (PTS − PF − missed FT + PM). */
 function avgFromVal(val: number): number {
   return Math.round(val);
 }
 
-export const ROSTER: Player[] = [
+/** Seed / fallback quote from avg VAL (no previous clamp). */
+function priceFromAvg(avgVal: number): number {
+  return computeMarketPrice(avgVal, null);
+}
+
+export const ROSTER_SEED: Player[] = [
   // —— Teixidó Associats CB Balaguer A (masculí) ——
   {
     id: "hector-lozano",
@@ -97,7 +100,8 @@ export const ROSTER: Player[] = [
     number: 19,
     pts: 15,
     avgVal: avgFromVal(9),
-    price: priceFrom(15, 9, 23.5),
+    price: priceFromAvg(avgFromVal(9)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
@@ -109,7 +113,8 @@ export const ROSTER: Player[] = [
     number: 20,
     pts: 10,
     avgVal: avgFromVal(-1),
-    price: priceFrom(10, -1, 27.1),
+    price: priceFromAvg(avgFromVal(-1)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
@@ -121,7 +126,8 @@ export const ROSTER: Player[] = [
     number: 43,
     pts: 9,
     avgVal: avgFromVal(8),
-    price: priceFrom(9, 8, 24.2),
+    price: priceFromAvg(avgFromVal(8)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
@@ -133,7 +139,8 @@ export const ROSTER: Player[] = [
     number: 6,
     pts: 9,
     avgVal: avgFromVal(-8),
-    price: priceFrom(9, -8, 27.5),
+    price: priceFromAvg(avgFromVal(-8)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
@@ -145,7 +152,8 @@ export const ROSTER: Player[] = [
     number: 0,
     pts: 8,
     avgVal: avgFromVal(1),
-    price: priceFrom(8, 1, 26.4),
+    price: priceFromAvg(avgFromVal(1)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
@@ -157,7 +165,8 @@ export const ROSTER: Player[] = [
     number: 24,
     pts: 6,
     avgVal: avgFromVal(7),
-    price: priceFrom(6, 7, 18),
+    price: priceFromAvg(avgFromVal(7)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
@@ -169,7 +178,8 @@ export const ROSTER: Player[] = [
     number: 68,
     pts: 6,
     avgVal: avgFromVal(-12),
-    price: priceFrom(6, -12, 23),
+    price: priceFromAvg(avgFromVal(-12)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
@@ -181,7 +191,8 @@ export const ROSTER: Player[] = [
     number: 26,
     pts: 0,
     avgVal: avgFromVal(-5),
-    price: priceFrom(0, -5, 16.1),
+    price: priceFromAvg(avgFromVal(-5)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
@@ -193,7 +204,8 @@ export const ROSTER: Player[] = [
     number: 8,
     pts: 0,
     avgVal: avgFromVal(-5),
-    price: priceFrom(0, -5, 14.1),
+    price: priceFromAvg(avgFromVal(-5)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
@@ -206,7 +218,8 @@ export const ROSTER: Player[] = [
     number: 11,
     pts: 15,
     avgVal: avgFromVal(34),
-    price: priceFrom(15, 34, 28.4),
+    price: priceFromAvg(avgFromVal(34)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
@@ -218,7 +231,8 @@ export const ROSTER: Player[] = [
     number: 13,
     pts: 13,
     avgVal: avgFromVal(27),
-    price: priceFrom(13, 27, 29.4),
+    price: priceFromAvg(avgFromVal(27)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
@@ -231,7 +245,8 @@ export const ROSTER: Player[] = [
     number: 21,
     pts: 8,
     avgVal: avgFromVal(22),
-    price: priceFrom(8, 22, 27.4),
+    price: priceFromAvg(avgFromVal(22)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
@@ -243,7 +258,8 @@ export const ROSTER: Player[] = [
     number: 88,
     pts: 8,
     avgVal: avgFromVal(20),
-    price: priceFrom(8, 20, 26.8),
+    price: priceFromAvg(avgFromVal(20)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
@@ -255,7 +271,8 @@ export const ROSTER: Player[] = [
     number: 95,
     pts: 6,
     avgVal: avgFromVal(17),
-    price: priceFrom(6, 17, 19.4),
+    price: priceFromAvg(avgFromVal(17)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
@@ -267,7 +284,8 @@ export const ROSTER: Player[] = [
     number: 23,
     pts: 5,
     avgVal: avgFromVal(-11),
-    price: priceFrom(5, -11, 10.9),
+    price: priceFromAvg(avgFromVal(-11)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
@@ -280,7 +298,8 @@ export const ROSTER: Player[] = [
     number: 10,
     pts: 2,
     avgVal: avgFromVal(-5),
-    price: priceFrom(2, -5, 18.3),
+    price: priceFromAvg(avgFromVal(-5)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
@@ -292,7 +311,8 @@ export const ROSTER: Player[] = [
     number: 27,
     pts: 1,
     avgVal: avgFromVal(-12),
-    price: priceFrom(1, -12, 10.6),
+    price: priceFromAvg(avgFromVal(-12)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
@@ -305,7 +325,8 @@ export const ROSTER: Player[] = [
     number: 79,
     pts: 1,
     avgVal: avgFromVal(-16),
-    price: priceFrom(1, -16, 15.7),
+    price: priceFromAvg(avgFromVal(-16)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
@@ -317,7 +338,8 @@ export const ROSTER: Player[] = [
     number: 24,
     pts: 0,
     avgVal: avgFromVal(-17),
-    price: priceFrom(0, -17, 13),
+    price: priceFromAvg(avgFromVal(-17)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
@@ -330,7 +352,8 @@ export const ROSTER: Player[] = [
     number: 23,
     pts: 29,
     avgVal: avgFromVal(20),
-    price: priceFrom(29, 20, 37.5),
+    price: priceFromAvg(avgFromVal(20)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
@@ -343,7 +366,8 @@ export const ROSTER: Player[] = [
     number: 13,
     pts: 15,
     avgVal: avgFromVal(16),
-    price: priceFrom(15, 16, 24.4),
+    price: priceFromAvg(avgFromVal(16)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
@@ -356,7 +380,8 @@ export const ROSTER: Player[] = [
     number: 8,
     pts: 5,
     avgVal: avgFromVal(4),
-    price: priceFrom(5, 4, 19.3),
+    price: priceFromAvg(avgFromVal(4)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
@@ -368,7 +393,8 @@ export const ROSTER: Player[] = [
     number: 30,
     pts: 2,
     avgVal: avgFromVal(1),
-    price: priceFrom(2, 1, 29),
+    price: priceFromAvg(avgFromVal(1)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
@@ -380,7 +406,8 @@ export const ROSTER: Player[] = [
     number: 27,
     pts: 2,
     avgVal: avgFromVal(10),
-    price: priceFrom(2, 10, 29.7),
+    price: priceFromAvg(avgFromVal(10)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
@@ -393,7 +420,8 @@ export const ROSTER: Player[] = [
     number: 33,
     pts: 2,
     avgVal: avgFromVal(-2),
-    price: priceFrom(2, -2, 8.6),
+    price: priceFromAvg(avgFromVal(-2)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
@@ -405,7 +433,8 @@ export const ROSTER: Player[] = [
     number: 93,
     pts: 1,
     avgVal: avgFromVal(-10),
-    price: priceFrom(1, -10, 11.1),
+    price: priceFromAvg(avgFromVal(-10)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
@@ -417,7 +446,8 @@ export const ROSTER: Player[] = [
     number: 11,
     pts: 0,
     avgVal: avgFromVal(-7),
-    price: priceFrom(0, -7, 2.7),
+    price: priceFromAvg(avgFromVal(-7)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
@@ -429,7 +459,8 @@ export const ROSTER: Player[] = [
     number: 25,
     pts: 0,
     avgVal: avgFromVal(7),
-    price: priceFrom(0, 7, 33.5),
+    price: priceFromAvg(avgFromVal(7)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
@@ -441,7 +472,8 @@ export const ROSTER: Player[] = [
     number: 24,
     pts: 0,
     avgVal: avgFromVal(-3),
-    price: priceFrom(0, -3, 4.2),
+    price: priceFromAvg(avgFromVal(-3)),
+    prevPrice: null,
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
@@ -449,14 +481,39 @@ export const ROSTER: Player[] = [
   },
 ];
 
+type MarketPricesFile = {
+  prices?: Record<
+    string,
+    { price: number; prevPrice?: number | null; avgVal?: number | null }
+  >;
+};
+
+/** Apply broker quotes from market-prices.json onto seed roster rows. */
+function applyMarketPrices(seed: Player[]): Player[] {
+  const file = marketPricesJson as MarketPricesFile;
+  const map = file.prices ?? {};
+  return seed.map((p) => {
+    const mp = map[p.id];
+    if (!mp) return p;
+    return {
+      ...p,
+      price: mp.price,
+      prevPrice: mp.prevPrice ?? null,
+      ...(typeof mp.avgVal === "number" ? { avgVal: Math.round(mp.avgVal) } : {}),
+    };
+  });
+}
+
+export const ROSTER: Player[] = applyMarketPrices(ROSTER_SEED);
+
 export const LINEUP_SIZE = 8;
 /** Pressupost amb mercat multi-equip. */
 export const INITIAL_BUDGET = 100_000;
 export const CAPTAIN_MULTIPLIER = 2;
 export const WIN_BONUS = 0.2;
 
-/** GameState.version — bump when roster ids / dual-team rule change. */
-export const GAME_VERSION = 8;
+/** GameState.version — bump when roster ids / dual-team / pricing rule change. */
+export const GAME_VERSION = 9;
 
 export const OPPONENTS = [
   "CB Cervera",

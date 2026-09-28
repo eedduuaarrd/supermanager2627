@@ -25,6 +25,9 @@ interface LineupBuilderProps {
   saving?: boolean;
   saveStatus?: SaveStatus;
   error?: string | null;
+  /** Tip-off / jornada lock — court becomes read-only. */
+  readOnly?: boolean;
+  lockMessage?: string | null;
 }
 
 function softProgressLabel(filled: number): string {
@@ -99,6 +102,7 @@ export function LineupBuilder({
   }
 
   function removePlayer(id: string) {
+    if (readOnly) return;
     const playerIds = lineup.playerIds.filter((x) => x !== id);
     let captainId = lineup.captainId;
     if (captainId === id) captainId = null;
@@ -107,6 +111,7 @@ export function LineupBuilder({
   }
 
   function addPlayer(id: string) {
+    if (readOnly) return;
     if (lineup.playerIds.includes(id)) return;
     if (lineup.playerIds.length >= LINEUP_SIZE) return;
     const player = roster.find((p) => p.id === id);
@@ -117,6 +122,7 @@ export function LineupBuilder({
   }
 
   function setCaptain(id: string) {
+    if (readOnly) return;
     onChange({
       ...lineup,
       captainId: id,
@@ -126,6 +132,7 @@ export function LineupBuilder({
   }
 
   function handleEmptySlot() {
+    if (readOnly) return;
     setSelectedId(null);
     setPickerOpen(true);
   }
@@ -137,11 +144,17 @@ export function LineupBuilder({
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
+      {readOnly && (
+        <div className="shrink-0 border border-amber-500/35 bg-amber-500/10 px-3 py-2.5 text-sm text-amber-50">
+          {lockMessage ??
+            "Alineació bloquejada: el primer partit del club d'aquesta jornada ja ha començat."}
+        </div>
+      )}
       <section className="budget-strip shrink-0 border border-line bg-panel/80 px-3.5 py-2.5 backdrop-blur-md sm:py-3">
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
             <p className="text-[10px] uppercase tracking-[0.18em] text-mute">
-              J{currentRound} · restant
+              J{currentRound} · {readOnly ? "només lectura" : "restant"}
               <span className="mx-1 text-white/25">·</span>
               <span
                 className={
@@ -153,6 +166,9 @@ export function LineupBuilder({
             </p>
             <p className="font-display text-xl leading-none text-bone tabular-nums sm:text-2xl">
               {formatPrice(Math.max(0, remaining))}
+            </p>
+            <p className="mt-1 text-[10px] text-mute">
+              Compra i venda al preu de mercat actual
             </p>
           </div>
           <div className="text-right">
@@ -222,15 +238,17 @@ export function LineupBuilder({
         </div>
       )}
 
-      <MarketSheet
-        open={pickerOpen}
-        roster={roster}
-        takenIds={lineup.playerIds}
-        remainingBudget={remaining}
-        lineupFull={filled >= LINEUP_SIZE}
-        onPick={handlePickFromSheet}
-        onClose={() => setPickerOpen(false)}
-      />
+      {!readOnly && (
+        <MarketSheet
+          open={pickerOpen}
+          roster={roster}
+          takenIds={lineup.playerIds}
+          remainingBudget={remaining}
+          lineupFull={filled >= LINEUP_SIZE}
+          onPick={handlePickFromSheet}
+          onClose={() => setPickerOpen(false)}
+        />
+      )}
 
       {sheetOpen && selectedPlayer && (
         <>
@@ -258,26 +276,30 @@ export function LineupBuilder({
                   VAL {selectedPlayer.avgVal} · Veure fitxa
                 </p>
               </Link>
-              <Button
-                type="button"
-                size="lg"
-                onClick={() => setCaptain(selectedPlayer.id)}
-                className={
-                  lineup.captainId === selectedPlayer.id
-                    ? "h-11 shrink-0 bg-grana text-bone hover:bg-grana-bright"
-                    : "h-11 shrink-0 border border-line bg-panel-2 text-bone hover:bg-white/10"
-                }
-              >
-                <Crown className="size-4" /> Capità
-              </Button>
-              <Button
-                type="button"
-                size="lg"
-                onClick={() => removePlayer(selectedPlayer.id)}
-                className="h-11 shrink-0 bg-bone text-ink hover:bg-white"
-              >
-                <UserMinus className="size-4" /> Treure
-              </Button>
+              {!readOnly && (
+                <>
+                  <Button
+                    type="button"
+                    size="lg"
+                    onClick={() => setCaptain(selectedPlayer.id)}
+                    className={
+                      lineup.captainId === selectedPlayer.id
+                        ? "h-11 shrink-0 bg-grana text-bone hover:bg-grana-bright"
+                        : "h-11 shrink-0 border border-line bg-panel-2 text-bone hover:bg-white/10"
+                    }
+                  >
+                    <Crown className="size-4" /> Capità
+                  </Button>
+                  <Button
+                    type="button"
+                    size="lg"
+                    onClick={() => removePlayer(selectedPlayer.id)}
+                    className="h-11 shrink-0 bg-bone text-ink hover:bg-white"
+                  >
+                    <UserMinus className="size-4" /> Treure
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </>

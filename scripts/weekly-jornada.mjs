@@ -272,6 +272,20 @@ function refresh() {
   const r = spawnSync(
     process.execPath,
     [join(root, "scripts/refresh-fcbq-stats.mjs"), "--from", fromPath],
+    {
+      stdio: "inherit",
+      cwd: root,
+      env: { ...process.env, SKIP_MARKET_PRICES: "1" },
+    },
+  );
+  if (r.status !== 0) process.exit(r.status ?? 1);
+}
+
+function updatePrices() {
+  console.log("→ update-market-prices.mjs");
+  const r = spawnSync(
+    process.execPath,
+    [join(root, "scripts/update-market-prices.mjs")],
     { stdio: "inherit", cwd: root },
   );
   if (r.status !== 0) process.exit(r.status ?? 1);
@@ -285,7 +299,10 @@ async function main() {
     }
     refresh();
   }
-  if (refreshOnly) return;
+  if (refreshOnly) {
+    updatePrices();
+    return;
+  }
 
   const db = openDb();
   const round = currentRound(db);
@@ -297,6 +314,7 @@ async function main() {
   );
 
   if (assignOnly || dryRun) {
+    updatePrices();
     console.log(dryRun ? "Dry run — skip score." : "Assign-only done.");
     return;
   }
@@ -319,6 +337,9 @@ async function main() {
     const result = scoreLocally();
     console.log("OK (local)", result);
   }
+
+  // One broker tick per weekly close / weekend sync.
+  updatePrices();
 }
 
 main().catch((err) => {

@@ -1,0 +1,216 @@
+{
+  "updatedAt": "2026-09-28",
+  "formula": "theoretical = max(0, avgVal) × 5000; newPrice = clamp(±15%) then round 500",
+  "notes": [
+    "Club-scale broker pricing for Supermanager Balaguer.",
+    "Dual-team fantasy ids are priced separately.",
+    "Roster overlays these quotes at runtime (applyMarketPrices).",
+    "Refresh: node scripts/update-market-prices.mjs",
+    "Seed (ignore prev): node scripts/update-market-prices.mjs --seed"
+  ],
+  "prices": {
+    "hector-lozano": {
+      "price": 45000,
+      "prevPrice": null,
+      "avgVal": 9,
+      "theoretical": 45000,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "eduard-bernat": {
+      "price": 0,
+      "prevPrice": null,
+      "avgVal": -1,
+      "theoretical": 0,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "toni-salud": {
+      "price": 40000,
+      "prevPrice": null,
+      "avgVal": 8,
+      "theoretical": 40000,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "ivan-franco": {
+      "price": 0,
+      "prevPrice": null,
+      "avgVal": -8,
+      "theoretical": 0,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "gerard-garcia": {
+      "price": 5000,
+      "prevPrice": null,
+      "avgVal": 1,
+      "theoretical": 5000,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "marc-escoda": {
+      "price": 35000,
+      "prevPrice": null,
+      "avgVal": 7,
+      "theoretical": 35000,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "babacar-toure": {
+      "price": 0,
+      "prevPrice": null,
+      "avgVal": -12,
+      "theoretical": 0,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "gerard-soldevila": {
+      "price": 0,
+      "prevPrice": null,
+      "avgVal": -5,
+      "theoretical": 0,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "roger-companys": {
+      "price": 0,
+      "prevPrice": null,
+      "avgVal": -5,
+      "theoretical": 0,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "ares-bunol": {
+      "price": 170000,
+      "prevPrice": null,
+      "avgVal": 34,
+      "theoretical": 170000,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "julia-pla__cudos-a": {
+      "price": 135000,
+      "prevPrice": null,
+      "avgVal": 27,
+      "theoretical": 135000,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "andrea-perat": {
+      "price": 110000,
+      "prevPrice": null,
+      "avgVal": 22,
+      "theoretical": 110000,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "neus-escoda": {
+      "price": 100000,
+      "prevPrice": null,
+      "avgVal": 20,
+      "theoretical": 100000,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "monica-fontanet": {
+      "price": 85000,
+      "prevPrice": null,
+      "avgVal": 17,
+      "theoretical": 85000,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "queralt-sole__cudos-a": {
+      "price": 0,
+      "prevPrice": null,
+      "avgVal": -11,
+      "theoretical": 0,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "clara-paniagua": {
+      "price": 0,
+      "prevPrice": null,
+      "avgVal": -5,
+      "theoretical": 0,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "mariama-mballo__cudos-a": {
+      "price": 0,
+      "prevPrice": null,
+      "avgVal": -12,
+      "theoretical": 0,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "martina-benitez": {
+      "price": 0,
+      "prevPrice": null,
+      "avgVal": -16,
+      "theoretical": 0,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "ada-domene": {
+      "price": 0,
+      "prevPrice": null,
+      "avgVal": -17,
+      "theoretical": 0,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "queralt-sole__farratges-b": {
+      "price": 100000,
+      "prevPrice": null,
+      "avgVal": 20,
+      "theoretical": 100000,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "julia-pla__farratges-b": {
+      "price": 80000,
+      "prevPrice": null,
+      "avgVal": 16,
+      "theoretical": 80000,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "jana-roldan": {
+      "price": 20000,
+      "prevPrice": null,
+      "avgVal": 4,
+      "theoretical": 20000,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "nuria-jimenez": {
+      "price": 5000,
+      "prevPrice": null,
+      "avgVal": 1,
+      "theoretical": 5000,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "mariama-mballo__farratges-b": {
+      "price": 50000,
+      "prevPrice": null,
+      "avgVal": 10,
+      "theoretical": 50000,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "abril-gracia": {
+      "price": 0,
+      "prevPrice": null,
+      "avgVal": -2,
+      "theoretical": 0,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "xenia-andreu": {
+      "price": 0,
+      "prevPrice": null,
+      "avgVal": -10,
+      "theoretical": 0,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "gina-betbese": {
+      "price": 0,
+      "prevPrice": null,
+      "avgVal": -7,
+      "theoretical": 0,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "gina-trilla": {
+      "price": 35000,
+      "prevPrice": null,
+      "avgVal": 7,
+      "theoretical": 35000,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    },
+    "jana-alarcon": {
+      "price": 0,
+      "prevPrice": null,
+      "avgVal": -3,
+      "theoretical": 0,
+      "updatedAt": "2026-09-28T21:33:30.062Z"
+    }
+  }
+}

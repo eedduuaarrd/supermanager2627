@@ -70,6 +70,16 @@ export function remainingBudget(budget: number, playerIds: string[]): number {
   return budget - spentBudget(playerIds);
 }
 
+/** Squad market value = sum of current quotes for players in lineup. */
+export function squadMarketValue(playerIds: string[]): number {
+  return spentBudget(playerIds);
+}
+
+/** Broker patrimoni = cash remaining + squad market value. */
+export function patrimoni(budget: number, playerIds: string[]): number {
+  return remainingBudget(budget, playerIds) + squadMarketValue(playerIds);
+}
+
 /**
  * Normalize lineup player ids from DB / API JSON.
  * Supports legacy position-keyed `{ slots: { base, aler, pivot } }` and

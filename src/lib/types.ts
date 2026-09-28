@@ -7,7 +7,10 @@ export interface Player {
   id: string;
   name: string;
   number: number | null;
+  /** Current broker market quote (€). */
   price: number;
+  /** Previous quote for ↑/↓ UI; null on first seed. */
+  prevPrice?: number | null;
   /** Mitjana de valoració (VAL fantasy Balaguer). */
   avgVal: number;
   source: PlayerSource;

@@ -10,6 +10,7 @@
  * Usage: node scripts/refresh-fcbq-stats.mjs [--from path]
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { computeVal } from "./compute-val.mjs";
@@ -220,3 +221,15 @@ const withGames = Object.values(out.players).filter((p) => p.games.length > 0);
 console.log(
   `Wrote ${OUT}: ${Object.keys(out.players).length} players, ${withGames.length} with games, ${withGames.reduce((n, p) => n + p.games.length, 0)} game rows`,
 );
+
+if (!process.env.SKIP_MARKET_PRICES) {
+  console.log("→ update-market-prices.mjs");
+  const priceRun = spawnSync(
+    process.execPath,
+    [join(root, "scripts/update-market-prices.mjs")],
+    { stdio: "inherit", cwd: root },
+  );
+  if (priceRun.status !== 0) process.exit(priceRun.status ?? 1);
+} else {
+  console.log("→ skip market prices (SKIP_MARKET_PRICES)");
+}

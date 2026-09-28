@@ -3,7 +3,8 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PlayerAvatar } from "@/components/player-avatar";
-import { formatPrice, teamLabel } from "@/data/roster";
+import { PriceLabel } from "@/components/price-label";
+import { teamLabel } from "@/data/roster";
 import type { Player } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Crown, Plus, X } from "lucide-react";
@@ -79,7 +80,12 @@ export function PlayerRow({
           </div>
           <p className="mt-0.5 text-xs text-mute">
             {player.pts != null ? `${player.pts} pts · ` : ""}VAL {player.avgVal}{" "}
-            · {formatPrice(player.price)}
+            ·{" "}
+            <PriceLabel
+              price={player.price}
+              prevPrice={player.prevPrice}
+              className="text-xs"
+            />
           </p>
         </div>
       </Link>

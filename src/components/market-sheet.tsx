@@ -71,7 +71,9 @@ export function MarketSheet({
               <h2 className="font-display text-xl tracking-wide text-bone">
                 Tria un jugador
               </h2>
-              <p className="mt-0.5 text-xs text-mute">Agrupats per equip del club</p>
+              <p className="mt-0.5 text-xs text-mute">
+                Agrupats per equip · Compra al preu de mercat actual
+              </p>
             </div>
             <Button
               type="button"

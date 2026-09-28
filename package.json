@@ -8,6 +8,7 @@
     "start": "next start -p 4317 -H 0.0.0.0",
     "lint": "eslint",
     "refresh-fcbq": "node scripts/refresh-fcbq-stats.mjs",
+    "update-prices": "node scripts/update-market-prices.mjs",
     "weekly": "node scripts/weekly-jornada.mjs"
   },
   "dependencies": {

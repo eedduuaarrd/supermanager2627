@@ -1,6 +1,8 @@
 import { PlayerAvatar } from "@/components/player-avatar";
+import { PriceLabel } from "@/components/price-label";
 import { Badge } from "@/components/ui/badge";
-import { formatPrice, teamLabel } from "@/data/roster";
+import { teamLabel } from "@/data/roster";
+import { MARKET_PRICE_FOOTNOTE_CA } from "@/lib/market-price";
 import { buildPlayerDetail, gameJornada } from "@/lib/player-stats";
 import { VAL_FORMULA_FOOTNOTE_CA } from "@/lib/val";
 import { ArrowLeft } from "lucide-react";
@@ -60,9 +62,11 @@ export default async function JugadorPage({
           </div>
           <p className="mt-2 text-sm text-mute">
             Preu{" "}
-            <span className="font-semibold tabular-nums text-bone">
-              {formatPrice(player.price)}
-            </span>
+            <PriceLabel
+              price={player.price}
+              prevPrice={player.prevPrice}
+              className="font-semibold text-bone"
+            />
           </p>
         </div>
       </section>
@@ -95,6 +99,9 @@ export default async function JugadorPage({
       </section>
       <p className="text-[11px] leading-relaxed text-mute">
         {VAL_FORMULA_FOOTNOTE_CA}
+      </p>
+      <p className="text-[11px] leading-relaxed text-mute">
+        {MARKET_PRICE_FOOTNOTE_CA}
       </p>
 
       <section>

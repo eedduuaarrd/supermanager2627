@@ -3,13 +3,17 @@
 import { useManager } from "@/components/manager-provider";
 import { TeamManager } from "@/components/team-manager";
 import { Button } from "@/components/ui/button";
+import { formatPrice } from "@/data/roster";
+import { BUY_SELL_RULE_CA, MARKET_PRICE_FOOTNOTE_CA } from "@/lib/market-price";
+import { patrimoni } from "@/lib/game";
 import { VAL_FORMULA_FOOTNOTE_CA } from "@/lib/val";
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function ComptePage() {
-  const { user, maxTeams } = useManager();
+  const { user, maxTeams, budget, lineup } = useManager();
   const router = useRouter();
+  const netWorth = patrimoni(budget, lineup.playerIds);
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -38,6 +42,18 @@ export default function ComptePage() {
 
       <TeamManager />
 
+      <section className="border border-line bg-panel/80 px-4 py-3">
+        <p className="text-[10px] uppercase tracking-[0.18em] text-mute">
+          Patrimoni
+        </p>
+        <p className="mt-1 font-display text-xl tabular-nums text-bone">
+          {formatPrice(netWorth)}
+        </p>
+        <p className="mt-1 text-[11px] text-mute">
+          Efectiu restant + valor de mercat de l&apos;alineació
+        </p>
+      </section>
+
       <section className="border border-line bg-panel/60 px-4 py-4">
         <p className="text-[10px] uppercase tracking-[0.18em] text-mute">
           Regles ràpides
@@ -46,9 +62,11 @@ export default function ComptePage() {
           <li>Fins a {maxTeams} equips per compte</li>
           <li>8 jugadors per alineació (qualsevol mix)</li>
           <li>Pressupost 100.000 € per equip</li>
+          <li>{BUY_SELL_RULE_CA}</li>
           <li>Capità ×2 als punts de jornada</li>
           <li>Cada setmana, jornada nova amb els partits del club</li>
           <li>{VAL_FORMULA_FOOTNOTE_CA}</li>
+          <li>{MARKET_PRICE_FOOTNOTE_CA}</li>
         </ul>
       </section>
 

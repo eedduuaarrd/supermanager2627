@@ -1,7 +1,8 @@
 "use client";
 
 import { PlayerAvatar } from "@/components/player-avatar";
-import { displayFirstName, formatPrice, LINEUP_SIZE } from "@/data/roster";
+import { PriceLabel } from "@/components/price-label";
+import { displayFirstName, LINEUP_SIZE } from "@/data/roster";
 import type { Player } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Crown, Plus } from "lucide-react";
@@ -334,7 +335,12 @@ function FilledChip({
         <p className="mt-0.5 text-[9px] tabular-nums text-bone/65 sm:text-[10px]">
           VAL {player.avgVal}
           <span className="mx-0.5 text-white/25">·</span>
-          {formatPrice(player.price).replace(/\s/g, "")}
+          <PriceLabel
+            price={player.price}
+            prevPrice={player.prevPrice}
+            compact
+            className="text-[9px] sm:text-[10px]"
+          />
         </p>
       </Link>
     </div>
