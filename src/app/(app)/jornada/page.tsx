@@ -49,16 +49,17 @@ function primaryCta(opts: {
 }
 
 function JornadaContent() {
-  const { teams, lineup, activeTeamId, maxTeams, createTeam } = useManager();
+  const { teams, lineup, activeTeamId, maxTeams, createTeam, round } =
+    useManager();
   const filled = lineup.playerIds.length;
   const hasCaptain = Boolean(lineup.captainId);
   const hasTeams = teams.length > 0;
   const atLimit = teams.length >= maxTeams;
 
   const [meta, setMeta] = useState<RoundMeta>({
-    round: 1,
+    round,
     status: "open",
-    label: "Jornada 1",
+    label: `Jornada ${round}`,
   });
   const [ranks, setRanks] = useState<RankInfo>({
     jornada: null,
