@@ -113,14 +113,6 @@ export function formatNextWindowCa(iso: string): string {
   }
 }
 
-export function changesRemainingLabelCa(
-  used: number,
-  max = MAX_TRANSFERS,
-): string {
-  const left = Math.max(0, max - used);
-  return `Et queden ${left}/${max} canvis`;
-}
-
 export function maxChangesExceededCa(max = MAX_TRANSFERS): string {
   return `Has esgotat els ${max} canvis d'aquesta finestra. Només pots treure jugadors o tornar a posar els de l'instantània.`;
 }
@@ -164,7 +156,7 @@ export function buildTransferState(opts: {
     snapshotIds: opts.snapshotIds,
     nextWindowAt: null,
     lockAt: opts.lockAt,
-    // No permanent “Et queden X/3” banner — surface maxChangesExceededCa only on save reject.
+    // Limit is silent until save rejects (maxChangesExceededCa → 403).
     message: null,
   };
 }

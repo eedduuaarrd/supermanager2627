@@ -11,7 +11,6 @@ function EquipContent() {
     roster,
     budget,
     lineup,
-    round,
     persistLineup,
     saving,
     saveStatus,
@@ -38,7 +37,6 @@ function EquipContent() {
           roster={roster!}
           budget={budget}
           lineup={lineup}
-          currentRound={round}
           onChange={persistLineup}
           saving={saving}
           saveStatus={saveStatus}

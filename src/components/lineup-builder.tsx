@@ -20,7 +20,6 @@ interface LineupBuilderProps {
   roster: Player[];
   budget: number;
   lineup: Lineup;
-  currentRound: number;
   onChange: (lineup: Lineup) => void;
   saving?: boolean;
   saveStatus?: SaveStatus;
@@ -55,7 +54,6 @@ export function LineupBuilder({
   roster,
   budget,
   lineup,
-  currentRound,
   onChange,
   saveStatus,
   error,
@@ -153,15 +151,13 @@ export function LineupBuilder({
         </div>
       ) : null}
       <div className="flex shrink-0 items-baseline justify-between gap-2 px-0.5 text-xs text-mute">
-        <p className="min-w-0 tabular-nums">
-          <span className="uppercase tracking-[0.12em]">J{currentRound}</span>
+        <p className="min-w-0 tabular-nums" aria-label="Pressupost i places">
+          <span className={filled === LINEUP_SIZE ? "text-bone/80" : undefined}>
+            {filled}/{LINEUP_SIZE}
+          </span>
           <span className="mx-1.5 text-white/20">·</span>
           <span className={overBudget ? "text-amber-200" : "text-bone"}>
             {formatPrice(remaining)}
-          </span>
-          <span className="mx-1.5 text-white/20">·</span>
-          <span className={filled === LINEUP_SIZE ? "text-bone/80" : undefined}>
-            {filled}/{LINEUP_SIZE}
           </span>
           {hint ? (
             <>

@@ -46,25 +46,19 @@ export function JornadaPointsHistory() {
 
   if (history == null) {
     return (
-      <div className="shrink-0 px-0.5 py-1">
-        <p className="text-[10px] uppercase tracking-[0.14em] text-mute">
-          Punts de jornada
-        </p>
-        <p className="mt-1 text-xs text-mute/70">Carregant…</p>
-      </div>
+      <p className="shrink-0 px-0.5 text-[10px] uppercase tracking-[0.14em] text-mute/70">
+        Punts de jornada…
+      </p>
     );
   }
 
   if (history.length === 0) {
     return (
-      <div className="shrink-0 px-0.5 py-1">
-        <p className="text-[10px] uppercase tracking-[0.14em] text-mute">
-          Punts de jornada
-        </p>
-        <p className="mt-1 text-sm text-mute">
-          Encara no hi ha punts de jornada.
-        </p>
-      </div>
+      <p className="shrink-0 px-0.5 text-[10px] text-mute/70">
+        <span className="uppercase tracking-[0.14em]">Punts de jornada</span>
+        <span className="mx-1.5 text-white/20">·</span>
+        Encara no n’hi ha
+      </p>
     );
   }
 
