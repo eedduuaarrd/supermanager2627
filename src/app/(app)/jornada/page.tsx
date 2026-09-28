@@ -16,10 +16,54 @@ type RoundMeta = {
   label: string;
 };
 
+type NextMatch = {
+  shortName: string;
+  opponent: string | null;
+  tipOff: string | null;
+  date: string | null;
+  home: boolean | null;
+};
+
 type RankInfo = {
   jornada: number | null;
   general: number | null;
 };
+
+function formatMatchWhen(m: NextMatch): string {
+  if (m.tipOff) {
+    try {
+      return new Intl.DateTimeFormat("ca-ES", {
+        timeZone: "Europe/Madrid",
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date(m.tipOff));
+    } catch {
+      /* fall through */
+    }
+  }
+  if (m.date) {
+    try {
+      return new Intl.DateTimeFormat("ca-ES", {
+        timeZone: "Europe/Madrid",
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+      }).format(new Date(`${m.date}T12:00:00`));
+    } catch {
+      return m.date;
+    }
+  }
+  return "Data pendent";
+}
+
+function homeAwayLabel(home: boolean | null): string | null {
+  if (home === true) return "local";
+  if (home === false) return "visitant";
+  return null;
+}
 
 function lineupComplete(filled: number, hasCaptain: boolean) {
   return filled >= LINEUP_SIZE && hasCaptain;
@@ -64,6 +108,7 @@ function JornadaContent() {
     jornada: null,
     general: null,
   });
+  const [nextMatches, setNextMatches] = useState<NextMatch[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
   const [newName, setNewName] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -82,12 +127,16 @@ function JornadaContent() {
         if (roundRes.ok) {
           const data = (await roundRes.json()) as RoundMeta & {
             weeklyNote?: string;
+            nextMatches?: NextMatch[];
           };
           setMeta({
             round: data.round,
             status: data.status === "closed" ? "closed" : "open",
             label: data.label ?? `Jornada ${data.round}`,
           });
+          if (Array.isArray(data.nextMatches)) {
+            setNextMatches(data.nextMatches);
+          }
         }
         if (jRes.ok) {
           const data = await jRes.json();
@@ -225,7 +274,49 @@ function JornadaContent() {
         </Link>
       )}
 
-      {/* 4. One-line rank */}
+      {/* 4. Propers partits — 4 club teams */}
+      {!createOpen && (
+        <section className="hub-fade-delay space-y-3">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-mute">
+            Propers partits
+          </p>
+          <ul className="space-y-2">
+            {(nextMatches.length
+              ? nextMatches
+              : [
+                  { shortName: "Teixidó A", opponent: null, tipOff: null, date: null, home: null },
+                  { shortName: "Lo Sifonet B", opponent: null, tipOff: null, date: null, home: null },
+                  { shortName: "Cudos A", opponent: null, tipOff: null, date: null, home: null },
+                  { shortName: "Farratges B", opponent: null, tipOff: null, date: null, home: null },
+                ]
+            ).map((m) => {
+              const venue = homeAwayLabel(m.home);
+              return (
+                <li
+                  key={m.shortName}
+                  className="flex items-baseline justify-between gap-3 border-b border-line/60 pb-2 last:border-0"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-bone">
+                      {m.shortName}
+                    </p>
+                    <p className="truncate text-xs text-mute">
+                      {m.opponent
+                        ? `${venue ? `${venue} · ` : ""}vs ${m.opponent}`
+                        : "Calendari pendent"}
+                    </p>
+                  </div>
+                  <p className="shrink-0 text-xs tabular-nums text-mute">
+                    {m.opponent ? formatMatchWhen(m) : "—"}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+
+      {/* 5. One-line rank */}
       {hasTeams && !createOpen && (
         <p className="hub-rank text-sm text-mute">
           Jornada{" "}

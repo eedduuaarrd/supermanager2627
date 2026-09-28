@@ -9,7 +9,9 @@
     "lint": "eslint",
     "refresh-fcbq": "node scripts/refresh-fcbq-stats.mjs",
     "update-prices": "node scripts/update-market-prices.mjs",
-    "weekly": "node scripts/weekly-jornada.mjs"
+    "weekly": "node scripts/weekly-jornada.mjs",
+    "fetch-fixtures": "node scripts/fetch-fcbq-fixtures.mjs",
+    "weekend-sync": "node scripts/weekend-sync.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

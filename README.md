@@ -81,6 +81,25 @@ Accions API (`POST /api/admin/weekly`, header `x-admin-token` o body `token`, o 
 
 L’admin també pot tancar des de **Classificació** («Tancar jornada (stats FCBQ)»).
 
+
+
+### Weekend sync (systemd)
+
+Dissabte i diumenge **23:59 Europe/Madrid** (`supermanager-weekend-sync.timer`):
+
+```bash
+ADMIN_TOKEN=… APP_URL=http://127.0.0.1:4317 npm run weekend-sync
+```
+
+Refresca plantilla → `player-stats.json`, fixtures → `fixtures.json`, puntua via `POST /api/admin/weekly`, actualitza `meta.lineup_lock_at`.
+Unitats a `deploy/systemd/`. Log: `/var/log/supermanager-weekend-sync.log`.
+
+### Bloqueig d'alineació (tip-off)
+
+`lockAt = min(tipOff)` dels partits dels 4 equips del club per a la jornada.
+Sense tip-off publicat → alineació oberta (no s'inventen hores; msstats porta data/local-visitant/rival).
+`PUT /api/lineup` → 403 en català si bloquejada. `/api/round` exposa `lockAt`, `locked`, `nextMatches`.
+
 ## Dades
 
 Plantilles FCBQ 2026-27 a `src/data/roster.ts` (snapshot `fcbq-rosters.json`).
