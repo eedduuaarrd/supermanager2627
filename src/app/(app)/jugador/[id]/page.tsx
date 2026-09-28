@@ -1,6 +1,6 @@
 import { PlayerAvatar } from "@/components/player-avatar";
-import { PriceLabel } from "@/components/price-label";
 import { Badge } from "@/components/ui/badge";
+import { ValorBlock } from "@/components/valor-block";
 import { teamLabel } from "@/data/roster";
 import {
   dateForGame,
@@ -132,18 +132,10 @@ export default async function JugadorPage({
               <span className="truncate">{teamLabel(player.teamId)}</span>
             </Badge>
           </div>
-          <p className="mt-2 text-sm text-mute">
-            Preu{" "}
-            <PriceLabel
-              price={player.price}
-              prevPrice={player.prevPrice}
-              className="font-semibold text-bone"
-              showDelta
-              variacioLabel
-            />
-          </p>
         </div>
       </section>
+
+      <ValorBlock price={player.price} prevPrice={player.prevPrice} />
 
       {nextMatch && (
         <section className="border-b border-line/60 pb-3">

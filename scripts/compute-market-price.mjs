@@ -6,6 +6,7 @@
  */
 
 export const EUR_PER_VAL = 1_000;
+export const PRICE_PER_VAL = EUR_PER_VAL;
 export const PRICE_STEP = 500;
 export const INITIAL_PRICE = 15_000;
 export const MIN_PRICE = PRICE_STEP;
@@ -61,5 +62,27 @@ export function nextMarketEntry(avgVal, current, updatedAt = new Date().toISOStr
     avgVal: avg,
     theoretical,
     updatedAt,
+  };
+}
+
+export function round1(value) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.round(value * 10) / 10;
+}
+
+/** Single-game VAL thresholds for next tick (ACB-like broker tables). */
+export function nextValThresholds(currentPrice, k = PRICE_PER_VAL) {
+  const P =
+    !Number.isFinite(currentPrice) || currentPrice <= 0
+      ? INITIAL_PRICE
+      : currentPrice;
+  const perVal = Number.isFinite(k) && k > 0 ? k : PRICE_PER_VAL;
+  return {
+    valUp: round1((P * (1 + PRICE_CLAMP_PCT)) / perVal),
+    valHold: round1(P / perVal),
+    valDown: round1((P * (1 - PRICE_CLAMP_PCT)) / perVal),
+    priceUp: applyPriceFloor(roundToPriceStep(P * (1 + PRICE_CLAMP_PCT))),
+    priceHold: applyPriceFloor(roundToPriceStep(P)),
+    priceDown: applyPriceFloor(roundToPriceStep(P * (1 - PRICE_CLAMP_PCT))),
   };
 }

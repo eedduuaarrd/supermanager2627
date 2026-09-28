@@ -12,6 +12,8 @@
  */
 
 export const EUR_PER_VAL = 1_000;
+/** Alias used in broker docs / ACB-style single-game tables. */
+export const PRICE_PER_VAL = EUR_PER_VAL;
 export const PRICE_STEP = 500;
 /** Flat opening quote for every fantasy id until the first scoring refresh. */
 export const INITIAL_PRICE = 15_000;
@@ -126,4 +128,54 @@ export function priceDelta(
   if (prevPrice == null || !Number.isFinite(prevPrice)) return null;
   const d = price - prevPrice;
   return d === 0 ? null : d;
+}
+
+/** Round to one decimal (broker VAL tables). */
+export function round1(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.round(value * 10) / 10;
+}
+
+export type NextValThresholds = {
+  /** Game VAL to push quote to the +15% band. */
+  valUp: number;
+  /** Game VAL that holds the quote (theoretical ≈ P). */
+  valHold: number;
+  /** Game VAL at/below which quote hits the −15% band. */
+  valDown: number;
+  /** Next printed prices if move max up / hold / max down. */
+  priceUp: number;
+  priceHold: number;
+  priceDown: number;
+};
+
+/**
+ * ACB-like single-game VAL thresholds for the *next* price tick.
+ *
+ * With current quote P and PRICE_PER_VAL k:
+ *   +15%: VAL ≥ round1(P × 1.15 / k)
+ *   hold: VAL ≈ round1(P / k)
+ *   −15%: VAL ≤ round1(P × 0.85 / k)
+ *
+ * Next prices: round500(P×1.15), round500(P), round500(P×0.85), then floor 500.
+ * Actual refresh still uses season avgVal × k clamped ±15% (see computeMarketPrice).
+ */
+export function nextValThresholds(
+  currentPrice: number,
+  k: number = PRICE_PER_VAL,
+): NextValThresholds {
+  const P =
+    !Number.isFinite(currentPrice) || currentPrice <= 0
+      ? INITIAL_PRICE
+      : currentPrice;
+  const perVal = Number.isFinite(k) && k > 0 ? k : PRICE_PER_VAL;
+
+  return {
+    valUp: round1((P * (1 + PRICE_CLAMP_PCT)) / perVal),
+    valHold: round1(P / perVal),
+    valDown: round1((P * (1 - PRICE_CLAMP_PCT)) / perVal),
+    priceUp: applyPriceFloor(roundToPriceStep(P * (1 + PRICE_CLAMP_PCT))),
+    priceHold: applyPriceFloor(roundToPriceStep(P)),
+    priceDown: applyPriceFloor(roundToPriceStep(P * (1 - PRICE_CLAMP_PCT))),
+  };
 }
