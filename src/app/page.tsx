@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 export default async function Home() {
   const user = await readSession();
-  if (user) redirect("/dashboard");
+  if (user) redirect("/jornada");
 
   return (
     <main className="relative flex min-h-full flex-1 flex-col">

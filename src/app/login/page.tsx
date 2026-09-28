@@ -27,7 +27,7 @@ export default function LoginPage() {
         setError(data.error ?? "Error d'accés.");
         return;
       }
-      router.replace("/dashboard");
+      router.replace("/jornada");
       router.refresh();
     });
   }

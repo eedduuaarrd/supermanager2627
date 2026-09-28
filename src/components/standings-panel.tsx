@@ -46,6 +46,7 @@ export function StandingsPanel({
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch standings on scope change
     void load(scope);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scope]);
@@ -92,7 +93,7 @@ export function StandingsPanel({
               : "bg-transparent text-mute hover:bg-white/10 hover:text-bone"
           }
         >
-          Última jornada
+          Jornada
         </Button>
       </div>
 

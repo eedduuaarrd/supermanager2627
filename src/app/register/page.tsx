@@ -29,7 +29,7 @@ export default function RegisterPage() {
         setError(data.error ?? "No s'ha pogut registrar.");
         return;
       }
-      router.replace("/dashboard");
+      router.replace("/onboarding");
       router.refresh();
     });
   }

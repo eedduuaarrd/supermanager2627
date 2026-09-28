@@ -160,7 +160,7 @@ export function LineupBuilder({
   }
 
   return (
-    <div className="space-y-3 pb-24">
+    <div className="space-y-3 pb-8">
       {/* Compact budget strip — single source of position counts */}
       <section className="budget-strip sticky top-0 z-20 border border-line bg-panel/80 px-3 py-2.5 backdrop-blur-md">
         <div className="flex items-end justify-between gap-3">
@@ -297,7 +297,7 @@ export function LineupBuilder({
 
       {/* Sticky selected-player actions — Fantasy LaLiga style */}
       {selectedPlayer && !lineup.confirmed && pickerSlot == null && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ink/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-md">
+        <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-40 border-t border-line bg-ink/95 px-4 py-3 backdrop-blur-md">
           <div className="mx-auto flex w-full max-w-lg items-center gap-2">
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-bone">
