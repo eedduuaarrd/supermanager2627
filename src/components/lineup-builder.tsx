@@ -55,6 +55,8 @@ export function LineupBuilder({
   onChange,
   saveStatus,
   error,
+  readOnly = false,
+  lockMessage = null,
 }: LineupBuilderProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
