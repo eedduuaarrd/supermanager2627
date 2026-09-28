@@ -48,11 +48,6 @@ export function TeamChips({
             >
               {active ? <Check className="size-3.5 shrink-0" aria-hidden /> : null}
               <span className="max-w-[9rem] truncate">{t.name}</span>
-              {active ? (
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-bone/80">
-                  Actiu
-                </span>
-              ) : null}
             </button>
           );
         })}
