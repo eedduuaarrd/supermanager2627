@@ -43,7 +43,7 @@ export const TEAMS: Record<TeamId, TeamInfo> = {
   },
   "masc-b": {
     id: "masc-b",
-    label: "Sifonet B",
+    label: "Lo Sifonet B",
     fullName: "LO SIFONET CB BALAGUER B",
     competition: "2A Territorial Senior Masculí",
     fcbqId: "c057eeae-3aae-4e33-b2ab-54fabb2700ae",

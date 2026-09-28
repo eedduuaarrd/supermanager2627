@@ -56,7 +56,7 @@ interface CourtBoardProps {
   confirmed?: boolean;
   selectedId?: string | null;
   onSelect?: (id: string | null) => void;
-  onEmptySlot?: (position: Position) => void;
+  onEmptySlot?: (slot: { slotIndex: number; position: Position }) => void;
 }
 
 export function CourtBoard({
@@ -237,7 +237,11 @@ export function CourtBoard({
                     onClick={
                       confirmed || !onEmptySlot
                         ? undefined
-                        : () => onEmptySlot(slot.position)
+                        : () =>
+                            onEmptySlot({
+                              slotIndex: i,
+                              position: slot.position,
+                            })
                     }
                   />
                 )}

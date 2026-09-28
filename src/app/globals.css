@@ -188,6 +188,21 @@
   box-shadow: 0 8px 28px rgb(0 0 0 / 35%);
 }
 
+.market-sheet {
+  animation: market-sheet-up 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes market-sheet-up {
+  from {
+    opacity: 0.6;
+    transform: translateY(18%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .court-chip--selected {
   z-index: 2;
 }
