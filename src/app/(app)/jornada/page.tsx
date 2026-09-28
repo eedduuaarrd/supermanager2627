@@ -2,12 +2,11 @@
 
 import { BootGate } from "@/components/boot-gate";
 import { useManager } from "@/components/manager-provider";
-import { TeamSwitcher } from "@/components/team-switcher";
+import { TeamChips } from "@/components/team-chips";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LINEUP_SIZE } from "@/data/roster";
 import { cn } from "@/lib/utils";
-import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 
@@ -152,25 +151,20 @@ function JornadaContent() {
         <p className="text-sm text-mute">Partits nous cada setmana.</p>
       </header>
 
-      {/* 2. Equip actiu + switch / create */}
+      {/* 2. Team chips — 1-tap switch + Nou */}
       <section className="hub-fade-delay space-y-3">
         <p className="text-[11px] uppercase tracking-[0.18em] text-mute">
           Equip actiu
         </p>
 
-        {hasTeams && !createOpen && (
-          <div className="flex flex-wrap items-center gap-3">
-            <TeamSwitcher className="min-w-0 flex-1 [&_select]:h-11 [&_select]:max-w-none [&_select]:w-full [&_select]:text-sm [&_p]:text-base [&_p]:text-bone" />
-            {!atLimit && (
-              <button
-                type="button"
-                onClick={() => setCreateOpen(true)}
-                className="inline-flex h-11 shrink-0 items-center gap-1.5 border border-line px-3 text-xs font-semibold uppercase tracking-wide text-bone hover:bg-white/5"
-              >
-                <Plus className="size-3.5" /> Nou equip
-              </button>
-            )}
-          </div>
+        {hasTeams && (
+          <TeamChips
+            createOpen={createOpen}
+            onCreateOpen={() => {
+              setCreateOpen(true);
+              setError(null);
+            }}
+          />
         )}
 
         {(!hasTeams || createOpen) && (
@@ -196,7 +190,7 @@ function JornadaContent() {
                 disabled={pending || atLimit}
                 className="hub-cta h-12 flex-1 bg-grana text-sm font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
               >
-                {hasTeams ? "Crear equip" : "Nou equip"}
+                {hasTeams ? "Crear" : "Nou equip"}
               </Button>
               {hasTeams && (
                 <Button
