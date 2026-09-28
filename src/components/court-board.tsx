@@ -15,19 +15,19 @@ type SlotDef = {
 };
 
 /**
- * Fixed half-court formation (looking toward the hoop):
- * 3 pivots near basket, 3 alers mid, 2 bases at bottom.
+ * Flat half-court grid (looking toward the hoop).
+ * Each row shares one `top`; left/right symmetry via `left` only.
  * left/top mark the CHIP CIRCLE center; labels sit below outside the circle.
  */
 const SLOTS: SlotDef[] = [
-  // pivots (clear of hoop / rim)
-  { key: "pivot-0", position: "pivot", left: "18%", top: "20%" },
-  { key: "pivot-1", position: "pivot", left: "50%", top: "16%" },
-  { key: "pivot-2", position: "pivot", left: "82%", top: "20%" },
+  // pivots — one flat row below the hoop
+  { key: "pivot-0", position: "pivot", left: "18%", top: "22%" },
+  { key: "pivot-1", position: "pivot", left: "50%", top: "22%" },
+  { key: "pivot-2", position: "pivot", left: "82%", top: "22%" },
   // alers
-  { key: "aler-0", position: "aler", left: "18%", top: "48%" },
-  { key: "aler-1", position: "aler", left: "50%", top: "52%" },
-  { key: "aler-2", position: "aler", left: "82%", top: "48%" },
+  { key: "aler-0", position: "aler", left: "18%", top: "50%" },
+  { key: "aler-1", position: "aler", left: "50%", top: "50%" },
+  { key: "aler-2", position: "aler", left: "82%", top: "50%" },
   // bases
   { key: "base-0", position: "base", left: "32%", top: "78%" },
   { key: "base-1", position: "base", left: "68%", top: "78%" },
@@ -83,12 +83,12 @@ export function CourtBoard({
         >
           <defs>
             <linearGradient id="courtWood" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#c4a07a" stopOpacity="0.32" />
-              <stop offset="45%" stopColor="#a07850" stopOpacity="0.2" />
-              <stop offset="100%" stopColor="#6e5238" stopOpacity="0.28" />
+              <stop offset="0%" stopColor="#8b6a45" stopOpacity="0.55" />
+              <stop offset="40%" stopColor="#6e5336" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#3d2e1f" stopOpacity="0.55" />
             </linearGradient>
-            <radialGradient id="paintGlow" cx="50%" cy="12%" r="42%">
-              <stop offset="0%" stopColor="#c23142" stopOpacity="0.12" />
+            <radialGradient id="paintGlow" cx="50%" cy="12%" r="45%">
+              <stop offset="0%" stopColor="#c23142" stopOpacity="0.18" />
               <stop offset="100%" stopColor="#c23142" stopOpacity="0" />
             </radialGradient>
           </defs>
@@ -100,34 +100,54 @@ export function CourtBoard({
             width="92"
             height="125.333"
             fill="none"
-            stroke="rgba(255,248,235,0.55)"
-            strokeWidth="0.8"
+            stroke="rgba(236,232,225,0.42)"
+            strokeWidth="0.75"
           />
-          {/* baseline / backboard */}
+          {/* baseline */}
           <line
-            x1="28"
+            x1="4"
             y1="4"
-            x2="72"
+            x2="96"
             y2="4"
-            stroke="rgba(236,232,225,0.55)"
-            strokeWidth="1.4"
+            stroke="rgba(236,232,225,0.42)"
+            strokeWidth="0.7"
           />
-          {/* rim — court marking only; no interactive slot here */}
-          <circle
-            cx="50"
-            cy="9"
-            r="2.6"
-            fill="none"
-            stroke="rgba(194,49,66,0.75)"
-            strokeWidth="0.85"
+          {/* backboard — thick board so hoop reads as hardware, not a slot */}
+          <rect
+            x="42"
+            y="3.2"
+            width="16"
+            height="1.8"
+            rx="0.25"
+            fill="rgba(236,232,225,0.72)"
+            stroke="rgba(236,232,225,0.9)"
+            strokeWidth="0.35"
           />
+          {/* rim support */}
           <line
             x1="50"
-            y1="4"
+            y1="5"
             x2="50"
-            y2="6.4"
-            stroke="rgba(236,232,225,0.55)"
+            y2="6.6"
+            stroke="rgba(236,232,225,0.7)"
+            strokeWidth="0.55"
+          />
+          {/* hoop: tiny orange rim + ball — never reads as empty player chip */}
+          <ellipse
+            cx="50"
+            cy="7.4"
+            rx="2.1"
+            ry="0.85"
+            fill="none"
+            stroke="#e87722"
             strokeWidth="0.7"
+          />
+          <circle cx="50" cy="7.15" r="0.95" fill="#e87722" opacity="0.95" />
+          <path
+            d="M 48.2 7.6 Q 50 10.2 51.8 7.6"
+            fill="none"
+            stroke="rgba(236,232,225,0.35)"
+            strokeWidth="0.35"
           />
           {/* paint */}
           <rect
@@ -180,7 +200,7 @@ export function CourtBoard({
         </svg>
 
         <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-ink/30"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-ink/55"
           aria-hidden
         />
 
@@ -245,7 +265,7 @@ function EmptySlot({
       disabled={disabled || !onClick}
       onClick={onClick}
       className={cn(
-        "court-chip court-chip--empty relative flex h-16 w-16 flex-col items-center justify-center sm:h-[4.5rem] sm:w-[4.5rem]",
+        "court-chip court-chip--empty relative flex h-16 w-16 flex-col items-center justify-center",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grana-bright",
         "disabled:cursor-default",
       )}
@@ -253,13 +273,13 @@ function EmptySlot({
     >
       <div
         className={cn(
-          "flex h-16 w-16 items-center justify-center rounded-full sm:h-[4.5rem] sm:w-[4.5rem]",
-          "border-2 border-dashed border-bone/60",
-          "bg-white/[0.14] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] backdrop-blur-[2px]",
+          "flex h-16 w-16 items-center justify-center rounded-full",
+          "border-2 border-dashed border-bone/50",
+          "bg-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[2px]",
           !disabled && "transition active:scale-95",
         )}
       >
-        <Plus className="size-6 text-bone/90 sm:size-7" strokeWidth={2.25} />
+        <Plus className="size-6 text-bone/90" strokeWidth={2.25} />
       </div>
       <span className="pointer-events-none absolute left-1/2 top-[calc(100%+0.35rem)] -translate-x-1/2 whitespace-nowrap text-center text-[9px] font-medium uppercase tracking-[0.16em] text-bone/75">
         {POSITION_LABEL[position]}
@@ -290,7 +310,7 @@ function FilledChip({
         onSelect(isSelected ? null : player.id);
       }}
       className={cn(
-        "court-chip group relative flex h-16 w-16 flex-col items-center justify-center sm:h-[4.5rem] sm:w-[4.5rem]",
+        "court-chip group relative flex h-16 w-16 flex-col items-center justify-center",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grana-bright",
         "disabled:cursor-default",
         isCaptain && "court-chip--captain",
@@ -303,13 +323,13 @@ function FilledChip({
       }
       aria-pressed={isSelected}
     >
-      <div className="relative h-16 w-16 sm:h-[4.5rem] sm:w-[4.5rem]">
+      <div className="relative h-16 w-16">
         <PlayerAvatar
           name={player.name}
           photoUrl={player.photoUrl}
           size="lg"
           className={cn(
-            "!h-16 !w-16 rounded-full ring-2 sm:!h-[4.5rem] sm:!w-[4.5rem]",
+            "!h-16 !w-16 rounded-full ring-2",
             isSelected
               ? "ring-grana-bright shadow-[0_0_0_4px_rgba(194,49,66,0.35)]"
               : isCaptain
@@ -324,7 +344,7 @@ function FilledChip({
         )}
       </div>
 
-      <div className="pointer-events-none absolute left-1/2 top-[calc(100%+0.3rem)] w-[5.5rem] -translate-x-1/2 text-center">
+      <div className="pointer-events-none absolute left-1/2 top-[calc(100%+0.35rem)] w-[5.5rem] -translate-x-1/2 text-center">
         <p className="truncate text-[11px] font-semibold leading-tight text-bone drop-shadow">
           {shortName(player.name)}
         </p>
