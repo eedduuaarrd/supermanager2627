@@ -26,6 +26,9 @@ type ManagerContextValue = {
   budget: number;
   round: number;
   roundStatus: "open" | "closed";
+  lineupLocked: boolean;
+  lockAt: string | null;
+  lockMessage: string | null;
   lineup: Lineup;
   ready: boolean;
   bootError: string | null;
@@ -67,6 +70,9 @@ export function ManagerProvider({
   const [budget, setBudget] = useState(100_000);
   const [round, setRound] = useState(initialRound);
   const [roundStatus, setRoundStatus] = useState<"open" | "closed">("open");
+  const [lineupLocked, setLineupLocked] = useState(false);
+  const [lockAt, setLockAt] = useState<string | null>(null);
+  const [lockMessage, setLockMessage] = useState<string | null>(null);
   const [lineup, setLineup] = useState<Lineup>({
     playerIds: [],
     captainId: null,
@@ -100,6 +106,15 @@ export function ManagerProvider({
     setRound(lineupData.round);
     setRoundStatus(
       lineupData.roundStatus === "closed" ? "closed" : "open",
+    );
+    setLineupLocked(Boolean(lineupData.locked));
+    setLockAt(
+      typeof lineupData.lockAt === "string" ? lineupData.lockAt : null,
+    );
+    setLockMessage(
+      typeof lineupData.lockMessage === "string"
+        ? lineupData.lockMessage
+        : null,
     );
     setLineup(lineupData.lineup);
     setTeams(teamsData.teams ?? []);
@@ -170,6 +185,13 @@ export function ManagerProvider({
 
   const persistLineup = useCallback(
     (next: Lineup) => {
+      if (lineupLocked || roundStatus === "closed") {
+        setActionError(
+          lockMessage ??
+            "L'alineació està bloquejada. No es pot modificar.",
+        );
+        return;
+      }
       const normalized: Lineup = {
         ...next,
         confirmed: false,
@@ -187,7 +209,7 @@ export function ManagerProvider({
         if (toSave) void flushSave(toSave);
       }, AUTOSAVE_MS);
     },
-    [flushSave],
+    [flushSave, lineupLocked, lockMessage, roundStatus],
   );
 
   const applyTeamsResponse = useCallback(
@@ -304,6 +326,9 @@ export function ManagerProvider({
       budget,
       round,
       roundStatus,
+      lineupLocked,
+      lockAt,
+      lockMessage,
       lineup,
       ready,
       bootError,
@@ -327,6 +352,9 @@ export function ManagerProvider({
       budget,
       round,
       roundStatus,
+      lineupLocked,
+      lockAt,
+      lockMessage,
       lineup,
       ready,
       bootError,

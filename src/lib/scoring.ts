@@ -13,7 +13,13 @@ import {
   fantasyStatFromGame,
   getPlayerGameForRound,
 } from "@/lib/player-stats";
-import { markRoundScored, openRound, getRoundStatus } from "@/lib/rounds";
+import {
+  markRoundScored,
+  openRound,
+  getRoundStatus,
+  getLineupLockAt,
+} from "@/lib/rounds";
+import { formatLockMessageCa, isLineupLocked } from "@/lib/fixtures";
 import type { RoundScore } from "@/lib/types";
 import { parsePlayerIds, validateLineupSave } from "@/lib/game";
 import { requireActiveTeamId } from "@/lib/teams";
@@ -162,6 +168,13 @@ export function saveLineup(
     return {
       ok: false,
       error: "La jornada està tancada. L'alineació ja no es pot modificar.",
+    };
+  }
+  const lockAt = getLineupLockAt(db);
+  if (isLineupLocked(lockAt)) {
+    return {
+      ok: false,
+      error: formatLockMessageCa(lockAt!),
     };
   }
   const existing = ensureLineupRow(teamId, round);

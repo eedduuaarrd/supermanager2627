@@ -1,0 +1,90 @@
+{
+  "updatedAt": "2026-09-28T21:30:25.361442Z",
+  "source": "msstats.optimalwayconsulting.com /v1/fcbq/teams/{id}/stats games[] (cached seed)",
+  "timezone": "Europe/Madrid",
+  "notes": [
+    "tipOff is ISO only when FCBQ calendar/matchCall publishes a real start time — never invent from date alone.",
+    "Without tipOff among the jornada's club games, lineup stays open (lockAt=null).",
+    "msstats games[] returns played fixtures with date+home/away+opponent; upcoming tip-offs need calendar (often behind reCAPTCHA).",
+    "Lo Sifonet B had no games in the last successful API snapshot."
+  ],
+  "gaps": [
+    "Live FCBQ/msstats fetch requires fcbq_rc cookie (reCAPTCHA); set FCBQ_COOKIE in /etc/supermanager.env when available.",
+    "No tip-off times in msstats games[] — only calendar dates."
+  ],
+  "teams": [
+    {
+      "teamId": "masc-a",
+      "slug": "teixido-a",
+      "shortName": "Teixidó A",
+      "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
+      "fixtures": [
+        {
+          "date": "2026-09-27",
+          "tipOff": null,
+          "home": false,
+          "opponent": "C.B. TORREFARRERA A",
+          "opponentId": "38ec538a-5833-4836-86e7-1fcf2c38851a",
+          "matchCallUuid": "90e8d06b-162e-4458-a218-0846fb5cc43a",
+          "matchDayNum": 1,
+          "result": "L",
+          "teamPoints": 63,
+          "opponentPoints": 70,
+          "jornada": 1,
+          "competition": "1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE"
+        }
+      ]
+    },
+    {
+      "teamId": "masc-b",
+      "slug": "sifonet-b",
+      "shortName": "Lo Sifonet B",
+      "fcbqTeamId": "c057eeae-3aae-4e33-b2ab-54fabb2700ae",
+      "fixtures": []
+    },
+    {
+      "teamId": "fem-a",
+      "slug": "cudos-a",
+      "shortName": "Cudos A",
+      "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
+      "fixtures": [
+        {
+          "date": "2026-09-25",
+          "tipOff": null,
+          "home": true,
+          "opponent": "MECVIL MANRESA CBF B",
+          "opponentId": "3238bea0-3b0e-4c6c-8b74-df9c10039fdd",
+          "matchCallUuid": "25fe684d-5342-4350-b3df-2ba657065352",
+          "matchDayNum": 1,
+          "result": "W",
+          "teamPoints": 59,
+          "opponentPoints": 53,
+          "jornada": 1,
+          "competition": "FASE PRÈVIA"
+        }
+      ]
+    },
+    {
+      "teamId": "fem-b",
+      "slug": "farratges-b",
+      "shortName": "Farratges B",
+      "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
+      "fixtures": [
+        {
+          "date": "2026-09-26",
+          "tipOff": null,
+          "home": true,
+          "opponent": "COOPERATIVA D'IVARS CB ALPICAT",
+          "opponentId": "3c348f8a-4230-414f-9459-96423e2a77f2",
+          "matchCallUuid": "496005f9-4412-4880-babd-71645944bbaf",
+          "matchDayNum": 1,
+          "result": "W",
+          "teamPoints": 56,
+          "opponentPoints": 54,
+          "jornada": 1,
+          "competition": "FASE PRÈVIA"
+        }
+      ]
+    }
+  ]
+}

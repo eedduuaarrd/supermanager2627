@@ -1,12 +1,17 @@
 import { NextResponse } from "next/server";
 import { readSession } from "@/lib/auth";
 import { getCurrentRound } from "@/lib/db";
-import { getRoundStatus } from "@/lib/rounds";
+import { computeLineupLockAt, loadFixtures } from "@/lib/fixtures";
+import {
+  getLineupLockAt,
+  getRoundStatus,
+  setLineupLockAt,
+} from "@/lib/rounds";
 import { closeJornada, openNextJornada } from "@/lib/scoring";
 
 export const runtime = "nodejs";
 
-type WeeklyAction = "refresh" | "close" | "open" | "run";
+type WeeklyAction = "refresh" | "close" | "open" | "run" | "lock";
 
 function authorize(req: Request, bodyToken?: string): boolean {
   const adminToken = process.env.ADMIN_TOKEN;
@@ -21,16 +26,22 @@ function authorize(req: Request, bodyToken?: string): boolean {
 
 /**
  * Weekly jornada ops.
- * Body: { token?, action: "refresh"|"close"|"open"|"run" }
- * - refresh: no-op here (stats refresh is `node scripts/refresh-fcbq-stats.mjs`); returns status
+ * Body: { token?, action: "refresh"|"close"|"open"|"run"|"lock", lockAt? }
+ * - refresh: hint for scripts/weekend-sync.mjs (stats+fixtures live outside Next)
  * - close: score current jornada from FCBQ game rows, lock lineups (no advance)
  * - open: open next jornada after a close
- * - run: close + advance (score + open next) — typical weekly cron step after refresh
+ * - run: close + advance (score + open next) — typical weekend cron after refresh
+ * - lock: recompute/store lineup_lock_at from fixtures.json (or body.lockAt)
  *
  * Also accepts session cookie for logged-in admin (UI).
  */
 export async function POST(req: Request) {
-  let body: { token?: string; action?: WeeklyAction; advance?: boolean } = {};
+  let body: {
+    token?: string;
+    action?: WeeklyAction;
+    advance?: boolean;
+    lockAt?: string | null;
+  } = {};
   try {
     body = (await req.json()) as typeof body;
   } catch {
@@ -53,9 +64,36 @@ export async function POST(req: Request) {
       return NextResponse.json({
         ok: true,
         action: "refresh",
-        hint: "Executa: node scripts/refresh-fcbq-stats.mjs [--from path] i després action=run",
+        hint: "Executa: node scripts/weekend-sync.mjs (o refresh-fcbq-stats + weekly-jornada)",
         round: getCurrentRound(),
         roundStatus: getRoundStatus(),
+        lockAt: getLineupLockAt(),
+      });
+    }
+
+    if (action === "lock") {
+      const round = getCurrentRound();
+      let lockAt: string | null =
+        body.lockAt === undefined
+          ? computeLineupLockAt(round, loadFixtures())
+          : body.lockAt;
+      // Reject invented / invalid timestamps
+      if (lockAt && !Number.isFinite(Date.parse(lockAt))) {
+        return NextResponse.json(
+          { error: "lockAt ISO invàlid." },
+          { status: 400 },
+        );
+      }
+      setLineupLockAt(lockAt);
+      return NextResponse.json({
+        ok: true,
+        action: "lock",
+        round,
+        lockAt,
+        note:
+          lockAt == null
+            ? "Sense tip-off publicat: alineació oberta."
+            : "lineup_lock_at actualitzat des de fixtures.",
       });
     }
 
@@ -82,6 +120,7 @@ export async function GET() {
   return NextResponse.json({
     round: getCurrentRound(),
     roundStatus: getRoundStatus(),
-    actions: ["refresh", "close", "open", "run"],
+    lockAt: getLineupLockAt(),
+    actions: ["refresh", "close", "open", "run", "lock"],
   });
 }

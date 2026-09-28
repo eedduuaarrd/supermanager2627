@@ -1,0 +1,193 @@
+import type { TeamId } from "@/lib/types";
+import fs from "node:fs";
+import path from "node:path";
+
+export type ClubFixture = {
+  date: string | null;
+  /** Real tip-off ISO (Europe/Madrid origin). Never invented from date alone. */
+  tipOff: string | null;
+  home: boolean | null;
+  opponent: string | null;
+  opponentId?: string | null;
+  matchCallUuid?: string | null;
+  matchDayNum?: number | null;
+  result?: string | null;
+  teamPoints?: number | null;
+  opponentPoints?: number | null;
+  /** Fantasy jornada this fixture counts toward when known. */
+  jornada?: number | null;
+  competition?: string | null;
+};
+
+export type ClubTeamFixtures = {
+  fcbqTeamId: string;
+  teamId: TeamId;
+  slug: string;
+  shortName: string;
+  fixtures: ClubFixture[];
+};
+
+export type FixturesFile = {
+  updatedAt?: string;
+  source?: string;
+  timezone?: string;
+  notes?: string[];
+  gaps?: string[];
+  teams: ClubTeamFixtures[];
+};
+
+export type NextMatch = {
+  fcbqTeamId: string;
+  teamId: TeamId;
+  shortName: string;
+  opponent: string | null;
+  tipOff: string | null;
+  date: string | null;
+  home: boolean | null;
+  matchCallUuid: string | null;
+};
+
+const EMPTY: FixturesFile = { teams: [] };
+
+/** Prefer on-disk JSON so weekend sync is visible without rebuild. */
+export function loadFixtures(): FixturesFile {
+  try {
+    const filePath = path.join(process.cwd(), "src/data/fixtures.json");
+    if (fs.existsSync(filePath)) {
+      return JSON.parse(fs.readFileSync(filePath, "utf8")) as FixturesFile;
+    }
+  } catch {
+    // fall through
+  }
+  return EMPTY;
+}
+
+function tipOffMs(f: ClubFixture): number | null {
+  if (typeof f.tipOff === "string" && f.tipOff.trim()) {
+    const t = Date.parse(f.tipOff);
+    return Number.isFinite(t) ? t : null;
+  }
+  return null;
+}
+
+function dateKey(f: ClubFixture): string | null {
+  if (typeof f.date === "string" && /^\d{4}-\d{2}-\d{2}/.test(f.date)) {
+    return f.date.slice(0, 10);
+  }
+  if (typeof f.tipOff === "string" && f.tipOff.length >= 10) {
+    return f.tipOff.slice(0, 10);
+  }
+  return null;
+}
+
+/** Fixtures that count for a fantasy jornada (explicit tag, else untagged upcoming). */
+export function fixturesForJornada(
+  jornada: number,
+  file = loadFixtures(),
+): ClubFixture[] {
+  const all: ClubFixture[] = [];
+  for (const team of file.teams ?? []) {
+    for (const f of team.fixtures ?? []) {
+      if (f.jornada === jornada) all.push(f);
+    }
+  }
+  return all;
+}
+
+/**
+ * Lineup lock = earliest real tip-off among the 4 club teams for that jornada.
+ * If no tipOff is published yet, returns null (lineup stays open).
+ */
+export function computeLineupLockAt(
+  jornada: number,
+  file = loadFixtures(),
+): string | null {
+  let min: number | null = null;
+  for (const f of fixturesForJornada(jornada, file)) {
+    const ms = tipOffMs(f);
+    if (ms == null) continue;
+    if (min == null || ms < min) min = ms;
+  }
+  // Also consider untagged fixtures in the same calendar week as tagged ones
+  // only when they have tipOff — still no date-only invention.
+  if (min == null) {
+    for (const team of file.teams ?? []) {
+      for (const f of team.fixtures ?? []) {
+        if (f.jornada != null && f.jornada !== jornada) continue;
+        const ms = tipOffMs(f);
+        if (ms == null) continue;
+        if (f.jornada == null) continue;
+        if (min == null || ms < min) min = ms;
+      }
+    }
+  }
+  return min == null ? null : new Date(min).toISOString();
+}
+
+export function isLineupLocked(
+  lockAt: string | null | undefined,
+  now = new Date(),
+): boolean {
+  if (!lockAt) return false;
+  const ms = Date.parse(lockAt);
+  if (!Number.isFinite(ms)) return false;
+  return now.getTime() >= ms;
+}
+
+/** Next match per club team (by tipOff, else by date). Past-only → null row. */
+export function nextMatchesForClub(
+  now = new Date(),
+  file = loadFixtures(),
+): NextMatch[] {
+  const nowMs = now.getTime();
+  const today = now.toISOString().slice(0, 10);
+
+  return (file.teams ?? []).map((team) => {
+    const upcoming = [...(team.fixtures ?? [])]
+      .map((f) => {
+        const tip = tipOffMs(f);
+        const dk = dateKey(f);
+        let sort = tip;
+        if (sort == null && dk) {
+          // Date-only: treat as end-of-day Madrid for "upcoming" display order only.
+          sort = Date.parse(`${dk}T23:59:59+02:00`);
+        }
+        return { f, sort, tip, dk };
+      })
+      .filter((x) => {
+        if (x.tip != null) return x.tip >= nowMs;
+        if (x.dk) return x.dk >= today;
+        return false;
+      })
+      .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
+
+    const best = upcoming[0]?.f;
+    return {
+      fcbqTeamId: team.fcbqTeamId,
+      teamId: team.teamId,
+      shortName: team.shortName,
+      opponent: best?.opponent ?? null,
+      tipOff: best?.tipOff ?? null,
+      date: best?.date ?? dateKey(best ?? { date: null, tipOff: null, home: null, opponent: null }),
+      home: best?.home ?? null,
+      matchCallUuid: best?.matchCallUuid ?? null,
+    };
+  });
+}
+
+export function formatLockMessageCa(lockAt: string): string {
+  try {
+    const d = new Date(lockAt);
+    const formatted = new Intl.DateTimeFormat("ca-ES", {
+      timeZone: "Europe/Madrid",
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(d);
+    return `Alineació bloquejada des del primer tip-off del club (${formatted}). Només lectura.`;
+  } catch {
+    return "Alineació bloquejada: el primer partit del club d'aquesta jornada ja ha començat.";
+  }
+}

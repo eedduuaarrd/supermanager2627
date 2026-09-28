@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { readSession } from "@/lib/auth";
 import { getCurrentRound } from "@/lib/db";
-import { getRoundStatus } from "@/lib/rounds";
+import {
+  formatLockMessageCa,
+  isLineupLocked,
+} from "@/lib/fixtures";
+import { getLineupLockAt, getRoundStatus } from "@/lib/rounds";
 import { ensureLineupRow, saveLineup } from "@/lib/scoring";
 import { requireActiveTeamId } from "@/lib/teams";
 import { INITIAL_BUDGET, LINEUP_SIZE, resolvePlayerId } from "@/data/roster";
@@ -29,6 +33,24 @@ function lineupPayload(row: {
   };
 }
 
+function lockState() {
+  const roundStatus = getRoundStatus();
+  const lockAt = getLineupLockAt();
+  const tipLocked = isLineupLocked(lockAt);
+  const locked = roundStatus === "closed" || tipLocked;
+  return {
+    roundStatus,
+    lockAt,
+    locked,
+    lockMessage:
+      tipLocked && lockAt
+        ? formatLockMessageCa(lockAt)
+        : roundStatus === "closed"
+          ? "La jornada està tancada. No es pot modificar l'alineació."
+          : null,
+  };
+}
+
 export async function GET() {
   const user = await readSession();
   if (!user) {
@@ -36,11 +58,14 @@ export async function GET() {
   }
   const teamId = requireActiveTeamId(user.id);
   const round = getCurrentRound();
-  const roundStatus = getRoundStatus();
+  const { roundStatus, lockAt, locked, lockMessage } = lockState();
   const row = ensureLineupRow(teamId, round);
   return NextResponse.json({
     round,
     roundStatus,
+    lockAt,
+    locked,
+    lockMessage,
     budget: row.budget ?? INITIAL_BUDGET,
     teamId,
     lineup: lineupPayload(row),
@@ -52,9 +77,16 @@ export async function PUT(req: Request) {
   if (!user) {
     return NextResponse.json({ error: "Cal iniciar sessió." }, { status: 401 });
   }
-  if (getRoundStatus() === "closed") {
+  const { roundStatus, lockAt, locked, lockMessage } = lockState();
+  if (locked) {
     return NextResponse.json(
-      { error: "La jornada està tancada. No es pot modificar l'alineació." },
+      {
+        error:
+          lockMessage ??
+          "L'alineació està bloquejada. No es pot modificar.",
+        lockAt,
+        locked: true,
+      },
       { status: 403 },
     );
   }
@@ -79,7 +111,10 @@ export async function PUT(req: Request) {
   const round = getCurrentRound();
   return NextResponse.json({
     round,
-    roundStatus: getRoundStatus(),
+    roundStatus,
+    lockAt,
+    locked: false,
+    lockMessage: null,
     budget: result.row.budget,
     teamId,
     lineup: lineupPayload(result.row),

@@ -112,4 +112,34 @@ export function openRound(round: number, db = getDb()) {
        scored_at = NULL`,
   ).run(round, `Jornada ${round}`, openedAt);
   setRoundStatus("open", db);
+  // Clear previous tip-off lock; weekend sync / fixtures refresh will set the new one.
+  clearLineupLockAt(db);
+}
+
+const LOCK_META_KEY = "lineup_lock_at";
+
+/** ISO tip-off lock for the current jornada (null/empty = no schedule yet → open). */
+export function getLineupLockAt(db = getDb()): string | null {
+  ensureRoundInfrastructure(db);
+  const row = db
+    .prepare("SELECT value FROM meta WHERE key = ?")
+    .get(LOCK_META_KEY) as DbMeta | undefined;
+  const v = row?.value?.trim();
+  return v ? v : null;
+}
+
+export function setLineupLockAt(iso: string | null, db = getDb()) {
+  ensureRoundInfrastructure(db);
+  if (!iso) {
+    clearLineupLockAt(db);
+    return;
+  }
+  db.prepare(
+    `INSERT INTO meta (key, value) VALUES (?, ?)
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+  ).run(LOCK_META_KEY, iso);
+}
+
+export function clearLineupLockAt(db = getDb()) {
+  db.prepare("DELETE FROM meta WHERE key = ?").run(LOCK_META_KEY);
 }
