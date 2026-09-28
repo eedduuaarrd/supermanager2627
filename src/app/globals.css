@@ -162,3 +162,76 @@
 .animate-fade-up-delay {
   animation: fade-up 0.65s ease-out 0.1s both;
 }
+
+/* ── Court board (El teu equip) ── */
+
+.court-board {
+  background: #141820;
+  isolation: isolate;
+  animation: court-board-load 0.55s ease-out both;
+}
+
+.court-board__surface {
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 8%, rgb(155 32 48 / 18%), transparent 55%),
+    repeating-linear-gradient(
+      92deg,
+      rgb(42 34 24 / 45%) 0px,
+      rgb(26 22 18 / 35%) 14px,
+      rgb(18 21 26 / 50%) 28px
+    ),
+    linear-gradient(180deg, #1a1612 0%, #12151a 55%, #0b0d10 100%);
+}
+
+.budget-strip {
+  box-shadow: 0 8px 28px rgb(0 0 0 / 35%);
+}
+
+@keyframes court-board-load {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes court-slot-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -42%) scale(0.72);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.court-slot {
+  animation: court-slot-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--slot-i, 0) * 45ms + 80ms);
+}
+
+@keyframes captain-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(194 49 66 / 0%);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgb(194 49 66 / 18%);
+  }
+}
+
+.court-chip--captain .captain-badge {
+  animation: captain-pulse 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .court-board,
+  .court-slot,
+  .court-chip--captain .captain-badge {
+    animation: none !important;
+  }
+}

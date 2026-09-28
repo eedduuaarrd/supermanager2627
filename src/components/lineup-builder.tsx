@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CourtBoard } from "@/components/court-board";
 import {
   formatPrice,
   LINEUP_SIZE,
@@ -69,7 +70,7 @@ export function LineupBuilder({
 
   const selectedPlayers = lineup.playerIds
     .map((id) => roster.find((p) => p.id === id))
-    .filter(Boolean);
+    .filter(Boolean) as Player[];
 
   function togglePlayer(id: string) {
     if (lineup.confirmed) return;
@@ -110,30 +111,35 @@ export function LineupBuilder({
 
   return (
     <div className="space-y-4">
-      <section className="border border-line bg-panel/90 p-4">
+      {/* Premium glass budget strip */}
+      <section className="budget-strip sticky top-0 z-20 border border-line bg-panel/75 px-4 py-3 backdrop-blur-md">
         <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.22em] text-mute">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-mute">
               Mercat · Jornada {currentRound}
               {saving ? " · Desant…" : ""}
             </p>
-            <p className="mt-1 font-display text-3xl text-bone">
+            <p className="mt-0.5 font-display text-3xl leading-none text-bone">
               {formatPrice(Math.max(0, remaining))}
             </p>
-            <p className="text-sm text-mute">pressupost restant</p>
+            <p className="mt-1 text-xs text-mute">pressupost restant</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-mute">Proj. jornada</p>
-            <p className="font-display text-2xl text-grana-bright">{projected}</p>
+            <p className="text-[10px] uppercase tracking-[0.18em] text-mute">
+              Proj. jornada
+            </p>
+            <p className="font-display text-2xl leading-none text-grana-bright">
+              {projected}
+            </p>
           </div>
         </div>
-        <div className="mt-3 h-1.5 overflow-hidden bg-white/10">
+        <div className="mt-3 h-1 overflow-hidden bg-white/10">
           <div
             className="h-full bg-grana transition-all duration-500"
             style={{ width: `${spentPct}%` }}
           />
         </div>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
           {(Object.keys(LINEUP_SLOTS) as Position[]).map((pos) => (
             <Badge
               key={pos}
@@ -160,41 +166,30 @@ export function LineupBuilder({
         </div>
       </section>
 
-      <section className="overflow-hidden border border-line bg-panel/80">
-        <header className="flex items-center justify-between border-b border-line px-4 py-3">
-          <h2 className="font-display text-xl tracking-wide text-bone">
-            Alineació
-          </h2>
+      {/* Court board hero — El teu equip */}
+      <section className="overflow-hidden">
+        <header className="mb-2 flex items-center justify-between px-0.5">
+          <div>
+            <h2 className="font-display text-2xl tracking-wide text-bone">
+              El teu equip
+            </h2>
+            <p className="mt-0.5 text-xs text-mute">
+              2 bases · 3 alers · 3 pivots · el capità suma el doble
+            </p>
+          </div>
           {lineup.confirmed && (
             <Badge className="bg-emerald-700 text-white">Confirmada</Badge>
           )}
         </header>
-        {selectedPlayers.length === 0 ? (
-          <div className="px-4 py-10 text-center">
-            <p className="font-medium text-bone">Sense jugadors</p>
-            <p className="mt-1 text-sm text-mute">
-              Afegeix 2 bases, 3 alers i 3 pivots. El capità suma el doble.
-            </p>
-          </div>
-        ) : (
-          <div>
-            {selectedPlayers.map((player) =>
-              player ? (
-                <PlayerRow
-                  key={player.id}
-                  player={player}
-                  selected
-                  isCaptain={lineup.captainId === player.id}
-                  action={lineup.confirmed ? "none" : "remove"}
-                  onAction={() => togglePlayer(player.id)}
-                  onCaptain={
-                    lineup.confirmed ? undefined : () => setCaptain(player.id)
-                  }
-                />
-              ) : null,
-            )}
-          </div>
-        )}
+        <CourtBoard
+          players={selectedPlayers}
+          captainId={lineup.captainId}
+          confirmed={lineup.confirmed}
+          onRemove={
+            lineup.confirmed ? undefined : (id) => togglePlayer(id)
+          }
+          onCaptain={lineup.confirmed ? undefined : setCaptain}
+        />
       </section>
 
       {!validation.ok && selectedPlayers.length > 0 && (
@@ -241,8 +236,7 @@ export function LineupBuilder({
             Mercat CBB
           </h2>
           <p className="text-xs text-mute">
-            {roster.length} jugadors FCBQ · fotos oficials quan el CDN les
-            publiqui; si no, silueta amb inicials.
+            {roster.length} jugadors FCBQ · toca per afegir a la pista
           </p>
           <div className="flex flex-wrap gap-2">
             {(["all", "base", "aler", "pivot"] as const).map((key) => (
