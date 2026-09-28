@@ -25,6 +25,7 @@ type ManagerContextValue = {
   roster: Player[] | null;
   budget: number;
   round: number;
+  roundStatus: "open" | "closed";
   lineup: Lineup;
   ready: boolean;
   bootError: string | null;
@@ -65,6 +66,7 @@ export function ManagerProvider({
   const [roster, setRoster] = useState<Player[] | null>(null);
   const [budget, setBudget] = useState(100_000);
   const [round, setRound] = useState(initialRound);
+  const [roundStatus, setRoundStatus] = useState<"open" | "closed">("open");
   const [lineup, setLineup] = useState<Lineup>({
     playerIds: [],
     captainId: null,
@@ -96,6 +98,9 @@ export function ManagerProvider({
     setRoster(rosterData.players);
     setBudget(lineupData.budget);
     setRound(lineupData.round);
+    setRoundStatus(
+      lineupData.roundStatus === "closed" ? "closed" : "open",
+    );
     setLineup(lineupData.lineup);
     setTeams(teamsData.teams ?? []);
     setActiveTeamId(teamsData.activeTeamId ?? null);
@@ -144,6 +149,9 @@ export function ManagerProvider({
           setLineup(data.lineup);
         }
         setRound(data.round);
+        if (data.roundStatus === "open" || data.roundStatus === "closed") {
+          setRoundStatus(data.roundStatus);
+        }
         setBudget(data.budget);
         setSaveStatus("saved");
         if (savedClearTimer.current) clearTimeout(savedClearTimer.current);
@@ -295,6 +303,7 @@ export function ManagerProvider({
       roster,
       budget,
       round,
+      roundStatus,
       lineup,
       ready,
       bootError,
@@ -317,6 +326,7 @@ export function ManagerProvider({
       roster,
       budget,
       round,
+      roundStatus,
       lineup,
       ready,
       bootError,

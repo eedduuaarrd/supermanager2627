@@ -131,28 +131,36 @@ function buildFromRosters(rosters, existing) {
               ? "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
               : "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit).",
         };
+        const sameTeam = entry.games.filter((g) => g.teamId === teamId);
         const fp = fingerprint(candidate);
-        const match = entry.games.find((g) => fingerprint(g) === fp);
+        const match =
+          entry.games.find((g) => fingerprint(g) === fp) ||
+          // Plantilla PJ=1 is a single aggregate row — update in place.
+          (sameTeam.length === 1 ? sameTeam[0] : null);
+
         if (match) {
-          // Keep assigned round/jornada/date/opponent; refresh raw box fields.
-          Object.assign(match, {
-            min: candidate.min,
-            pts: candidate.pts,
-            t2c: candidate.t2c,
-            t2i: candidate.t2i,
-            t3c: candidate.t3c,
-            t3i: candidate.t3i,
-            tlc: candidate.tlc,
-            tli: candidate.tli,
-            val: candidate.val,
-            pm: candidate.pm,
-            note: candidate.note,
-            competition: candidate.competition,
-          });
-        } else if (entry.games.some((g) => g.teamId === teamId)) {
-          // Same team already has a different box — append only if clearly new.
-          entry.games.push(candidate);
+          // Preserve round/jornada/date/opponent; refresh box score fields only.
+          match.min = candidate.min;
+          match.pts = candidate.pts;
+          match.t2c = candidate.t2c;
+          match.t2i = candidate.t2i;
+          match.t3c = candidate.t3c;
+          match.t3i = candidate.t3i;
+          match.tlc = candidate.tlc;
+          match.tli = candidate.tli;
+          match.val = candidate.val;
+          match.pm = candidate.pm;
+          match.note = candidate.note;
+          match.competition = candidate.competition;
+          match.fcbqTeamId = candidate.fcbqTeamId;
+          if (match.round == null && match.jornada != null) {
+            match.round = match.jornada;
+          }
+          if (match.jornada == null && match.round != null) {
+            match.jornada = match.round;
+          }
         } else {
+          // Truly new box score — leave round null for weekly-jornada to assign.
           entry.games.push(candidate);
         }
       } else if (pj > 1) {

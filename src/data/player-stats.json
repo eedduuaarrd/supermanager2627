@@ -10,7 +10,10 @@
   "notes": [
     "When PJ=1, team-page totals equal that one game (honest seed).",
     "Person × team = distinct fantasy id (no cross-team dedupe).",
-    "Refresh: node scripts/refresh-fcbq-stats.mjs [--from path | --live]"
+    "Each game.round/jornada maps to fantasy jornada when assigned.",
+    "Do not invent future games; append only when FCBQ publishes new stats.",
+    "Refresh: node scripts/refresh-fcbq-stats.mjs [--from path]",
+    "Weekly ops: node scripts/weekly-jornada.mjs"
   ],
   "players": {
     "marc-escoda": {
@@ -21,7 +24,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
@@ -36,7 +39,8 @@
           "tli": 0,
           "val": null,
           "pm": 4,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -50,7 +54,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
@@ -65,7 +69,8 @@
           "tli": 0,
           "val": null,
           "pm": -2,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -79,7 +84,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
@@ -94,7 +99,8 @@
           "tli": 4,
           "val": null,
           "pm": 4,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -108,7 +114,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
@@ -123,7 +129,8 @@
           "tli": 4,
           "val": null,
           "pm": -3,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -137,7 +144,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
@@ -152,7 +159,8 @@
           "tli": 5,
           "val": null,
           "pm": -15,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -166,7 +174,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
@@ -181,7 +189,8 @@
           "tli": 2,
           "val": null,
           "pm": -3,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -195,7 +204,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
@@ -210,7 +219,8 @@
           "tli": 2,
           "val": null,
           "pm": 1,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -224,7 +234,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
@@ -239,7 +249,8 @@
           "tli": 1,
           "val": null,
           "pm": -15,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -253,7 +264,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
@@ -268,7 +279,8 @@
           "tli": 3,
           "val": null,
           "pm": -6,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -282,7 +294,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
@@ -297,7 +309,8 @@
           "tli": 0,
           "val": null,
           "pm": -2,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -311,7 +324,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
@@ -326,7 +339,8 @@
           "tli": 3,
           "val": null,
           "pm": 19,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -340,7 +354,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
@@ -355,7 +369,8 @@
           "tli": 2,
           "val": null,
           "pm": 18,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -369,7 +384,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
@@ -384,7 +399,8 @@
           "tli": 6,
           "val": null,
           "pm": 24,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -398,7 +414,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
@@ -413,7 +429,8 @@
           "tli": 2,
           "val": null,
           "pm": -13,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -427,7 +444,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
@@ -442,7 +459,8 @@
           "tli": 0,
           "val": null,
           "pm": 13,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -456,7 +474,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
@@ -471,7 +489,8 @@
           "tli": 2,
           "val": null,
           "pm": -12,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -485,7 +504,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
@@ -500,7 +519,8 @@
           "tli": 0,
           "val": null,
           "pm": -17,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -514,7 +534,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
@@ -529,7 +549,8 @@
           "tli": 2,
           "val": null,
           "pm": -15,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -543,7 +564,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
@@ -558,7 +579,8 @@
           "tli": 4,
           "val": null,
           "pm": 15,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -572,7 +594,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
@@ -587,7 +609,8 @@
           "tli": 5,
           "val": null,
           "pm": 7,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -601,7 +624,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
@@ -616,7 +639,8 @@
           "tli": 0,
           "val": null,
           "pm": 1,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -630,7 +654,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
@@ -645,7 +669,8 @@
           "tli": 12,
           "val": null,
           "pm": -1,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -659,7 +684,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
@@ -674,7 +699,8 @@
           "tli": 0,
           "val": null,
           "pm": 12,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -688,7 +714,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
@@ -703,7 +729,8 @@
           "tli": 5,
           "val": null,
           "pm": 0,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -717,7 +744,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
@@ -732,7 +759,8 @@
           "tli": 2,
           "val": null,
           "pm": -9,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -746,7 +774,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
@@ -761,7 +789,8 @@
           "tli": 2,
           "val": null,
           "pm": -3,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -775,7 +804,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
@@ -790,7 +819,8 @@
           "tli": 0,
           "val": null,
           "pm": -6,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -804,7 +834,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
@@ -819,7 +849,8 @@
           "tli": 4,
           "val": null,
           "pm": 11,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",
@@ -833,7 +864,7 @@
       "games": [
         {
           "date": null,
-          "round": null,
+          "round": 1,
           "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
@@ -848,7 +879,8 @@
           "tli": 0,
           "val": null,
           "pm": -2,
-          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-.",
+          "jornada": 1
         }
       ],
       "source": "fcbq-team-page-aggregate",

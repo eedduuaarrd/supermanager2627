@@ -62,7 +62,7 @@ export function StandingsPanel({
         return;
       }
       setSimMsg(
-        `Jornada ${data.round} tancada (${data.scored} equips). Rival: ${data.opponent}. Ara jornada ${data.nextRound}.`,
+        `Jornada ${data.round} tancada (${data.scored} equips, stats FCBQ). Ara jornada ${data.nextRound}.`,
       );
       onSimulated?.();
       await load(scope);
@@ -154,8 +154,9 @@ export function StandingsPanel({
             Administració
           </p>
           <p className="mt-2 text-sm text-mute">
-            Tanca la jornada actual: puntua l&apos;última alineació desada de
-            cada equip i obre la següent.
+            Tanca la jornada amb les estadístiques FCBQ d&apos;aquella setmana
+            (VAL o +/-), bloqueja les alineacions i obre la següent. No simula
+            partits inventats.
           </p>
           <Button
             type="button"
@@ -165,10 +166,10 @@ export function StandingsPanel({
           >
             {simulating ? (
               <>
-                <Loader2 className="size-4 animate-spin" /> Simulant…
+                <Loader2 className="size-4 animate-spin" /> Tancant…
               </>
             ) : (
-              "Tancar / simular jornada"
+              "Tancar jornada (stats FCBQ)"
             )}
           </Button>
           {simMsg && <p className="mt-3 text-sm text-bone">{simMsg}</p>}

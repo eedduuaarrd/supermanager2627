@@ -1,7 +1,7 @@
 import { PlayerAvatar } from "@/components/player-avatar";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice, teamLabel } from "@/data/roster";
-import { buildPlayerDetail } from "@/lib/player-stats";
+import { buildPlayerDetail, gameJornada } from "@/lib/player-stats";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -77,7 +77,7 @@ export default async function JugadorPage({
         </div>
         <div>
           <p className="text-[10px] uppercase tracking-[0.14em] text-mute">
-            Mitj. VAL
+            {summary.usesPmFallback ? "Mitj. VAL/±" : "Mitj. VAL"}
           </p>
           <p className="mt-1 font-display text-2xl tabular-nums text-grana-bright">
             {summary.avgVal == null ? "—" : fmt(summary.avgVal, 1)}
@@ -108,6 +108,10 @@ export default async function JugadorPage({
             <p className="text-sm text-mute">
               Encara no hi ha partits registrats
             </p>
+            <p className="mt-2 text-xs text-mute">
+              L&apos;historial creix cada setmana amb els partits FCBQ del club.
+              No s&apos;inventen partits futurs.
+            </p>
           </div>
         ) : (
           <ul className="divide-y divide-line border border-line">
@@ -118,18 +122,32 @@ export default async function JugadorPage({
                     <p className="text-sm font-semibold text-bone">
                       {g.opponent
                         ? `vs ${g.opponent}`
-                        : g.round
-                          ? `Jornada ${g.round}`
+                        : gameJornada(g)
+                          ? `Jornada ${gameJornada(g)}`
                           : "Partit FCBQ"}
                     </p>
                     <p className="mt-0.5 text-[11px] text-mute">
                       {teamLabel(g.teamId)}
                       {g.date ? ` · ${g.date}` : ""}
+                      {gameJornada(g) != null && g.opponent
+                        ? ` · J${gameJornada(g)}`
+                        : ""}
                     </p>
                   </div>
-                  <p className="shrink-0 font-display text-xl tabular-nums text-grana-bright">
-                    VAL {fmt(g.val, 0)}
-                  </p>
+                  <div className="shrink-0 text-right">
+                    <p className="font-display text-xl tabular-nums text-grana-bright">
+                      {g.val != null
+                        ? `VAL ${fmt(g.val, 0)}`
+                        : g.pm != null
+                          ? `+/- ${fmt(g.pm, 0)}`
+                          : "—"}
+                    </p>
+                    {g.val == null && g.pm != null && (
+                      <p className="text-[9px] uppercase tracking-wider text-mute">
+                        VAL no publicat
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <dl className="mt-3 grid grid-cols-4 gap-2 text-center sm:grid-cols-5">
                   <div>

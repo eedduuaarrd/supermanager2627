@@ -64,6 +64,26 @@ function openDb() {
   mkdirSync(dir, { recursive: true });
   const db = new Database(join(dir, "supermanager.db"));
   db.pragma("journal_mode = WAL");
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS meta (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
+  `);
+  const cur = db.prepare("SELECT value FROM meta WHERE key = ?").get("current_round");
+  if (!cur) {
+    db.prepare("INSERT INTO meta (key, value) VALUES (?, ?)").run(
+      "current_round",
+      "1",
+    );
+  }
+  const st = db.prepare("SELECT value FROM meta WHERE key = ?").get("round_status");
+  if (!st) {
+    db.prepare("INSERT INTO meta (key, value) VALUES (?, ?)").run(
+      "round_status",
+      "open",
+    );
+  }
   return db;
 }
 
