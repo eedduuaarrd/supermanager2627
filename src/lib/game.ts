@@ -6,6 +6,7 @@ import {
   OPPONENTS,
   WIN_BONUS,
   getPlayer,
+  resolvePlayerId,
 } from "@/data/roster";
 import type {
   GameState,
@@ -14,6 +15,20 @@ import type {
   RoundResult,
   RoundScore,
 } from "@/lib/types";
+
+/** Map legacy / collapsed ids → current fantasy ids; drop unknown. */
+export function migratePlayerIdList(ids: string[]): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const raw of ids) {
+    const resolved = resolvePlayerId(raw);
+    if (!resolved || seen.has(resolved)) continue;
+    seen.add(resolved);
+    out.push(resolved);
+    if (out.length >= LINEUP_SIZE) break;
+  }
+  return out;
+}
 
 export function emptyLineup(): Lineup {
   return {
@@ -71,9 +86,9 @@ export function parsePlayerIds(raw: unknown): string[] {
   }
 
   if (Array.isArray(data)) {
-    return data
-      .filter((x): x is string => typeof x === "string" && x.length > 0)
-      .slice(0, LINEUP_SIZE);
+    return migratePlayerIdList(
+      data.filter((x): x is string => typeof x === "string" && x.length > 0),
+    );
   }
 
   if (!data || typeof data !== "object") return [];
@@ -81,15 +96,17 @@ export function parsePlayerIds(raw: unknown): string[] {
   const obj = data as Record<string, unknown>;
 
   if (Array.isArray(obj.playerIds)) {
-    return obj.playerIds
-      .filter((x): x is string => typeof x === "string" && x.length > 0)
-      .slice(0, LINEUP_SIZE);
+    return migratePlayerIdList(
+      obj.playerIds.filter(
+        (x): x is string => typeof x === "string" && x.length > 0,
+      ),
+    );
   }
 
   if (Array.isArray(obj.slots)) {
-    return obj.slots
-      .filter((x): x is string => typeof x === "string" && x.length > 0)
-      .slice(0, LINEUP_SIZE);
+    return migratePlayerIdList(
+      obj.slots.filter((x): x is string => typeof x === "string" && x.length > 0),
+    );
   }
 
   if (obj.slots && typeof obj.slots === "object" && !Array.isArray(obj.slots)) {
@@ -102,17 +119,26 @@ export function parsePlayerIds(raw: unknown): string[] {
         if (typeof id === "string" && id.length > 0) ids.push(id);
       }
     }
-    return ids.slice(0, LINEUP_SIZE);
+    return migratePlayerIdList(ids);
   }
 
   return [];
 }
 
-/** True when stored JSON was not already a flat string[]. */
+/**
+ * True when stored lineup JSON needs a rewrite: legacy shapes, collapsed
+ * dual-team ids, or ids missing from the current roster.
+ */
 export function needsPlayerIdsMigration(raw: string): boolean {
   try {
     const data = JSON.parse(raw) as unknown;
-    return !Array.isArray(data);
+    if (!Array.isArray(data)) return true;
+    const asStrings = data.filter(
+      (x): x is string => typeof x === "string" && x.length > 0,
+    );
+    const migrated = migratePlayerIdList(asStrings);
+    if (migrated.length !== asStrings.length) return true;
+    return migrated.some((id, i) => id !== asStrings[i]);
   } catch {
     return true;
   }

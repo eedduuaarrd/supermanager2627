@@ -50,15 +50,12 @@ export default async function JugadorPage({
             {player.name}
           </h1>
           <div className="mt-2 flex flex-wrap gap-1.5">
-            {player.teamIds.map((tid) => (
-              <Badge
-                key={tid}
-                variant="outline"
-                className="border-white/15 text-[10px] uppercase tracking-wide text-mute"
-              >
-                {teamLabel(tid)}
-              </Badge>
-            ))}
+            <Badge
+              variant="outline"
+              className="border-white/15 text-[10px] uppercase tracking-wide text-mute"
+            >
+              {teamLabel(player.teamId)}
+            </Badge>
           </div>
           <p className="mt-2 text-sm text-mute">
             Preu{" "}

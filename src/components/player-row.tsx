@@ -28,14 +28,29 @@ export function PlayerRow({
   onAction,
   onCaptain,
 }: PlayerRowProps) {
-  const href = `/jugador/${player.id}`;
+  const href = `/jugador/${encodeURIComponent(player.id)}`;
+  const canTapRow = action === "add" && !disabled && onAction;
 
   return (
     <div
+      role={canTapRow ? "button" : undefined}
+      tabIndex={canTapRow ? 0 : undefined}
+      onClick={canTapRow ? onAction : undefined}
+      onKeyDown={
+        canTapRow
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onAction?.();
+              }
+            }
+          : undefined
+      }
       className={cn(
         "flex items-center gap-3 border-b border-line px-3 py-3 transition-colors",
         selected && "bg-grana/10",
         isCaptain && "bg-white/[0.04]",
+        canTapRow && "cursor-pointer active:bg-white/[0.06]",
         disabled && action === "add" && "opacity-45",
       )}
     >
@@ -55,15 +70,12 @@ export function PlayerRow({
                 <Crown className="size-3" /> Capità
               </Badge>
             )}
-            {player.teamIds.map((tid) => (
-              <Badge
-                key={tid}
-                variant="outline"
-                className="border-white/15 text-[10px] uppercase tracking-wide text-mute"
-              >
-                {teamLabel(tid)}
-              </Badge>
-            ))}
+            <Badge
+              variant="outline"
+              className="border-white/15 text-[10px] uppercase tracking-wide text-mute"
+            >
+              {teamLabel(player.teamId)}
+            </Badge>
           </div>
           <p className="mt-0.5 text-xs text-mute">
             {player.pts != null ? `${player.pts} pts · ` : ""}VAL {player.avgVal}{" "}

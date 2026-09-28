@@ -4,6 +4,7 @@ import {
   OPPONENTS,
   WIN_BONUS,
   getPlayer,
+  resolvePlayerId,
 } from "@/data/roster";
 import {
   getCurrentRound,
@@ -13,7 +14,6 @@ import {
 } from "@/lib/db";
 import type { RoundScore } from "@/lib/types";
 import {
-  needsPlayerIdsMigration,
   parsePlayerIds,
   validateLineupSave,
 } from "@/lib/game";
@@ -118,10 +118,22 @@ export function ensureLineupRow(userId: string, round?: number) {
 }
 
 function migrateLineupRowIfNeeded(row: DbLineup): DbLineup {
-  if (!needsPlayerIdsMigration(row.player_ids)) return row;
   const flat = parsePlayerIds(row.player_ids);
-  const captainId =
-    row.captain_id && flat.includes(row.captain_id) ? row.captain_id : null;
+  const captainId = resolveCaptainId(row.captain_id, flat);
+  const sameIds = (() => {
+    try {
+      const raw = JSON.parse(row.player_ids) as unknown;
+      return (
+        Array.isArray(raw) &&
+        raw.length === flat.length &&
+        flat.every((id, i) => id === raw[i])
+      );
+    } catch {
+      return false;
+    }
+  })();
+  if (sameIds && captainId === row.captain_id) return row;
+
   const db = getDb();
   db.prepare(
     `UPDATE lineups SET player_ids = ?, captain_id = ? WHERE user_id = ? AND round = ?`,
@@ -131,6 +143,16 @@ function migrateLineupRowIfNeeded(row: DbLineup): DbLineup {
     player_ids: JSON.stringify(flat),
     captain_id: captainId,
   };
+}
+
+function resolveCaptainId(
+  captainId: string | null,
+  playerIds: string[],
+): string | null {
+  if (!captainId) return null;
+  const mapped = resolvePlayerId(captainId);
+  if (mapped && playerIds.includes(mapped)) return mapped;
+  return null;
 }
 
 export function saveLineup(

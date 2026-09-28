@@ -1,5 +1,5 @@
 import playerStatsJson from "@/data/player-stats.json";
-import { getPlayer, TEAMS } from "@/data/roster";
+import { getPlayer, resolvePlayerId, TEAMS } from "@/data/roster";
 import type { TeamId } from "@/lib/types";
 
 export interface PlayerGameStat {
@@ -43,11 +43,15 @@ type PlayerStatsFile = {
 const DATA = playerStatsJson as unknown as PlayerStatsFile;
 
 export function getPlayerStats(playerId: string): PlayerStatsRecord | null {
-  return DATA.players[playerId] ?? null;
+  const resolved = resolvePlayerId(playerId) ?? playerId;
+  return DATA.players[resolved] ?? DATA.players[playerId] ?? null;
 }
 
 export function getPlayerGames(playerId: string): PlayerGameStat[] {
-  return getPlayerStats(playerId)?.games ?? [];
+  const player = getPlayer(playerId);
+  const games = getPlayerStats(playerId)?.games ?? [];
+  if (!player) return games;
+  return games.filter((g) => g.teamId === player.teamId);
 }
 
 /** Season summary from real game rows only — never invent zeros. */
@@ -81,16 +85,18 @@ export function summarizeGames(games: PlayerGameStat[]) {
 }
 
 export function buildPlayerDetail(playerId: string) {
-  const player = getPlayer(playerId);
+  const resolved = resolvePlayerId(playerId);
+  if (!resolved) return null;
+  const player = getPlayer(resolved);
   if (!player) return null;
 
-  const stats = getPlayerStats(playerId);
-  const games = stats?.games ?? [];
+  const stats = getPlayerStats(resolved);
+  const games = getPlayerGames(resolved);
   const summary = summarizeGames(games);
 
   return {
     player,
-    teams: player.teamIds.map((id) => TEAMS[id]),
+    teams: [TEAMS[player.teamId]],
     games,
     summary,
     meta: {

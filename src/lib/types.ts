@@ -11,9 +11,12 @@ export interface Player {
   /** Mitjana de valoració (VAL FCBQ o estimada). */
   avgVal: number;
   source: PlayerSource;
-  /** Primary FCBQ senior team (short id). */
+  /** Primary (and only) FCBQ senior team for this fantasy id. */
   teamId: TeamId;
-  /** All FCBQ teams where this player appears (dual-roster). */
+  /**
+   * Teams this fantasy row belongs to — always .
+   * Kept for UI helpers; dual-club people are separate roster rows.
+   */
   teamIds: TeamId[];
   /** Points per game from latest FCBQ sample, if any. */
   pts?: number;

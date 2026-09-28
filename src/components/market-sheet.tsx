@@ -35,7 +35,7 @@ export function MarketSheet({
 
     return TEAM_ORDER.map((teamId) => ({
       teamId,
-      players: available.filter((p) => p.teamIds.includes(teamId)),
+      players: available.filter((p) => p.teamId === teamId),
     })).filter((s) => s.players.length > 0);
   }, [open, roster, takenIds]);
 

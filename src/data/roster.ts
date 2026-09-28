@@ -13,11 +13,12 @@ import type { Player, TeamId } from "@/lib/types";
  * - FARRATGES LA NOGUERA CB BALAGUER B
  *   https://www.basquetcatala.cat/estadistica/equip/a5c75f3f-ca35-4553-9eb6-a29780eb2007
  *
- * L'FCBQ no publica número de samarreta ni posició a la fitxa d'estadística.
- * No hi ha posicions fantasy: l'alineació són 8 jugadors lliures.
+ * Regla Balaguer: persona × equip = jugador fantasy distint (no es deduplica).
+ * Ids: `slug` per un sol equip; `slug__equip` quan la mateixa persona juga a dos.
+ * L'FCBQ no publica número de samarreta. Sense posicions: alineació de 8 lliures.
  * Preus derivats de PTS + VAL + MIN de la mostra FCBQ (1 partit a la captura).
  *
- * Regles: plantilla 8, pressupost 100.000 € (mercat multi-equip ~26 jugadors).
+ * Regles: plantilla 8, pressupost 100.000 € (mercat multi-equip, 29 entrades).
  */
 
 export interface TeamInfo {
@@ -67,6 +68,14 @@ export const TEAMS: Record<TeamId, TeamInfo> = {
 
 export const TEAM_ORDER: TeamId[] = ["masc-a", "masc-b", "fem-a", "fem-b"];
 
+/** Human slug used in fantasy ids (`julia-pla__cudos-a`). */
+export const TEAM_ID_SLUG: Record<TeamId, string> = {
+  "masc-a": "teixido-a",
+  "masc-b": "sifonet-b",
+  "fem-a": "cudos-a",
+  "fem-b": "farratges-b",
+};
+
 function priceFrom(pts: number, val: number, min: number): number {
   const raw = 5_000 + pts * 700 + Math.max(val, 0) * 450 + min * 120;
   return Math.min(16_500, Math.max(4_500, Math.round(raw / 500) * 500));
@@ -104,16 +113,16 @@ export const ROSTER: Player[] = [
     photoUrl: "/players/eduard-bernat.png",
   },
   {
-    id: "toni-salud",
-    name: "Toni Salud Garcia",
+    id: "gerard-garcia",
+    name: "Gerard Garcia Rosauro",
     number: null,
     pts: 8,
-    avgVal: avgFrom(4, 8),
-    price: priceFrom(8, 4, 24.2),
+    avgVal: avgFrom(-3, 8),
+    price: priceFrom(8, -3, 26.4),
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
-    photoUrl: "/players/toni-salud.jpg",
+    photoUrl: "/players/gerard-garcia.jpg",
   },
   {
     id: "ivan-franco",
@@ -128,28 +137,16 @@ export const ROSTER: Player[] = [
     photoUrl: "/players/ivan-franco.png",
   },
   {
-    id: "gerard-garcia",
-    name: "Gerard Garcia Rosauro",
+    id: "toni-salud",
+    name: "Toni Salud Garcia",
     number: null,
     pts: 8,
-    avgVal: avgFrom(-3, 8),
-    price: priceFrom(8, -3, 26.4),
+    avgVal: avgFrom(4, 8),
+    price: priceFrom(8, 4, 24.2),
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
-    photoUrl: "/players/gerard-garcia.jpg",
-  },
-  {
-    id: "marc-escoda",
-    name: "Marc Escoda Angerri",
-    number: null,
-    pts: 6,
-    avgVal: avgFrom(4, 6),
-    price: priceFrom(6, 4, 18),
-    source: "fcbq",
-    teamId: "masc-a",
-    teamIds: ["masc-a"],
-    photoUrl: "/players/marc-escoda.jpg",
+    photoUrl: "/players/toni-salud.jpg",
   },
   {
     id: "babacar-toure",
@@ -157,18 +154,30 @@ export const ROSTER: Player[] = [
     number: null,
     pts: 6,
     avgVal: avgFrom(-15, 6),
-    price: priceFrom(6, -15, 23),
+    price: priceFrom(6, -15, 23.0),
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
     photoUrl: "/players/babacar-toure.jpg",
   },
   {
+    id: "marc-escoda",
+    name: "Marc Escoda Angerri",
+    number: null,
+    pts: 6,
+    avgVal: avgFrom(4, 6),
+    price: priceFrom(6, 4, 18.0),
+    source: "fcbq",
+    teamId: "masc-a",
+    teamIds: ["masc-a"],
+    photoUrl: "/players/marc-escoda.jpg",
+  },
+  {
     id: "gerard-soldevila",
     name: "Gerard Soldevila Casas",
     number: null,
     pts: 0,
-    avgVal: 2,
+    avgVal: avgFrom(-2, 0),
     price: priceFrom(0, -2, 16.1),
     source: "fcbq",
     teamId: "masc-a",
@@ -187,7 +196,6 @@ export const ROSTER: Player[] = [
     teamIds: ["masc-a"],
     photoUrl: "/players/roger-companys.jpg",
   },
-
   // —— Cudos Consultors CB Balaguer A (femení) ——
   {
     id: "ares-bunol",
@@ -202,17 +210,17 @@ export const ROSTER: Player[] = [
     photoUrl: "/players/ares-bunol.jpg",
   },
   {
-    id: "julia-pla",
+    id: "julia-pla__cudos-a",
     name: "Júlia Pla Pla",
     number: null,
-    pts: 15,
-    avgVal: avgFrom(18, 15),
-    price: priceFrom(15, 18, 29.4),
+    pts: 13,
+    avgVal: avgFrom(18, 13),
+    price: priceFrom(13, 18, 29.4),
     source: "fcbq",
     teamId: "fem-a",
-    teamIds: ["fem-a", "fem-b"],
+    teamIds: ["fem-a"],
     photoUrl: "/players/julia-pla.jpg",
-    note: "Apareix també a Farratges B (FCBQ).",
+    note: "També al mercat com a julia-pla__farratges-b (Farratges La Noguera CB Balaguer B).",
   },
   {
     id: "andrea-perat",
@@ -251,17 +259,17 @@ export const ROSTER: Player[] = [
     photoUrl: "/players/monica-fontanet.jpg",
   },
   {
-    id: "gueralt-sole",
+    id: "gueralt-sole__cudos-a",
     name: "Gueralt Solé Torres",
     number: null,
-    pts: 23,
-    avgVal: avgFrom(12, 23),
-    price: priceFrom(23, 12, 37.5),
+    pts: 5,
+    avgVal: avgFrom(-13, 5),
+    price: priceFrom(5, -13, 10.8),
     source: "fcbq",
-    teamId: "fem-b",
-    teamIds: ["fem-a", "fem-b"],
+    teamId: "fem-a",
+    teamIds: ["fem-a"],
     photoUrl: "/players/gueralt-sole.jpg",
-    note: "Apareix a Cudos A i Farratges B; preu/VAL agafen el millor mostreig FCBQ.",
+    note: "També al mercat com a gueralt-sole__farratges-b (Farratges La Noguera CB Balaguer B).",
   },
   {
     id: "clara-paniagua",
@@ -276,17 +284,17 @@ export const ROSTER: Player[] = [
     photoUrl: "/players/clara-paniagua.png",
   },
   {
-    id: "mariana-mballo",
+    id: "mariana-mballo__cudos-a",
     name: "Mariana Mballo Diallo",
     number: null,
-    pts: 2,
-    avgVal: avgFrom(12, 2),
-    price: priceFrom(2, 12, 23.7),
+    pts: 1,
+    avgVal: avgFrom(-12, 1),
+    price: priceFrom(1, -12, 10.6),
     source: "fcbq",
-    teamId: "fem-b",
-    teamIds: ["fem-a", "fem-b"],
+    teamId: "fem-a",
+    teamIds: ["fem-a"],
     photoUrl: "/players/mariana-mballo.jpg",
-    note: "Apareix també a Cudos A (FCBQ).",
+    note: "També al mercat com a mariana-mballo__farratges-b (Farratges La Noguera CB Balaguer B).",
   },
   {
     id: "martina-benitez",
@@ -305,15 +313,40 @@ export const ROSTER: Player[] = [
     name: "Ada Doriene Moraleda",
     number: null,
     pts: 0,
-    avgVal: 1,
-    price: priceFrom(0, -17, 13),
+    avgVal: avgFrom(-17, 0),
+    price: priceFrom(0, -17, 13.0),
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
     photoUrl: "/players/ada-dorienie.jpg",
   },
-
-  // —— Farratges La Noguera CB Balaguer B (només exclusives) ——
+  // —— Farratges La Noguera CB Balaguer B (femení) ——
+  {
+    id: "gueralt-sole__farratges-b",
+    name: "Gueralt Solé Torres",
+    number: null,
+    pts: 23,
+    avgVal: avgFrom(-1, 23),
+    price: priceFrom(23, -1, 37.5),
+    source: "fcbq",
+    teamId: "fem-b",
+    teamIds: ["fem-b"],
+    photoUrl: "/players/gueralt-sole.jpg",
+    note: "També al mercat com a gueralt-sole__cudos-a (Cudos Consultors CB Balaguer A).",
+  },
+  {
+    id: "julia-pla__farratges-b",
+    name: "Júlia Pla Pla",
+    number: null,
+    pts: 15,
+    avgVal: avgFrom(7, 15),
+    price: priceFrom(15, 7, 24.4),
+    source: "fcbq",
+    teamId: "fem-b",
+    teamIds: ["fem-b"],
+    photoUrl: "/players/julia-pla.jpg",
+    note: "També al mercat com a julia-pla__cudos-a (Cudos Consultors CB Balaguer A).",
+  },
   {
     id: "jana-roldan",
     name: "Jana Roldán Arandilla",
@@ -327,18 +360,6 @@ export const ROSTER: Player[] = [
     photoUrl: "/players/jana-roldan.jpg",
   },
   {
-    id: "nuria-jimenez",
-    name: "Núria Jiménez Aran",
-    number: null,
-    pts: 2,
-    avgVal: avgFrom(1, 2),
-    price: priceFrom(2, 1, 23),
-    source: "fcbq",
-    teamId: "fem-b",
-    teamIds: ["fem-b"],
-    photoUrl: "/players/nuria-jimenez.jpg",
-  },
-  {
     id: "abril-gracia",
     name: "Abril Gràcia Palacín",
     number: null,
@@ -349,6 +370,31 @@ export const ROSTER: Player[] = [
     teamId: "fem-b",
     teamIds: ["fem-b"],
     photoUrl: "/players/abril-gracia.jpg",
+  },
+  {
+    id: "mariana-mballo__farratges-b",
+    name: "Mariana Mballo Diallo",
+    number: null,
+    pts: 2,
+    avgVal: avgFrom(12, 2),
+    price: priceFrom(2, 12, 23.7),
+    source: "fcbq",
+    teamId: "fem-b",
+    teamIds: ["fem-b"],
+    photoUrl: "/players/mariana-mballo.jpg",
+    note: "També al mercat com a mariana-mballo__cudos-a (Cudos Consultors CB Balaguer A).",
+  },
+  {
+    id: "nuria-jimenez",
+    name: "Núria Jiménez Aran",
+    number: null,
+    pts: 2,
+    avgVal: avgFrom(1, 2),
+    price: priceFrom(2, 1, 23.0),
+    source: "fcbq",
+    teamId: "fem-b",
+    teamIds: ["fem-b"],
+    photoUrl: "/players/nuria-jimenez.jpg",
   },
   {
     id: "xenia-andreu",
@@ -367,7 +413,7 @@ export const ROSTER: Player[] = [
     name: "Gina Betbesé Sànchez",
     number: null,
     pts: 0,
-    avgVal: 1,
+    avgVal: avgFrom(-6, 0),
     price: priceFrom(0, -6, 2.7),
     source: "fcbq",
     teamId: "fem-b",
@@ -391,7 +437,7 @@ export const ROSTER: Player[] = [
     name: "Jana Alarcón Solanés",
     number: null,
     pts: 0,
-    avgVal: 1,
+    avgVal: avgFrom(-2, 0),
     price: priceFrom(0, -2, 4.2),
     source: "fcbq",
     teamId: "fem-b",
@@ -406,8 +452,8 @@ export const INITIAL_BUDGET = 100_000;
 export const CAPTAIN_MULTIPLIER = 2;
 export const WIN_BONUS = 0.2;
 
-/** GameState.version — bump when lineup/roster schema changes (no positions). */
-export const GAME_VERSION = 4;
+/** GameState.version — bump when roster ids / dual-team rule change. */
+export const GAME_VERSION = 5;
 
 export const OPPONENTS = [
   "CB Cervera",
@@ -420,8 +466,25 @@ export const OPPONENTS = [
   "Sícoris Lleida",
 ];
 
+/**
+ * Map collapsed / legacy fantasy ids → current primary-team variant.
+ * Dual-roster people previously shared one id; now person×team.
+ */
+export const LEGACY_PLAYER_ID_MAP: Record<string, string> = {
+  "julia-pla": "julia-pla__cudos-a",
+  "gueralt-sole": "gueralt-sole__farratges-b",
+  "mariana-mballo": "mariana-mballo__farratges-b",
+};
+
+export function resolvePlayerId(id: string): string | null {
+  const mapped = LEGACY_PLAYER_ID_MAP[id] ?? id;
+  return ROSTER.some((p) => p.id === mapped) ? mapped : null;
+}
+
 export function getPlayer(id: string): Player | undefined {
-  return ROSTER.find((p) => p.id === id);
+  const resolved = resolvePlayerId(id);
+  if (!resolved) return undefined;
+  return ROSTER.find((p) => p.id === resolved);
 }
 
 export function formatPrice(value: number): string {
