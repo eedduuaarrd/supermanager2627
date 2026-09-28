@@ -2,6 +2,7 @@
 
 import { BootGate } from "@/components/boot-gate";
 import { useManager } from "@/components/manager-provider";
+import { TeamManager } from "@/components/team-manager";
 import { TeamSwitcher } from "@/components/team-switcher";
 import { LINEUP_SIZE } from "@/data/roster";
 import { projectedPoints } from "@/lib/game";
@@ -51,6 +52,8 @@ function JornadaContent() {
           tanca la jornada.
         </p>
       </section>
+
+      <TeamManager />
 
       <section className="border border-line bg-panel/80 px-4 py-4">
         <div className="flex items-start justify-between gap-3">
