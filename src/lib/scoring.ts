@@ -23,6 +23,12 @@ import { formatLockMessageCa, isLineupLocked } from "@/lib/fixtures";
 import type { RoundScore } from "@/lib/types";
 import { parsePlayerIds, validateLineupSave } from "@/lib/game";
 import { requireActiveTeamId } from "@/lib/teams";
+import {
+  MAX_TRANSFERS,
+  countChangesUsed,
+  maxChangesExceededCa,
+  parseSnapshotIds,
+} from "@/lib/transfers";
 
 export type StandingRow = {
   teamId: string;
@@ -95,6 +101,16 @@ export function getStandings(
   };
 }
 
+function resolveCaptainId(
+  captainId: string | null,
+  playerIds: string[],
+): string | null {
+  if (!captainId) return null;
+  const mapped = resolvePlayerId(captainId);
+  if (mapped && playerIds.includes(mapped)) return mapped;
+  return null;
+}
+
 /** Read lineup row for a fantasy team and flatten legacy JSON if needed. */
 export function ensureLineupRow(teamId: string, round?: number) {
   const db = getDb();
@@ -104,14 +120,55 @@ export function ensureLineupRow(teamId: string, round?: number) {
     .get(teamId, r) as DbLineup | undefined;
   if (existing) return migrateLineupRowIfNeeded(existing);
 
+  const prev = db
+    .prepare(`SELECT * FROM lineups WHERE team_id = ? AND round = ?`)
+    .get(teamId, r - 1) as DbLineup | undefined;
+  const carryIds = prev ? parsePlayerIds(prev.player_ids) : [];
+  const carryCaptain = prev
+    ? resolveCaptainId(prev.captain_id, carryIds)
+    : null;
+
   db.prepare(
-    `INSERT INTO lineups (team_id, round, player_ids, captain_id, confirmed, confirmed_at, budget)
-     VALUES (?, ?, '[]', NULL, 0, NULL, ?)`,
-  ).run(teamId, r, INITIAL_BUDGET);
+    `INSERT INTO lineups
+     (team_id, round, player_ids, captain_id, confirmed, confirmed_at, budget,
+      snapshot_ids, changes_used)
+     VALUES (?, ?, ?, ?, 0, NULL, ?, ?, 0)`,
+  ).run(
+    teamId,
+    r,
+    JSON.stringify(carryIds),
+    carryCaptain,
+    INITIAL_BUDGET,
+    JSON.stringify(carryIds),
+  );
 
   return db
     .prepare("SELECT * FROM lineups WHERE team_id = ? AND round = ?")
     .get(teamId, r) as DbLineup;
+}
+
+export function resetTransferSnapshot(
+  teamId: string,
+  round: number,
+  db = getDb(),
+) {
+  const row = ensureLineupRow(teamId, round);
+  const ids = parsePlayerIds(row.player_ids);
+  db.prepare(
+    `UPDATE lineups SET snapshot_ids = ?, changes_used = 0
+     WHERE team_id = ? AND round = ?`,
+  ).run(JSON.stringify(ids), teamId, round);
+}
+
+export function resetAllTransferWindows(round?: number, db = getDb()) {
+  const r = round ?? getCurrentRound(db);
+  const teams = db.prepare("SELECT id FROM fantasy_teams").all() as {
+    id: string;
+  }[];
+  for (const t of teams) {
+    ensureLineupRow(t.id, r);
+    resetTransferSnapshot(t.id, r, db);
+  }
 }
 
 /** Convenience: ensure lineup for the user's active team. */
@@ -147,16 +204,6 @@ function migrateLineupRowIfNeeded(row: DbLineup): DbLineup {
   };
 }
 
-function resolveCaptainId(
-  captainId: string | null,
-  playerIds: string[],
-): string | null {
-  if (!captainId) return null;
-  const mapped = resolvePlayerId(captainId);
-  if (mapped && playerIds.includes(mapped)) return mapped;
-  return null;
-}
-
 export function saveLineup(
   teamId: string,
   playerIds: string[],
@@ -189,11 +236,24 @@ export function saveLineup(
   const check = validateLineupSave(playerIds, resolvedCaptain, existing.budget);
   if (!check.ok) return check;
 
+  const snapshotIds = parseSnapshotIds(existing.snapshot_ids);
+  const changesUsed = countChangesUsed(snapshotIds, playerIds);
+  if (changesUsed > MAX_TRANSFERS) {
+    return { ok: false, error: maxChangesExceededCa(MAX_TRANSFERS) };
+  }
+
   db.prepare(
     `UPDATE lineups
-     SET player_ids = ?, captain_id = ?, confirmed = 0, confirmed_at = NULL
+     SET player_ids = ?, captain_id = ?, confirmed = 0, confirmed_at = NULL,
+         changes_used = ?
      WHERE team_id = ? AND round = ?`,
-  ).run(JSON.stringify(playerIds), resolvedCaptain, teamId, round);
+  ).run(
+    JSON.stringify(playerIds),
+    resolvedCaptain,
+    changesUsed,
+    teamId,
+    round,
+  );
   return { ok: true, row: ensureLineupRow(teamId, round) };
 }
 
@@ -306,6 +366,7 @@ export function closeJornada(options?: {
       }[];
       for (const t of teams) {
         ensureLineupRow(t.id, next);
+        resetTransferSnapshot(t.id, next, db);
       }
     }
   });
@@ -341,6 +402,7 @@ export function openNextJornada(): {
     }[];
     for (const t of teams) {
       ensureLineupRow(t.id, next);
+      resetTransferSnapshot(t.id, next, db);
     }
   });
   tx();

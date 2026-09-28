@@ -6,7 +6,9 @@
  * 2) Refresh fixtures.json from msstats (best-effort; needs FCBQ_COOKIE for live)
  * 3) Tag this week's fixtures with current fantasy jornada
  * 4) Assign untagged game rows → current round; score + open next via ADMIN API
+ *    (opening next jornada resets transfer snapshots + canvis counters)
  * 5) Recompute lineup_lock_at from fixtures tip-offs (null if none published)
+ *    Transfer window: Sun 23:59 Madrid → first tip-off; max 3 canvis per team
  *
  * Usage (VPS, app running):
  *   ADMIN_TOKEN=… APP_URL=http://127.0.0.1:4317 node scripts/weekend-sync.mjs

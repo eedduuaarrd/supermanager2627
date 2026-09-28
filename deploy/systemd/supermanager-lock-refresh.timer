@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh lineup tip-off lock every morning (Europe/Madrid)
+
+[Timer]
+OnCalendar=*-*-* 08:00:00
+Timezone=Europe/Madrid
+Persistent=true
+Unit=supermanager-lock-refresh.service
+
+[Install]
+WantedBy=timers.target

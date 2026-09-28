@@ -4,8 +4,8 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 
 export const MAX_TEAMS_PER_USER = 5;
-/** 2 = multi fantasy teams; 3 = weekly jornada rounds meta. */
-export const SCHEMA_VERSION = "3";
+/** 2 = multi fantasy teams; 3 = weekly jornada rounds meta; 4 = transfer canvis. */
+export const SCHEMA_VERSION = "4";
 
 export type DbUser = {
   id: string;
@@ -33,6 +33,8 @@ export type DbLineup = {
   confirmed: number;
   confirmed_at: string | null;
   budget: number;
+  snapshot_ids: string;
+  changes_used: number;
 };
 
 export type DbRoundScore = {
@@ -309,6 +311,8 @@ export function getDb(): Database.Database {
       confirmed INTEGER NOT NULL DEFAULT 0,
       confirmed_at TEXT,
       budget INTEGER NOT NULL,
+      snapshot_ids TEXT NOT NULL DEFAULT '[]',
+      changes_used INTEGER NOT NULL DEFAULT 0,
       PRIMARY KEY (team_id, round)
     );
 
@@ -361,9 +365,59 @@ export function getDb(): Database.Database {
 
   migrateToMultiTeams(db);
   migrateWeeklyRounds(db);
+  migrateTransferWindow(db);
 
   globalForDb.__smDb = db;
   return db;
+}
+
+function migrateTransferWindow(db: Database.Database) {
+  const cols = tableColumns(db, "lineups");
+  if (!cols.includes("snapshot_ids")) {
+    db.exec(`ALTER TABLE lineups ADD COLUMN snapshot_ids TEXT NOT NULL DEFAULT '[]'`);
+  }
+  if (!cols.includes("changes_used")) {
+    db.exec(
+      `ALTER TABLE lineups ADD COLUMN changes_used INTEGER NOT NULL DEFAULT 0`,
+    );
+  }
+
+  const rows = db
+    .prepare(
+      `SELECT team_id, round, player_ids, snapshot_ids FROM lineups
+       WHERE snapshot_ids IS NULL OR snapshot_ids = '' OR snapshot_ids = '[]'`,
+    )
+    .all() as {
+    team_id: string;
+    round: number;
+    player_ids: string;
+    snapshot_ids: string;
+  }[];
+
+  const upd = db.prepare(
+    `UPDATE lineups SET snapshot_ids = ?, changes_used = 0
+     WHERE team_id = ? AND round = ?`,
+  );
+  for (const row of rows) {
+    let ids: unknown;
+    try {
+      ids = JSON.parse(row.player_ids);
+    } catch {
+      ids = [];
+    }
+    if (!Array.isArray(ids) || ids.length === 0) continue;
+    const snapEmpty =
+      !row.snapshot_ids ||
+      row.snapshot_ids === "[]" ||
+      row.snapshot_ids.trim() === "";
+    if (!snapEmpty) continue;
+    upd.run(JSON.stringify(ids), row.team_id, row.round);
+  }
+
+  db.prepare(
+    `INSERT INTO meta (key, value) VALUES (?, ?)
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+  ).run("schema_version", SCHEMA_VERSION);
 }
 
 function migrateWeeklyRounds(db: Database.Database) {

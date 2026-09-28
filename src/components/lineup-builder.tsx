@@ -28,6 +28,8 @@ interface LineupBuilderProps {
   /** Tip-off / jornada lock — court becomes read-only. */
   readOnly?: boolean;
   lockMessage?: string | null;
+  changesLabel?: string | null;
+  changesRemaining?: number | null;
 }
 
 function softProgressLabel(filled: number): string {
@@ -146,12 +148,19 @@ export function LineupBuilder({
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      {readOnly && (
+      {readOnly ? (
         <div className="shrink-0 border border-amber-500/35 bg-amber-500/10 px-3 py-2.5 text-sm text-amber-50">
           {lockMessage ??
-            "Alineació bloquejada: el primer partit del club d'aquesta jornada ja ha començat."}
+            "Finestra de transferències tancada. Només lectura fins diumenge 23:59 (Madrid)."}
         </div>
-      )}
+      ) : changesLabel ? (
+        <div className="shrink-0 border border-line bg-panel/70 px-3 py-2 text-sm text-bone">
+          <span className="font-medium text-grana-bright">{changesLabel}</span>
+          <span className="mt-0.5 block text-[11px] text-mute">
+            Un canvi = afegir un jugador que no era a l&apos;instantània (màx. 3).
+          </span>
+        </div>
+      ) : null}
       <section className="budget-strip shrink-0 border border-line bg-panel/80 px-3.5 py-2.5 backdrop-blur-md sm:py-3">
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">

@@ -17,6 +17,15 @@ export const MAX_TEAMS = 5;
 
 export type SaveStatus = "idle" | "saving" | "saved" | "error";
 
+export type TransferInfo = {
+  windowOpen: boolean;
+  changesUsed: number;
+  changesRemaining: number;
+  maxChanges: number;
+  nextWindowAt: string | null;
+  message: string | null;
+};
+
 type ManagerContextValue = {
   user: SessionUser;
   teams: FantasyTeamInfo[];
@@ -29,6 +38,7 @@ type ManagerContextValue = {
   lineupLocked: boolean;
   lockAt: string | null;
   lockMessage: string | null;
+  transfer: TransferInfo | null;
   lineup: Lineup;
   ready: boolean;
   bootError: string | null;
@@ -73,6 +83,7 @@ export function ManagerProvider({
   const [lineupLocked, setLineupLocked] = useState(false);
   const [lockAt, setLockAt] = useState<string | null>(null);
   const [lockMessage, setLockMessage] = useState<string | null>(null);
+  const [transfer, setTransfer] = useState<TransferInfo | null>(null);
   const [lineup, setLineup] = useState<Lineup>({
     playerIds: [],
     captainId: null,
@@ -116,6 +127,20 @@ export function ManagerProvider({
         ? lineupData.lockMessage
         : null,
     );
+    const t = lineupData.transfer;
+    if (t && typeof t === "object") {
+      setTransfer({
+        windowOpen: Boolean(t.windowOpen),
+        changesUsed: Number(t.changesUsed ?? 0),
+        changesRemaining: Number(t.changesRemaining ?? 0),
+        maxChanges: Number(t.maxChanges ?? 3),
+        nextWindowAt:
+          typeof t.nextWindowAt === "string" ? t.nextWindowAt : null,
+        message: typeof t.message === "string" ? t.message : null,
+      });
+    } else {
+      setTransfer(null);
+    }
     setLineup(lineupData.lineup);
     setTeams(teamsData.teams ?? []);
     setActiveTeamId(teamsData.activeTeamId ?? null);
@@ -168,6 +193,20 @@ export function ManagerProvider({
           setRoundStatus(data.roundStatus);
         }
         setBudget(data.budget);
+        if (data.transfer && typeof data.transfer === "object") {
+          const t = data.transfer;
+          setTransfer({
+            windowOpen: Boolean(t.windowOpen),
+            changesUsed: Number(t.changesUsed ?? 0),
+            changesRemaining: Number(t.changesRemaining ?? 0),
+            maxChanges: Number(t.maxChanges ?? 3),
+            nextWindowAt:
+              typeof t.nextWindowAt === "string" ? t.nextWindowAt : null,
+            message: typeof t.message === "string" ? t.message : null,
+          });
+          if (typeof t.message === "string") setLockMessage(t.message);
+        }
+        if (typeof data.locked === "boolean") setLineupLocked(data.locked);
         setSaveStatus("saved");
         if (savedClearTimer.current) clearTimeout(savedClearTimer.current);
         savedClearTimer.current = setTimeout(() => {
@@ -329,6 +368,7 @@ export function ManagerProvider({
       lineupLocked,
       lockAt,
       lockMessage,
+      transfer,
       lineup,
       ready,
       bootError,
@@ -355,6 +395,7 @@ export function ManagerProvider({
       lineupLocked,
       lockAt,
       lockMessage,
+      transfer,
       lineup,
       ready,
       bootError,

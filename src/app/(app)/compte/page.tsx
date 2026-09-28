@@ -64,6 +64,10 @@ export default function ComptePage() {
           <li>Pressupost 100.000 € per equip</li>
           <li>{BUY_SELL_RULE_CA}</li>
           <li>Capità ×2 als punts de jornada</li>
+          <li>
+            Finestra de transferències: diumenge 23:59 (Madrid) → primer tip-off;
+            màxim 3 canvis (afegir un jugador nou vs l&apos;instantània)
+          </li>
           <li>Cada setmana, jornada nova amb els partits del club</li>
           <li>{VAL_FORMULA_FOOTNOTE_CA}</li>
           <li>{MARKET_PRICE_FOOTNOTE_CA}</li>

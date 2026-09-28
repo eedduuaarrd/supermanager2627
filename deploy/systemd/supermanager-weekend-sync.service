@@ -1,0 +1,14 @@
+[Unit]
+Description=Supermanager Balaguer weekend sync (stats, score, transfer window, tip-off lock)
+After=network.target supermanager.service
+Wants=supermanager.service
+
+[Service]
+Type=oneshot
+User=ebernat
+WorkingDirectory=/home/ebernat/supermanager
+EnvironmentFile=/etc/supermanager.env
+Environment=APP_URL=http://127.0.0.1:4317
+Environment=DATA_DIR=/home/ebernat/supermanager/data
+ExecStart=/usr/bin/node /home/ebernat/supermanager/scripts/weekend-sync.mjs
+Nice=10

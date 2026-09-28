@@ -1,0 +1,11 @@
+[Unit]
+Description=Supermanager Balaguer tip-off lock refresh from fixtures
+After=network.target supermanager.service
+
+[Service]
+Type=oneshot
+User=ebernat
+WorkingDirectory=/home/ebernat/supermanager
+EnvironmentFile=/etc/supermanager.env
+Environment=APP_URL=http://127.0.0.1:4317
+ExecStart=/usr/bin/curl -sS -X POST http://127.0.0.1:4317/api/admin/weekly -H 'content-type: application/json' -H "x-admin-token: ${ADMIN_TOKEN}" -d '{"action":"lock"}'

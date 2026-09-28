@@ -10,6 +10,10 @@ import { ensureLineupRow, saveLineup } from "@/lib/scoring";
 import { requireActiveTeamId } from "@/lib/teams";
 import { INITIAL_BUDGET, LINEUP_SIZE, resolvePlayerId } from "@/data/roster";
 import { parsePlayerIds } from "@/lib/game";
+import {
+  buildTransferState,
+  parseSnapshotIds,
+} from "@/lib/transfers";
 
 export const runtime = "nodejs";
 
@@ -38,17 +42,38 @@ function lockState() {
   const lockAt = getLineupLockAt();
   const tipLocked = isLineupLocked(lockAt);
   const locked = roundStatus === "closed" || tipLocked;
+  const tipMessage =
+    tipLocked && lockAt
+      ? formatLockMessageCa(lockAt)
+      : roundStatus === "closed"
+        ? "La jornada està tancada. No es pot modificar l'alineació."
+        : null;
   return {
     roundStatus,
     lockAt,
     locked,
-    lockMessage:
-      tipLocked && lockAt
-        ? formatLockMessageCa(lockAt)
-        : roundStatus === "closed"
-          ? "La jornada està tancada. No es pot modificar l'alineació."
-          : null,
+    tipLocked,
+    tipMessage,
   };
+}
+
+function transferPayload(
+  row: {
+    player_ids: string;
+    snapshot_ids?: string;
+    changes_used?: number;
+  },
+  lock: ReturnType<typeof lockState>,
+) {
+  const currentIds = parsePlayerIds(row.player_ids);
+  const snapshotIds = parseSnapshotIds(row.snapshot_ids);
+  return buildTransferState({
+    windowOpen: !lock.locked,
+    snapshotIds,
+    currentIds,
+    lockAt: lock.lockAt,
+    tipLockMessage: lock.tipMessage,
+  });
 }
 
 export async function GET() {
@@ -58,14 +83,16 @@ export async function GET() {
   }
   const teamId = requireActiveTeamId(user.id);
   const round = getCurrentRound();
-  const { roundStatus, lockAt, locked, lockMessage } = lockState();
+  const lock = lockState();
   const row = ensureLineupRow(teamId, round);
+  const transfer = transferPayload(row, lock);
   return NextResponse.json({
     round,
-    roundStatus,
-    lockAt,
-    locked,
-    lockMessage,
+    roundStatus: lock.roundStatus,
+    lockAt: lock.lockAt,
+    locked: lock.locked,
+    lockMessage: transfer.message,
+    transfer,
     budget: row.budget ?? INITIAL_BUDGET,
     teamId,
     lineup: lineupPayload(row),
@@ -77,15 +104,23 @@ export async function PUT(req: Request) {
   if (!user) {
     return NextResponse.json({ error: "Cal iniciar sessió." }, { status: 401 });
   }
-  const { roundStatus, lockAt, locked, lockMessage } = lockState();
-  if (locked) {
+  const lock = lockState();
+  if (lock.locked) {
+    const transfer = buildTransferState({
+      windowOpen: false,
+      snapshotIds: [],
+      currentIds: [],
+      lockAt: lock.lockAt,
+      tipLockMessage: lock.tipMessage,
+    });
     return NextResponse.json(
       {
         error:
-          lockMessage ??
+          transfer.message ??
           "L'alineació està bloquejada. No es pot modificar.",
-        lockAt,
+        lockAt: lock.lockAt,
         locked: true,
+        transfer,
       },
       { status: 403 },
     );
@@ -109,19 +144,20 @@ export async function PUT(req: Request) {
   }
 
   const round = getCurrentRound();
+  const transfer = transferPayload(result.row, lock);
   return NextResponse.json({
     round,
-    roundStatus,
-    lockAt,
+    roundStatus: lock.roundStatus,
+    lockAt: lock.lockAt,
     locked: false,
-    lockMessage: null,
+    lockMessage: transfer.message,
+    transfer,
     budget: result.row.budget,
     teamId,
     lineup: lineupPayload(result.row),
   });
 }
 
-/** Alias for older clients — same as PUT. */
 export async function POST(req: Request) {
   return PUT(req);
 }
