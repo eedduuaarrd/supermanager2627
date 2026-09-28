@@ -20,27 +20,34 @@ const NAV = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const isEquip = pathname === "/equip" || pathname.startsWith("/equip/");
 
   return (
-    <div className="flex min-h-full flex-1 flex-col">
-      <header className="sticky top-0 z-30 border-b border-line bg-ink/90 backdrop-blur-md">
-        <div className="mx-auto flex h-14 max-w-lg items-center px-4">
-          <Link href="/jornada" className="font-display text-xl text-bone">
+    <div className="flex h-dvh min-h-0 flex-col overflow-hidden">
+      <header className="z-30 shrink-0 border-b border-line bg-ink/90 backdrop-blur-md">
+        <div className="mx-auto flex h-11 max-w-lg items-center px-4">
+          <Link href="/jornada" className="font-display text-lg text-bone">
             Supermanager
             <span className="text-grana-bright"> Balaguer</span>
           </Link>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-lg flex-1 px-4 pb-[calc(4.75rem+env(safe-area-inset-bottom))] pt-4">
+      <main
+        className={cn(
+          "mx-auto flex w-full max-w-lg min-h-0 flex-1 flex-col px-4 pt-2",
+          "pb-[calc(3.5rem+env(safe-area-inset-bottom))]",
+          isEquip ? "overflow-hidden" : "overflow-y-auto overscroll-contain",
+        )}
+      >
         {children}
       </main>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ink/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md"
+        className="fixed inset-x-0 bottom-0 z-40 shrink-0 border-t border-line bg-ink/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md"
         aria-label="Navegació principal"
       >
-        <ul className="mx-auto grid h-16 max-w-lg grid-cols-4">
+        <ul className="mx-auto grid h-14 max-w-lg grid-cols-4">
           {NAV.map(({ href, label, icon: Icon }) => {
             const active =
               pathname === href || pathname.startsWith(`${href}/`);

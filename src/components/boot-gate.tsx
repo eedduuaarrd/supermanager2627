@@ -11,7 +11,7 @@ export function BootGate({ children }: { children: ReactNode }) {
 
   if (!ready) {
     return (
-      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3 text-center">
+      <div className="flex h-full min-h-0 flex-col items-center justify-center gap-3 text-center">
         <Loader2 className="size-8 animate-spin text-mute" />
         <p className="text-mute">Carregant…</p>
       </div>
@@ -20,7 +20,7 @@ export function BootGate({ children }: { children: ReactNode }) {
 
   if (bootError || !roster) {
     return (
-      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center">
+      <div className="flex h-full min-h-0 flex-col items-center justify-center gap-4 text-center">
         <AlertTriangle className="size-10 text-grana-bright" />
         <h2 className="font-display text-3xl text-bone">Error de càrrega</h2>
         <p className="text-mute">{bootError}</p>
@@ -35,5 +35,5 @@ export function BootGate({ children }: { children: ReactNode }) {
     );
   }
 
-  return children;
+  return <div className="flex h-full min-h-0 flex-col">{children}</div>;
 }

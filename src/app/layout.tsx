@@ -23,9 +23,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ca"
-      className={`${display.variable} ${sans.variable} h-full antialiased`}
+      className={`${display.variable} ${sans.variable} h-dvh antialiased`}
     >
-      <body className="arena-bg min-h-full flex flex-col font-sans text-bone">
+      <body className="arena-bg flex h-dvh min-h-0 flex-col overflow-hidden font-sans text-bone">
         {children}
       </body>
     </html>
