@@ -35,10 +35,12 @@
           "tlc": 2,
           "tli": 2,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -3,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 19
     },
     "eduard-bernat": {
       "playerId": "eduard-bernat",
@@ -62,10 +64,12 @@
           "tlc": 2,
           "tli": 3,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -6,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 20
     },
     "toni-salud": {
       "playerId": "toni-salud",
@@ -89,10 +93,12 @@
           "tlc": 1,
           "tli": 4,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": 4,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 43
     },
     "ivan-franco": {
       "playerId": "ivan-franco",
@@ -116,10 +122,12 @@
           "tlc": 4,
           "tli": 5,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -15,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 6
     },
     "gerard-garcia": {
       "playerId": "gerard-garcia",
@@ -143,10 +151,12 @@
           "tlc": 2,
           "tli": 4,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -3,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 0
     },
     "marc-escoda": {
       "playerId": "marc-escoda",
@@ -170,10 +180,12 @@
           "tlc": 0,
           "tli": 0,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": 4,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 24
     },
     "babacar-toure": {
       "playerId": "babacar-toure",
@@ -197,10 +209,12 @@
           "tlc": 0,
           "tli": 1,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -15,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 68
     },
     "gerard-soldevila": {
       "playerId": "gerard-soldevila",
@@ -224,10 +238,12 @@
           "tlc": 0,
           "tli": 0,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -2,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 26
     },
     "roger-companys": {
       "playerId": "roger-companys",
@@ -251,10 +267,12 @@
           "tlc": 0,
           "tli": 2,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": 1,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 8
     },
     "ares-bunol": {
       "playerId": "ares-bunol",
@@ -278,10 +296,12 @@
           "tlc": 4,
           "tli": 6,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": 24,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 11
     },
     "julia-pla__cudos-a": {
       "playerId": "julia-pla__cudos-a",
@@ -305,10 +325,12 @@
           "tlc": 2,
           "tli": 2,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": 18,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 13
     },
     "andrea-perat": {
       "playerId": "andrea-perat",
@@ -332,10 +354,12 @@
           "tlc": 2,
           "tli": 3,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": 19,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 21
     },
     "neus-escoda": {
       "playerId": "neus-escoda",
@@ -359,10 +383,12 @@
           "tlc": 2,
           "tli": 4,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": 15,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 88
     },
     "monica-fontanet": {
       "playerId": "monica-fontanet",
@@ -386,10 +412,12 @@
           "tlc": 0,
           "tli": 0,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": 13,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 95
     },
     "queralt-sole__cudos-a": {
       "playerId": "queralt-sole__cudos-a",
@@ -413,10 +441,12 @@
           "tlc": 1,
           "tli": 2,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -13,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 23
     },
     "clara-paniagua": {
       "playerId": "clara-paniagua",
@@ -440,10 +470,12 @@
           "tlc": 0,
           "tli": 0,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -2,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 10
     },
     "mariama-mballo__cudos-a": {
       "playerId": "mariama-mballo__cudos-a",
@@ -467,10 +499,12 @@
           "tlc": 1,
           "tli": 2,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -12,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 27
     },
     "martina-benitez": {
       "playerId": "martina-benitez",
@@ -494,10 +528,12 @@
           "tlc": 1,
           "tli": 2,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -15,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 79
     },
     "ada-domene": {
       "playerId": "ada-domene",
@@ -521,10 +557,12 @@
           "tlc": 0,
           "tli": 0,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -17,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 24
     },
     "queralt-sole__farratges-b": {
       "playerId": "queralt-sole__farratges-b",
@@ -548,10 +586,12 @@
           "tlc": 7,
           "tli": 12,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -1,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 23
     },
     "julia-pla__farratges-b": {
       "playerId": "julia-pla__farratges-b",
@@ -575,10 +615,12 @@
           "tlc": 3,
           "tli": 5,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": 7,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 13
     },
     "jana-roldan": {
       "playerId": "jana-roldan",
@@ -602,10 +644,12 @@
           "tlc": 5,
           "tli": 5,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": 0,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 8
     },
     "nuria-jimenez": {
       "playerId": "nuria-jimenez",
@@ -629,10 +673,12 @@
           "tlc": 0,
           "tli": 0,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": 1,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 30
     },
     "mariama-mballo__farratges-b": {
       "playerId": "mariama-mballo__farratges-b",
@@ -656,10 +702,12 @@
           "tlc": 0,
           "tli": 0,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": 12,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 27
     },
     "abril-gracia": {
       "playerId": "abril-gracia",
@@ -683,10 +731,12 @@
           "tlc": 2,
           "tli": 2,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -3,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 33
     },
     "xenia-andreu": {
       "playerId": "xenia-andreu",
@@ -710,10 +760,12 @@
           "tlc": 1,
           "tli": 2,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -9,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 93
     },
     "gina-betbese": {
       "playerId": "gina-betbese",
@@ -737,10 +789,12 @@
           "tlc": 0,
           "tli": 0,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -6,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 11
     },
     "gina-trilla": {
       "playerId": "gina-trilla",
@@ -764,10 +818,12 @@
           "tlc": 0,
           "tli": 4,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": 11,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 25
     },
     "jana-alarcon": {
       "playerId": "jana-alarcon",
@@ -791,10 +847,12 @@
           "tlc": 0,
           "tli": 0,
           "val": null,
-          "note": "Mostreig FCBQ (PJ=1 a la fitxa d'equip; totals = aquest partit)."
+          "pm": -2,
+          "note": "Mostreig FCBQ (PJ=1). VAL no publicat a Plantilla; PM = +/-."
         }
       ],
-      "source": "fcbq-team-page-aggregate"
+      "source": "fcbq-team-page-aggregate",
+      "number": 24
     }
   }
 }
