@@ -118,7 +118,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
-    photoUrl: null,
+    photoUrl: "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_0637491b1-35a9-4ca9-86d7-2323df5404e3.jpg",
   },
   {
     id: "ivan-franco",
@@ -131,7 +131,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
-    photoUrl: null,
+    photoUrl: "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_466700_2d99d5bb-2ed4-4b0e-979f-d2766cb091e2.png",
   },
   {
     id: "gerard-garcia",
@@ -144,7 +144,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
-    photoUrl: null,
+    photoUrl: "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_074b432d0-55fc-45d5-9335-5ea7ce569baa.jpg",
   },
   {
     id: "marc-escoda",
@@ -157,7 +157,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
-    photoUrl: null,
+    photoUrl: "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_227692_ec30a116-abce-4144-9f16-6573f8e178c7.jpg",
   },
   {
     id: "babacar-toure",
@@ -170,7 +170,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
-    photoUrl: null,
+    photoUrl: "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_383137_ad007b3a-1b53-4616-9dad-713002f13d3c.jpg",
   },
   {
     id: "gerard-soldevila",
@@ -183,7 +183,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
-    photoUrl: null,
+    photoUrl: "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_45890_caec6ef8-213e-413c-bf4c-c334a2c5845f.jpg",
   },
   {
     id: "roger-companys",
@@ -196,7 +196,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "masc-a",
     teamIds: ["masc-a"],
-    photoUrl: null,
+    photoUrl: "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_293807_dd8246e8-6ad4-4f66-b36e-8ea2708a878d.jpg",
   },
 
   // —— Cudos Consultors CB Balaguer A (femení) ——
@@ -211,7 +211,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
-    photoUrl: null,
+    photoUrl: "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_329267_85505692-5d90-43c4-b5c1-03e7cd74437e.jpg",
   },
   {
     id: "julia-pla",
@@ -224,7 +224,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a", "fem-b"],
-    photoUrl: null,
+    photoUrl: "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_012cb9cdd-c129-4346-9ea6-7aee03c4f29a.jpg",
     note: "Apareix també a Farratges B (FCBQ).",
   },
   {
@@ -238,7 +238,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
-    photoUrl: null,
+    photoUrl: "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_0e63a3f12-bfe0-4240-8602-bbec0df1b7de.jpeg",
   },
   {
     id: "neus-escoda",
@@ -251,7 +251,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
-    photoUrl: null,
+    photoUrl: "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_09958ef53-48ee-42c1-96be-80493b36c5ec.jpg",
   },
   {
     id: "monica-fontanet",
@@ -264,7 +264,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
-    photoUrl: null,
+    photoUrl: "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_361373_44327862-1395-4f87-87d8-03562bc8483b.jpg",
   },
   {
     id: "gueralt-sole",
@@ -277,7 +277,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-a", "fem-b"],
-    photoUrl: null,
+    photoUrl: "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_332647_8d29bda3-c7a2-40b2-bf88-6f035e592415.jpg",
     note: "Apareix a Cudos A i Farratges B; preu/VAL agafen el millor mostreig FCBQ.",
   },
   {
@@ -291,7 +291,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
-    photoUrl: null,
+    photoUrl: "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_269827_b9c8396e-3b72-48d2-911a-4c993eef56d5.png",
   },
   {
     id: "mariana-mballo",
@@ -304,7 +304,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-a", "fem-b"],
-    photoUrl: null,
+    photoUrl: "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_0eacea48f-fafe-49ed-8a1e-6a419c064096.jpeg",
     note: "Apareix també a Cudos A (FCBQ).",
   },
   {
@@ -318,7 +318,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
-    photoUrl: null,
+    photoUrl: "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_337373_4d33f03a-b1cd-4ec4-8eed-e21d6d115f70.jpg",
   },
   {
     id: "ada-dorienie",
@@ -331,7 +331,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-a",
     teamIds: ["fem-a"],
-    photoUrl: null,
+    photoUrl: "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_374656_6d535a3b-dced-4e68-8646-f08e8cd24978.jpeg",
   },
 
   // —— Farratges La Noguera CB Balaguer B (només exclusives) ——
@@ -346,7 +346,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
-    photoUrl: null,
+    photoUrl: "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_352802_c6406ff0-012b-4691-810b-3082a9018d1b.jpg",
   },
   {
     id: "nuria-jimenez",
@@ -359,7 +359,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
-    photoUrl: null,
+    photoUrl: "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_0bba2ba64-94e1-44f0-bfa5-b441eee44573.jpeg",
   },
   {
     id: "abril-gracia",
@@ -372,7 +372,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
-    photoUrl: null,
+    photoUrl: "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_362772_d3e3c61a-da18-4d2b-b21e-dec63b10543d.jpeg",
   },
   {
     id: "xenia-andreu",
@@ -385,7 +385,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
-    photoUrl: null,
+    photoUrl: "https://d1wppq8sjja81z.cloudfront.net/basquet/FED_FOTO/Thumbs/PER_0_3a38f87b-57f2-4720-85d9-044331505379.jpg",
   },
   {
     id: "gina-betbese",
@@ -398,7 +398,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
-    photoUrl: null,
+    photoUrl: "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_01f6a9dc4-8527-4389-a112-0c50d40a6af8.jpeg",
   },
   {
     id: "gina-trilla",
@@ -411,7 +411,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
-    photoUrl: null,
+    photoUrl: "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_0d1b4bcd5-3781-4bc2-a1e6-9b1bfd28d6e0.jpg",
   },
   {
     id: "jana-alarcon",
@@ -424,7 +424,7 @@ export const ROSTER: Player[] = [
     source: "fcbq",
     teamId: "fem-b",
     teamIds: ["fem-b"],
-    photoUrl: null,
+    photoUrl: "https://playofffederacions.s3.eu-west-1.amazonaws.com/basquet/FED_FOTO/Thumbs/PER_0fc175a7e-6f7a-4ae5-ac9d-5acbea3a61ea.jpg",
   },
 ];
 
