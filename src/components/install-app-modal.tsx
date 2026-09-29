@@ -107,17 +107,65 @@ function PlatformLabel({ children }: { children: ReactNode }) {
   );
 }
 
+function StepNumber({ n }: { n: number }) {
+  return (
+    <span
+      className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-grana/90 text-[0.65rem] font-bold text-bone"
+      aria-hidden
+    >
+      {n}
+    </span>
+  );
+}
+
 function AndroidInstallSteps() {
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       <PlatformLabel>Android</PlatformLabel>
-      <p className="text-sm leading-snug text-bone/85">
-        Menú
-        <IconChip>
-          <ChromeMenuIcon />
-        </IconChip>
-        → «Afegeix a la pantalla d&apos;inici»
-      </p>
+      <ol className="list-none space-y-2.5 text-sm leading-snug text-bone/85">
+        <li className="flex gap-2.5">
+          <StepNumber n={1} />
+          <span>
+            Obriu{" "}
+            <span className="font-semibold text-bone">supercbb.com</span> amb{" "}
+            <span className="font-semibold text-bone">Chrome</span>.
+          </span>
+        </li>
+        <li className="flex gap-2.5">
+          <StepNumber n={2} />
+          <span>
+            Toqueu el menú{" "}
+            <span className="font-semibold text-bone">⋮</span> (tres punts) a
+            dalt a la dreta
+            <IconChip>
+              <ChromeMenuIcon />
+            </IconChip>
+            .
+          </span>
+        </li>
+        <li className="flex gap-2.5">
+          <StepNumber n={3} />
+          <span>
+            Toqueu{" "}
+            <span className="font-semibold text-bone">
+              «Instal·lar l&apos;app»
+            </span>{" "}
+            o{" "}
+            <span className="font-semibold text-bone">
+              «Afegeix a la pantalla d&apos;inici»
+            </span>
+            .
+          </span>
+        </li>
+        <li className="flex gap-2.5">
+          <StepNumber n={4} />
+          <span>
+            Confirmeu{" "}
+            <span className="font-semibold text-bone">«Instal·la»</span> /{" "}
+            <span className="font-semibold text-bone">«Afegeix»</span>.
+          </span>
+        </li>
+      </ol>
     </div>
   );
 }
@@ -128,12 +176,7 @@ function IphoneInstallSteps() {
       <PlatformLabel>iPhone</PlatformLabel>
       <ol className="list-none space-y-2.5 text-sm leading-snug text-bone/85">
         <li className="flex gap-2.5">
-          <span
-            className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-grana/90 text-[0.65rem] font-bold text-bone"
-            aria-hidden
-          >
-            1
-          </span>
+          <StepNumber n={1} />
           <span>
             Obriu{" "}
             <span className="font-semibold text-bone">supercbb.com</span> amb{" "}
@@ -142,12 +185,7 @@ function IphoneInstallSteps() {
           </span>
         </li>
         <li className="flex gap-2.5">
-          <span
-            className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-grana/90 text-[0.65rem] font-bold text-bone"
-            aria-hidden
-          >
-            2
-          </span>
+          <StepNumber n={2} />
           <span>
             Toqueu el botó{" "}
             <span className="font-semibold text-bone">Compartir</span> a la barra
@@ -159,12 +197,7 @@ function IphoneInstallSteps() {
           </span>
         </li>
         <li className="flex gap-2.5">
-          <span
-            className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-grana/90 text-[0.65rem] font-bold text-bone"
-            aria-hidden
-          >
-            3
-          </span>
+          <StepNumber n={3} />
           <span>
             Feu lliscar la llista i toqueu{" "}
             <span className="font-semibold text-bone">
@@ -174,12 +207,7 @@ function IphoneInstallSteps() {
           </span>
         </li>
         <li className="flex gap-2.5">
-          <span
-            className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-grana/90 text-[0.65rem] font-bold text-bone"
-            aria-hidden
-          >
-            4
-          </span>
+          <StepNumber n={4} />
           <span>
             Confirmeu amb{" "}
             <span className="font-semibold text-bone">«Afegeix»</span>.
@@ -307,14 +335,19 @@ export function InstallAppModal() {
           <div className="space-y-4 px-5 py-4">
             {canNativeInstall ? (
               <>
-                <Button
-                  type="button"
-                  disabled={installing}
-                  onClick={() => void handleNativeInstall()}
-                  className="h-11 min-h-11 w-full touch-manipulation bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright disabled:opacity-70"
-                >
-                  {installing ? "Instal·lant…" : "Instal·lar l'app"}
-                </Button>
+                <div className="space-y-2">
+                  <Button
+                    type="button"
+                    disabled={installing}
+                    onClick={() => void handleNativeInstall()}
+                    className="h-11 min-h-11 w-full touch-manipulation bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright disabled:opacity-70"
+                  >
+                    {installing ? "Instal·lant…" : "Instal·lar l'app"}
+                  </Button>
+                  <p className="text-sm leading-snug text-mute">
+                    Això afegeix Supermanager a la pantalla d&apos;inici.
+                  </p>
+                </div>
                 <div className="space-y-3.5">
                   <AndroidInstallSteps />
                   <IphoneInstallSteps />
@@ -345,27 +378,20 @@ export function InstallAppModal() {
             </label>
           </div>
 
-          {!canNativeInstall ? (
-            <div className="border-t border-line px-5 py-4">
-              <Button
-                type="button"
-                onClick={persistAndClose}
-                className="h-11 min-h-11 w-full touch-manipulation bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
-              >
-                D&apos;acord
-              </Button>
-            </div>
-          ) : (
-            <div className="border-t border-line px-5 py-3">
-              <button
-                type="button"
-                onClick={persistAndClose}
-                className="w-full py-1 text-center text-xs text-mute hover:text-bone"
-              >
-                Ara no
-              </button>
-            </div>
-          )}
+          <div className="border-t border-line px-5 py-4">
+            <Button
+              type="button"
+              onClick={persistAndClose}
+              className={
+                canNativeInstall
+                  ? "h-11 min-h-11 w-full touch-manipulation border border-line bg-transparent font-semibold uppercase tracking-wide text-bone hover:bg-ink"
+                  : "h-11 min-h-11 w-full touch-manipulation bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
+              }
+              variant={canNativeInstall ? "outline" : "default"}
+            >
+              D&apos;acord
+            </Button>
+          </div>
         </DialogPrimitive.Popup>
       </DialogPortal>
     </Dialog>
