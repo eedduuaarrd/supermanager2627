@@ -14,7 +14,10 @@ const sans = IBM_Plex_Sans({
   variable: "--font-sans",
 });
 
+const siteUrl = "https://supermanager.2.28.127.154.sslip.io";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Supermanager Balaguer",
   description:
     "Gestor fantasy dels sèniors del Club Bàsquet Balaguer. Alineació, capità i classificacions de jornada i general.",
@@ -36,6 +39,38 @@ export const metadata: Metadata = {
   },
   formatDetection: {
     telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    locale: "ca_ES",
+    url: siteUrl,
+    siteName: "Supermanager Balaguer",
+    title: "Supermanager Balaguer",
+    description:
+      "Gestor fantasy dels sèniors del Club Bàsquet Balaguer. Alineació, capità i classificacions de jornada i general.",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        type: "image/png",
+        alt: "Supermanager Balaguer",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Supermanager Balaguer",
+    description:
+      "Gestor fantasy dels sèniors del Club Bàsquet Balaguer. Alineació, capità i classificacions de jornada i general.",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "Supermanager Balaguer",
+      },
+    ],
   },
 };
 
