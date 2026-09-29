@@ -42,7 +42,7 @@ export default function RegisterPage() {
       </div>
       <h1 className="font-display text-4xl text-bone">Registre</h1>
       <p className="mt-2 text-sm text-mute">
-        El primer compte creat al servidor és administrador (pot tancar jornades).
+        Crea el teu compte de mànager del Club Bàsquet Balaguer.
       </p>
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
         <div>

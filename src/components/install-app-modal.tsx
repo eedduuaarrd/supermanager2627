@@ -18,10 +18,13 @@ import {
 } from "@/lib/pwa-install";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { XIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 
 const DONT_SHOW_KEY = "sm_install_modal_dont_show";
 const SESSION_KEY = "sm_install_modal_session_dismiss";
+/** Delay before first-visit auto-open so onboarding / first paint aren't blocked. */
+const AUTO_SHOW_DELAY_MS = 1500;
 export const OPEN_INSTALL_MODAL_EVENT = "sm:open-install-modal";
 
 function isStandaloneDisplay(): boolean {
@@ -261,7 +264,9 @@ export function openInstallAppModal() {
 
 /** First-visit PWA install tutorial (Android + iPhone). */
 export function InstallAppModal() {
-  const autoShow = useSyncExternalStore(
+  const pathname = usePathname();
+  const onOnboarding = pathname === "/onboarding" || pathname.startsWith("/onboarding/");
+  const autoShowEligible = useSyncExternalStore(
     subscribeNoop,
     shouldAutoShow,
     () => false,
@@ -280,9 +285,21 @@ export function InstallAppModal() {
   const [manualOpen, setManualOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const [installing, setInstalling] = useState(false);
+  const [delayPassed, setDelayPassed] = useState(false);
 
   const canNativeInstall = deferredPrompt != null;
-  const open = manualOpen || (autoShow && !dismissed);
+  const autoShow =
+    autoShowEligible && !onOnboarding && delayPassed && !dismissed;
+  const open = manualOpen || autoShow;
+
+  useEffect(() => {
+    if (!autoShowEligible || onOnboarding) {
+      setDelayPassed(false);
+      return;
+    }
+    const t = window.setTimeout(() => setDelayPassed(true), AUTO_SHOW_DELAY_MS);
+    return () => window.clearTimeout(t);
+  }, [autoShowEligible, onOnboarding]);
 
   useEffect(() => {
     function onOpenRequest() {

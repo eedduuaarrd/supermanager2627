@@ -28,10 +28,9 @@ npm run start
 ## Com jugar
 
 1. Obre la URL pública i **Registra’t** (nom, equip fantasy, correu, contrasenya ≥ 8).
-2. El **primer compte** del servidor és administrador (pot tancar jornades).
-3. A **Inici**: gestiona equips fantasy (fins a 5) i mira l’estat de la jornada.
-4. A **Equip**: afegeix 8 jugadors (3 pivots, 3 alers, 2 bases) i tria capità — l’alineació es desa sola.
-5. Classificació **general** i d’**última jornada** a Classificació.
+2. A **Inici**: gestiona equips fantasy (fins a 5) i mira l’estat de la jornada.
+3. A **Equip**: afegeix 8 jugadors (3 pivots, 3 alers, 2 bases) i tria capità — l’alineació es desa sola.
+4. Classificació **general** i d’**última jornada** a Classificació.
 
 ## Model de jornada (setmanal FCBQ)
 
@@ -106,6 +105,10 @@ ADMIN_TOKEN=… APP_URL=http://127.0.0.1:4317 npm run weekend-sync
 
 Refresca plantilla → `player-stats.json`, fixtures → `fixtures.json`, puntua via `POST /api/admin/weekly`, actualitza `meta.lineup_lock_at`.
 Unitats a `deploy/systemd/`. Log: `/var/log/supermanager-weekend-sync.log`.
+
+### Backup SQLite (systemd)
+
+Diari **03:15 Europe/Madrid** (`supermanager-db-backup.timer`): còpia a `data/backups/supermanager-YYYYMMDD.db`, retenció 14 dies. Log: `/var/log/supermanager-db-backup.log`.
 
 ### Bloqueig d'alineació (tip-off)
 

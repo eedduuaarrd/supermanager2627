@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily SQLite backup for Supermanager Balaguer
+
+[Timer]
+OnCalendar=*-*-* 03:15:00 Europe/Madrid
+Persistent=true
+Unit=supermanager-db-backup.service
+
+[Install]
+WantedBy=timers.target

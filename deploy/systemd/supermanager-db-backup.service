@@ -1,0 +1,16 @@
+[Unit]
+Description=Supermanager Balaguer daily SQLite backup
+After=local-fs.target
+Wants=local-fs.target
+
+[Service]
+Type=oneshot
+User=ebernat
+Group=ebernat
+WorkingDirectory=/home/ebernat/supermanager
+EnvironmentFile=-/etc/supermanager.env
+Environment=DATA_DIR=/home/ebernat/supermanager/data
+Environment=SQLITE_BACKUP_LOG=/var/log/supermanager-db-backup.log
+Environment=RETENTION_DAYS=14
+ExecStart=/bin/bash /home/ebernat/supermanager/scripts/backup-sqlite.sh
+Nice=10

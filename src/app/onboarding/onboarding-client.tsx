@@ -32,9 +32,13 @@ export function OnboardingClient() {
       </p>
       <ul className="mt-6 space-y-3 border-l border-grana pl-4 text-sm text-bone">
         <li>8 jugadors: 3 pivots, 3 alers, 2 bases</li>
-        <li>Pressupost 100.000 €</li>
+        <li>Pressupost 100.000 € · preus de mercat parten de 10.000 €</li>
         <li>Capità ×2</li>
         <li>Toca + a la pista (només la posició d&apos;aquell slot)</li>
+        <li>
+          Equip nou: canvis il·limitats fins al tip-off; després, màxim 3 canvis
+          per jornada
+        </li>
       </ul>
       <Button
         type="button"
