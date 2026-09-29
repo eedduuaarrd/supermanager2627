@@ -10,9 +10,15 @@ import {
   DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  getDeferredInstallPrompt,
+  isIosDevice,
+  promptNativeInstall,
+  subscribeDeferredInstallPrompt,
+} from "@/lib/pwa-install";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { XIcon } from "lucide-react";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 
 const DONT_SHOW_KEY = "sm_install_modal_dont_show";
 const SESSION_KEY = "sm_install_modal_session_dismiss";
@@ -42,6 +48,54 @@ function subscribeNoop() {
   return () => {};
 }
 
+/** Chrome / Chromium overflow menu — three vertical dots. */
+function ChromeMenuIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="1em"
+      height="1em"
+      fill="currentColor"
+      aria-hidden
+      className={className}
+    >
+      <circle cx="12" cy="5" r="2" />
+      <circle cx="12" cy="12" r="2" />
+      <circle cx="12" cy="19" r="2" />
+    </svg>
+  );
+}
+
+/** iOS Safari Share — box with upward arrow. */
+function IosShareIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="1em"
+      height="1em"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      className={className}
+    >
+      <path d="M12 3v11" />
+      <path d="M8.5 6.5 12 3l3.5 3.5" />
+      <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" />
+    </svg>
+  );
+}
+
+function InlineIcon({ children }: { children: ReactNode }) {
+  return (
+    <span className="mx-0.5 inline-flex translate-y-[0.1em] items-center text-bone align-text-bottom [&_svg]:size-[1.05em]">
+      {children}
+    </span>
+  );
+}
+
 /** Open the install modal (e.g. from «Com instal·lar»). */
 export function openInstallAppModal() {
   if (typeof window === "undefined") return;
@@ -55,16 +109,30 @@ export function InstallAppModal() {
     shouldAutoShow,
     () => false,
   );
+  const deferredPrompt = useSyncExternalStore(
+    subscribeDeferredInstallPrompt,
+    getDeferredInstallPrompt,
+    () => null,
+  );
+  const ios = useSyncExternalStore(
+    subscribeNoop,
+    isIosDevice,
+    () => false,
+  );
   const [dismissed, setDismissed] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [installing, setInstalling] = useState(false);
+  const [showManual, setShowManual] = useState(false);
 
+  const canNativeInstall = deferredPrompt != null;
   const open = manualOpen || (autoShow && !dismissed);
 
   useEffect(() => {
     function onOpenRequest() {
       if (isStandaloneDisplay()) return;
       setDontShowAgain(false);
+      setShowManual(false);
       setManualOpen(true);
     }
 
@@ -85,6 +153,7 @@ export function InstallAppModal() {
     }
     setDismissed(true);
     setManualOpen(false);
+    setShowManual(false);
   }
 
   function handleOpenChange(next: boolean) {
@@ -93,6 +162,25 @@ export function InstallAppModal() {
       return;
     }
     persistAndClose();
+  }
+
+  async function handleNativeInstall() {
+    setInstalling(true);
+    try {
+      const outcome = await promptNativeInstall();
+      if (outcome === "accepted") {
+        try {
+          localStorage.setItem(DONT_SHOW_KEY, "1");
+        } catch {
+          /* ignore */
+        }
+        setDismissed(true);
+        setManualOpen(false);
+        return;
+      }
+    } finally {
+      setInstalling(false);
+    }
   }
 
   return (
@@ -126,23 +214,78 @@ export function InstallAppModal() {
           </DialogHeader>
 
           <div className="space-y-4 px-5 py-4">
-            <div className="space-y-1.5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-grana-bright">
-                Android
-              </p>
-              <p className="text-sm leading-snug text-mute">
-                Chrome → menú ⋮ → «Afegeix a la pantalla d&apos;inici» o
-                «Instal·la l&apos;app».
-              </p>
-            </div>
-            <div className="space-y-1.5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-grana-bright">
-                iPhone
-              </p>
-              <p className="text-sm leading-snug text-mute">
-                Safari → Compartir □↑ → «Afegeix a la pantalla d&apos;inici».
-              </p>
-            </div>
+            {canNativeInstall ? (
+              <>
+                <Button
+                  type="button"
+                  disabled={installing}
+                  onClick={() => void handleNativeInstall()}
+                  className="h-11 min-h-11 w-full touch-manipulation bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright disabled:opacity-70"
+                >
+                  {installing ? "Instal·lant…" : "Instal·lar l'app"}
+                </Button>
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setShowManual((v) => !v)}
+                    className="text-xs text-mute underline-offset-4 hover:text-bone hover:underline"
+                  >
+                    {showManual ? "Amaga els passos" : "O manualment"}
+                  </button>
+                  {showManual ? (
+                    <p className="mt-2 text-sm leading-snug text-mute">
+                      Chrome → menú
+                      <InlineIcon>
+                        <ChromeMenuIcon />
+                      </InlineIcon>
+                      → «Afegeix a la pantalla d&apos;inici» o «Instal·la
+                      l&apos;app».
+                    </p>
+                  ) : null}
+                </div>
+              </>
+            ) : ios ? (
+              <div className="space-y-2">
+                <p className="text-sm leading-snug text-mute">
+                  Safari →
+                  <InlineIcon>
+                    <IosShareIcon />
+                  </InlineIcon>
+                  Compartir → «Afegeix a la pantalla d&apos;inici».
+                </p>
+                <p className="text-xs leading-snug text-mute/80">
+                  A l&apos;iPhone, Apple només permet instal·lar-la així.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-grana-bright">
+                    Android
+                  </p>
+                  <p className="text-sm leading-snug text-mute">
+                    Chrome → menú
+                    <InlineIcon>
+                      <ChromeMenuIcon />
+                    </InlineIcon>
+                    → «Afegeix a la pantalla d&apos;inici» o «Instal·la
+                    l&apos;app».
+                  </p>
+                </div>
+                <div className="space-y-1.5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-grana-bright">
+                    iPhone
+                  </p>
+                  <p className="text-sm leading-snug text-mute">
+                    Safari →
+                    <InlineIcon>
+                      <IosShareIcon />
+                    </InlineIcon>
+                    Compartir → «Afegeix a la pantalla d&apos;inici».
+                  </p>
+                </div>
+              </div>
+            )}
 
             <label className="flex cursor-pointer items-start gap-2.5 pt-1 text-sm text-mute">
               <input
@@ -155,15 +298,27 @@ export function InstallAppModal() {
             </label>
           </div>
 
-          <div className="border-t border-line px-5 py-4">
-            <Button
-              type="button"
-              onClick={persistAndClose}
-              className="h-11 min-h-11 w-full touch-manipulation bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
-            >
-              D&apos;acord
-            </Button>
-          </div>
+          {!canNativeInstall ? (
+            <div className="border-t border-line px-5 py-4">
+              <Button
+                type="button"
+                onClick={persistAndClose}
+                className="h-11 min-h-11 w-full touch-manipulation bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
+              >
+                D&apos;acord
+              </Button>
+            </div>
+          ) : (
+            <div className="border-t border-line px-5 py-3">
+              <button
+                type="button"
+                onClick={persistAndClose}
+                className="w-full py-1 text-center text-xs text-mute hover:text-bone"
+              >
+                Ara no
+              </button>
+            </div>
+          )}
         </DialogPrimitive.Popup>
       </DialogPortal>
     </Dialog>
