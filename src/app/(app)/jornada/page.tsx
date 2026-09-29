@@ -1,6 +1,7 @@
 "use client";
 
 import { BootGate } from "@/components/boot-gate";
+import { InstallHint } from "@/components/install-hint";
 import { useManager } from "@/components/manager-provider";
 import { TeamChips } from "@/components/team-chips";
 import { Button } from "@/components/ui/button";
@@ -319,6 +320,9 @@ function JornadaContent() {
           </span>
         </p>
       )}
+
+      {/* 6. PWA install — collapsed, dismissible */}
+      {!createOpen && <InstallHint />}
     </div>
   );
 }
