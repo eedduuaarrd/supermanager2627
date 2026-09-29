@@ -91,9 +91,7 @@ Accions API (`POST /api/admin/weekly`, header `x-admin-token` o body `token`, o 
 | `open` | Obre la següent jornada |
 | `run` | `close` + obrir següent (pas típic del cron) |
 
-L’admin també pot tancar des de **Classificació** («Tancar jornada (stats FCBQ)»).
-
-
+El tancament de jornada a l’app està desactivat: només via timer/scripts o `POST /api/admin/weekly` amb `ADMIN_TOKEN`.
 
 ### Weekend sync (systemd)
 

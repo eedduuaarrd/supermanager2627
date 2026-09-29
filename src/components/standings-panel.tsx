@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { AlertCircle, Loader2, Trophy } from "lucide-react";
 
 type StandingRow = {
@@ -15,20 +15,12 @@ type StandingRow = {
   isYou: boolean;
 };
 
-export function StandingsPanel({
-  isAdmin,
-  onSimulated,
-}: {
-  isAdmin: boolean;
-  onSimulated?: () => void;
-}) {
+export function StandingsPanel() {
   const [scope, setScope] = useState<"jornada" | "general">("general");
   const [rows, setRows] = useState<StandingRow[]>([]);
   const [round, setRound] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [simMsg, setSimMsg] = useState<string | null>(null);
-  const [simulating, startSim] = useTransition();
 
   async function load(nextScope = scope) {
     setLoading(true);
@@ -51,23 +43,6 @@ export function StandingsPanel({
     void load(scope);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scope]);
-
-  function simulate() {
-    setSimMsg(null);
-    startSim(async () => {
-      const res = await fetch("/api/round/simulate", { method: "POST" });
-      const data = await res.json();
-      if (!res.ok) {
-        setSimMsg(data.error ?? "Error en simular.");
-        return;
-      }
-      setSimMsg(
-        `Jornada ${data.round} tancada (${data.scored} equips, stats FCBQ). Ara jornada ${data.nextRound}.`,
-      );
-      onSimulated?.();
-      await load(scope);
-    });
-  }
 
   return (
     <div className="space-y-4">
@@ -147,34 +122,6 @@ export function StandingsPanel({
           </ol>
         )}
       </section>
-
-      {isAdmin && (
-        <section className="border border-line bg-panel/70 p-4">
-          <p className="text-xs uppercase tracking-[0.2em] text-mute">
-            Administració
-          </p>
-          <p className="mt-2 text-sm text-mute">
-            Tanca la jornada amb les estadístiques FCBQ d&apos;aquella setmana
-            (VAL = PTS − faltes − TL fallats + ±), bloqueja les alineacions i
-            obre la següent. No simula partits inventats.
-          </p>
-          <Button
-            type="button"
-            disabled={simulating}
-            onClick={simulate}
-            className="mt-3 bg-panel-2 text-bone ring-1 ring-white/20 hover:bg-white/10"
-          >
-            {simulating ? (
-              <>
-                <Loader2 className="size-4 animate-spin" /> Tancant…
-              </>
-            ) : (
-              "Tancar jornada (stats FCBQ)"
-            )}
-          </Button>
-          {simMsg && <p className="mt-3 text-sm text-bone">{simMsg}</p>}
-        </section>
-      )}
     </div>
   );
 }

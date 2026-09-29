@@ -39,7 +39,7 @@ function authorize(req: Request, bodyToken?: string): boolean {
  * - lock: recompute/store lineup_lock_at from fixtures.json (or body.lockAt);
  *   if tip-off already passed, promote transfer_phase initial → normal
  *
- * Also accepts session cookie for logged-in admin (UI).
+ * Also accepts session cookie for logged-in admin (scripts / curl with session).
  */
 export async function POST(req: Request) {
   let body: {

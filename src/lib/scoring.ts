@@ -614,7 +614,7 @@ export function openNextJornada(): {
 }
 
 /**
- * @deprecated name kept for admin button — scores from FCBQ, not random sim.
+ * @deprecated name kept for API compatibility — scores from FCBQ, not random sim.
  */
 export function simulateJornada() {
   return closeJornada({ advance: true });
