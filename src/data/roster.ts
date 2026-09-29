@@ -343,7 +343,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "martina-benitez",
-    position: "B",
+    position: "A",
     name: "Martina Benítez Farrando",
     number: 79,
     pts: 1,
