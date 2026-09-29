@@ -197,18 +197,10 @@ function IphoneInstallSteps() {
           <StepNumber n={1} />
           <span>
             Obriu{" "}
-            <span className="font-semibold text-bone">https://supercbb.com</span>{" "}
-            amb <span className="font-semibold text-bone">Safari</span> (Chrome
-            també va bé a iOS 16.4+). Toqueu la{" "}
-            <span className="font-semibold text-bone">barra d&apos;adreces</span>{" "}
-            a la part inferior perquè s&apos;obri la barra d&apos;eines i
-            aparegui Compartir. Si veieu{" "}
-            <span className="font-semibold text-bone">⋯</span> (Més) en lloc de
-            Compartir, toqueu-lo primer
-            <IconChip>
-              <IosMoreIcon />
-            </IconChip>
-            .
+            <span className="font-semibold text-bone">supercbb.com</span> amb{" "}
+            <span className="font-semibold text-bone">Safari</span> (també{" "}
+            <span className="font-semibold text-bone">Chrome</span>/Firefox a
+            iOS 16.4+).
           </span>
         </li>
         <li className="flex gap-2.5">
@@ -220,32 +212,35 @@ function IphoneInstallSteps() {
             <IconChip>
               <IosShareIcon />
             </IconChip>
-            .
+            . Si no el veieu: toqueu la barra d&apos;adreces. En Compact:{" "}
+            <span className="font-semibold text-bone">⋯</span> (Més)
+            <IconChip>
+              <IosMoreIcon />
+            </IconChip>{" "}
+            → Compartir. A Chrome: a la dreta de l&apos;adreça.
           </span>
         </li>
         <li className="flex gap-2.5">
           <StepNumber n={3} />
           <span>
-            Al full de compartir, feu lliscar cap avall la llista d&apos;accions
-            (sovint no es veu de primer). Si no la trobeu: toqueu{" "}
-            <span className="font-semibold text-bone">Més</span>
-            <IconChip>
-              <IosMoreIcon />
-            </IconChip>{" "}
-            /{" "}
+            Feu lliscar (o{" "}
+            <span className="font-semibold text-bone">Més</span> /{" "}
             <span className="font-semibold text-bone">
               Edita les accions…
             </span>
-            , activeu{" "}
+            ) i toqueu{" "}
             <span className="font-semibold text-bone">
               «Afegeix a la pantalla d&apos;inici»
             </span>
-            . Després toqueu{" "}
-            <span className="font-semibold text-bone">
-              «Afegeix a la pantalla d&apos;inici»
-            </span>{" "}
-            i confirmeu{" "}
-            <span className="font-semibold text-bone">«Afegeix»</span>.
+            .
+          </span>
+        </li>
+        <li className="flex gap-2.5">
+          <StepNumber n={4} />
+          <span>
+            Confirmeu{" "}
+            <span className="font-semibold text-bone">«Afegeix»</span> (a dalt a
+            la dreta).
           </span>
         </li>
       </ol>
