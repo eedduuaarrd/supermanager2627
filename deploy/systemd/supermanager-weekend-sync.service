@@ -1,5 +1,5 @@
 [Unit]
-Description=Supermanager Balaguer weekend sync (stats, fixtures, score, tip-off lock)
+Description=Supermanager Balaguer weekend sync (stats, fixtures, score, prices, tip-off lock)
 After=network-online.target supermanager.service
 Wants=network-online.target
 

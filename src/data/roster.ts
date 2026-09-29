@@ -24,6 +24,8 @@ import marketPricesJson from "@/data/market-prices.json";
  * Preus broker: sortida flat INITIAL_PRICE 10.000 €; només es mouen quan creix
  *   el nombre de partits amb VAL (clamp ±15% vs prev, rodona 500, mín. 500).
  *   Compra/venda al preu de mercat actual. Veure market-prices.json.
+ *   El servidor llegeix el JSON del disc en runtime (live-roster); el tick del
+ *   weekend-sync no cal rebuild. Client usa /api/roster.
  *   budget column = efectiu (cash); buy/sell al preu actual.
  *   8×10k = 80k < 100k: hi ha marge per completar la plantilla de 8.
  *
@@ -513,16 +515,18 @@ export const ROSTER_SEED: Player[] = [
   },
 ];
 
-type MarketPricesFile = {
+export type MarketPricesFile = {
   prices?: Record<
     string,
     { price: number; prevPrice?: number | null; avgVal?: number | null }
   >;
 };
 
-/** Apply broker quotes from market-prices.json onto seed roster rows. */
-function applyMarketPrices(seed: Player[]): Player[] {
-  const file = marketPricesJson as MarketPricesFile;
+/** Apply broker quotes from a market-prices file onto seed roster rows. */
+export function overlayMarketPrices(
+  seed: Player[],
+  file: MarketPricesFile,
+): Player[] {
   const map = file.prices ?? {};
   return seed.map((p) => {
     const mp = map[p.id];
@@ -545,7 +549,11 @@ function applyMarketPrices(seed: Player[]): Player[] {
   });
 }
 
-export const ROSTER: Player[] = applyMarketPrices(ROSTER_SEED);
+/** Bundled snapshot — client / fallback. Server prefers live disk via live-roster. */
+export const ROSTER: Player[] = overlayMarketPrices(
+  ROSTER_SEED,
+  marketPricesJson as MarketPricesFile,
+);
 
 export const POSITION_LABEL: Record<Player["position"], string> = {
   B: "Base",

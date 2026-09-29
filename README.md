@@ -48,6 +48,7 @@ Cada **jornada fantasy ≈ els partits d’aquella setmana** dels 4 equips sèni
 - Sortida flat **10.000 €** per a tothom.
 - Preu teòric = mitjana VAL de temporada × **1.000 €**; cotització limitada a **±15%** vs el preu anterior (rodona 500 €, mín. 500 €).
 - Els preus només es mouen quan creix el nombre de partits amb VAL (`update-market-prices.mjs`; `--force` per forçar).
+- El **weekend sync** (dissabte/diumenge 23:59) executa el tick automàticament després de puntuar; l’app llegeix les quotes en runtime (sense rebuild).
 - A la fitxa del jugador: llindars «pujar / mantenir / baixar» el 15%.
 
 ```bash

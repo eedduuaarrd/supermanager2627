@@ -11,10 +11,12 @@ import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function ComptePage() {
-  const { user, maxTeams, budget, lineup } = useManager();
+  const { user, maxTeams, budget, lineup, roster } = useManager();
   const router = useRouter();
-  const marketValue = squadMarketValue(lineup.playerIds);
-  const netWorth = patrimoni(budget, lineup.playerIds);
+  const priceOf = (id: string) =>
+    roster?.find((p) => p.id === id)?.price ?? 0;
+  const marketValue = squadMarketValue(lineup.playerIds, priceOf);
+  const netWorth = patrimoni(budget, lineup.playerIds, priceOf);
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });

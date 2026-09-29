@@ -7,7 +7,8 @@
  * 3) Tag this week's fixtures with current fantasy jornada
  * 4) Assign untagged game rows → current round; score + open next via ADMIN API
  *    (opening next jornada resets transfer snapshots + canvis counters)
- * 5) Recompute lineup_lock_at from fixtures tip-offs (null if none published)
+ * 5) Tick broker market prices (normal tick, anti-retick if no new games)
+ * 6) Recompute lineup_lock_at from fixtures tip-offs (null if none published)
  *    Transfer window: Sun 23:59 Madrid → first tip-off; max 3 canvis per team
  *
  * Usage (VPS, app running):
@@ -19,6 +20,7 @@
  *   --skip-refresh       skip plantilla refresh
  *   --skip-fixtures      skip fixtures fetch
  *   --skip-score         refresh+lock only
+ *   --skip-prices        skip market price tick
  *   --dry-run            print plan
  */
 import { spawnSync } from "node:child_process";
@@ -46,6 +48,7 @@ const fromPath =
 const skipRefresh = args.includes("--skip-refresh");
 const skipFixtures = args.includes("--skip-fixtures");
 const skipScore = args.includes("--skip-score");
+const skipPrices = args.includes("--skip-prices");
 const dryRun = args.includes("--dry-run");
 
 const APP_URL = (process.env.APP_URL || "http://127.0.0.1:4317").replace(
@@ -91,11 +94,11 @@ function currentRound() {
   }
 }
 
-function runNode(script, scriptArgs = []) {
+function runNode(script, scriptArgs = [], extraEnv = {}) {
   const r = spawnSync(process.execPath, [join(root, script), ...scriptArgs], {
     stdio: "inherit",
     cwd: root,
-    env: process.env,
+    env: { ...process.env, ...extraEnv },
   });
   if (r.status !== 0) {
     throw new Error(`${script} exited ${r.status}`);
@@ -196,7 +199,10 @@ async function main() {
     }
     log(`refresh-fcbq-stats --from ${fromPath}`);
     if (!dryRun) {
-      runNode("scripts/refresh-fcbq-stats.mjs", ["--from", fromPath]);
+      // Price tick runs once after scoring (anti-retick); skip during refresh.
+      runNode("scripts/refresh-fcbq-stats.mjs", ["--from", fromPath], {
+        SKIP_MARKET_PRICES: "1",
+      });
     }
   }
 
@@ -215,7 +221,7 @@ async function main() {
   );
 
   if (dryRun) {
-    log("dry-run — skip assign/score/lock API");
+    log("dry-run — skip assign/score/prices/lock API");
     return;
   }
 
@@ -233,6 +239,13 @@ async function main() {
       const result = await postAdmin("run");
       log(`score OK ${JSON.stringify(result)}`);
     }
+  }
+
+  // Broker tick after scoring: ±15% when scored game count grew (shouldTickPrice).
+  // Writes src/data/market-prices.json; app reads it at runtime (no rebuild).
+  if (!skipPrices) {
+    log("update-market-prices (normal tick, anti-retick)");
+    runNode("scripts/update-market-prices.mjs");
   }
 
   // After score+advance, lock applies to the NEW open jornada from remaining tip-offs.

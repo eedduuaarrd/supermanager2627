@@ -98,9 +98,16 @@ export function LineupBuilder({
   }, [sheetOpen]);
 
   const committedIds = savedPlayerIds ?? lineup.playerIds;
-  const remaining = remainingBudget(budget, lineup.playerIds, committedIds);
+  const priceOf = (id: string) =>
+    roster.find((p) => p.id === id)?.price ?? 0;
+  const remaining = remainingBudget(
+    budget,
+    lineup.playerIds,
+    committedIds,
+    priceOf,
+  );
   const counts = countByPosition(lineup.playerIds);
-  const validation = validateLineup(lineup, budget, committedIds);
+  const validation = validateLineup(lineup, budget, committedIds, priceOf);
   const projected = projectedPoints(lineup);
   const filled = lineup.playerIds.length;
   const overBudget = remaining < 0;

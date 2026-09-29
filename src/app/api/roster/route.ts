@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { readSession } from "@/lib/auth";
 import {
-  ROSTER,
   TEAMS,
   TEAM_ORDER,
   INITIAL_BUDGET,
@@ -9,6 +8,7 @@ import {
   LINEUP_SLOTS,
   POSITION_LABEL,
 } from "@/data/roster";
+import { getLiveRoster } from "@/lib/live-roster";
 
 export const runtime = "nodejs";
 
@@ -18,7 +18,7 @@ export async function GET() {
     return NextResponse.json({ error: "Cal iniciar sessió." }, { status: 401 });
   }
   return NextResponse.json({
-    players: ROSTER,
+    players: getLiveRoster(),
     teams: TEAM_ORDER.map((id) => TEAMS[id]),
     rules: {
       budget: INITIAL_BUDGET,

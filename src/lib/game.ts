@@ -83,8 +83,18 @@ export function createInitialState(managerName = "Mànager CBB"): GameState {
   };
 }
 
-export function spentBudget(playerIds: string[]): number {
-  return playerIds.reduce((sum, id) => sum + (getPlayer(id)?.price ?? 0), 0);
+/** Quote lookup — pass live/API roster prices when the bundled ROSTER may be stale. */
+export type PriceOf = (playerId: string) => number;
+
+function defaultPriceOf(id: string): number {
+  return getPlayer(id)?.price ?? 0;
+}
+
+export function spentBudget(
+  playerIds: string[],
+  priceOf: PriceOf = defaultPriceOf,
+): number {
+  return playerIds.reduce((sum, id) => sum + priceOf(id), 0);
 }
 
 /**
@@ -96,17 +106,18 @@ export function applyMarketTransfers(
   cash: number,
   fromIds: string[],
   toIds: string[],
+  priceOf: PriceOf = defaultPriceOf,
 ): { cash: number; ok: boolean } {
   let next = cash;
   const from = new Set(fromIds.filter(Boolean));
   const to = new Set(toIds.filter(Boolean));
   for (const id of fromIds) {
     if (!id || to.has(id)) continue;
-    next += getPlayer(id)?.price ?? 0;
+    next += priceOf(id);
   }
   for (const id of toIds) {
     if (!id || from.has(id)) continue;
-    next -= getPlayer(id)?.price ?? 0;
+    next -= priceOf(id);
   }
   return { cash: next, ok: next >= 0 };
 }
@@ -119,18 +130,26 @@ export function remainingBudget(
   cash: number,
   draftIds: string[],
   savedIds: string[] = draftIds,
+  priceOf: PriceOf = defaultPriceOf,
 ): number {
-  return applyMarketTransfers(cash, savedIds, draftIds).cash;
+  return applyMarketTransfers(cash, savedIds, draftIds, priceOf).cash;
 }
 
 /** Squad market value = sum of current quotes for players in lineup. */
-export function squadMarketValue(playerIds: string[]): number {
-  return spentBudget(playerIds);
+export function squadMarketValue(
+  playerIds: string[],
+  priceOf: PriceOf = defaultPriceOf,
+): number {
+  return spentBudget(playerIds, priceOf);
 }
 
 /** Broker patrimoni = efectiu + valor de mercat de l'alineació. */
-export function patrimoni(cash: number, playerIds: string[]): number {
-  return cash + squadMarketValue(playerIds);
+export function patrimoni(
+  cash: number,
+  playerIds: string[],
+  priceOf: PriceOf = defaultPriceOf,
+): number {
+  return cash + squadMarketValue(playerIds, priceOf);
 }
 
 export function countByPosition(playerIds: string[]): Record<Position, number> {
@@ -224,13 +243,14 @@ export function validateLineup(
   lineup: Lineup,
   cash: number,
   savedIds: string[] = lineup.playerIds,
+  priceOf: PriceOf = defaultPriceOf,
 ): { ok: boolean; issues: LineupIssue[] } {
   const issues: LineupIssue[] = [];
   const unique = new Set(lineup.playerIds);
 
   if (unique.size !== lineup.playerIds.length) issues.push("duplicate");
   if (lineup.playerIds.length !== LINEUP_SIZE) issues.push("incomplete");
-  if (remainingBudget(cash, lineup.playerIds, savedIds) < 0) {
+  if (remainingBudget(cash, lineup.playerIds, savedIds, priceOf) < 0) {
     issues.push("budget");
   }
 
@@ -264,6 +284,7 @@ export function validateLineupSave(
   captainId: string | null,
   cash: number,
   previousIds: string[] = [],
+  priceOf: PriceOf = defaultPriceOf,
 ): { ok: true; cash: number } | { ok: false; error: string } {
   if (playerIds.length > LINEUP_SIZE) {
     return { ok: false, error: `Com a màxim ${LINEUP_SIZE} jugadors.` };
@@ -287,7 +308,7 @@ export function validateLineupSave(
       error: "Posició incorrecta: cal 3 pivots, 3 alers i 2 bases.",
     };
   }
-  const transfer = applyMarketTransfers(cash, previousIds, playerIds);
+  const transfer = applyMarketTransfers(cash, previousIds, playerIds, priceOf);
   if (!transfer.ok) {
     return { ok: false, error: "Has superat el pressupost disponible." };
   }

@@ -9,6 +9,7 @@ import {
   getDb,
   type DbLineup,
 } from "@/lib/db";
+import { livePriceOf } from "@/lib/live-roster";
 import {
   fantasyStatFromGame,
   getPlayerGameForRound,
@@ -230,7 +231,7 @@ export function migrateCashLedgerOnce(db = getDb()) {
       if (row.budget !== INITIAL_BUDGET) continue;
       const ids = parsePlayerIds(row.player_ids);
       if (ids.length === 0) continue;
-      const cash = Math.max(0, INITIAL_BUDGET - spentBudget(ids));
+      const cash = Math.max(0, INITIAL_BUDGET - spentBudget(ids, livePriceOf));
       upd.run(cash, row.team_id, row.round);
     }
     db.prepare(
@@ -363,7 +364,12 @@ function migrateLineupRowIfNeeded(row: DbLineup): DbLineup {
         }
       }
       const before = migratePlayerIdList(previous);
-      const transfer = applyMarketTransfers(row.budget, before, flat);
+      const transfer = applyMarketTransfers(
+        row.budget,
+        before,
+        flat,
+        livePriceOf,
+      );
       if (transfer.cash !== row.budget) {
         nextBudget = Math.max(0, transfer.cash);
         budgetChanged = true;
@@ -427,6 +433,7 @@ export function saveLineup(
     resolvedCaptain,
     existing.budget,
     previousIds,
+    livePriceOf,
   );
   if (!check.ok) return check;
 
