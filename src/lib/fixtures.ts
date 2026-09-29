@@ -150,23 +150,12 @@ export function computeLineupLockAt(
   file = loadFixtures(),
 ): string | null {
   let min: number | null = null;
+  // Only fixtures explicitly tagged for this fantasy jornada, with a real tipOff.
+  // Untagged rows are ignored (never invent times). Tag the club weekend first.
   for (const f of fixturesForJornada(jornada, file)) {
     const ms = tipOffMs(f);
     if (ms == null) continue;
     if (min == null || ms < min) min = ms;
-  }
-  // Also consider untagged fixtures in the same calendar week as tagged ones
-  // only when they have tipOff — still no date-only invention.
-  if (min == null) {
-    for (const team of file.teams ?? []) {
-      for (const f of team.fixtures ?? []) {
-        if (f.jornada != null && f.jornada !== jornada) continue;
-        const ms = tipOffMs(f);
-        if (ms == null) continue;
-        if (f.jornada == null) continue;
-        if (min == null || ms < min) min = ms;
-      }
-    }
   }
   return min == null ? null : new Date(min).toISOString();
 }

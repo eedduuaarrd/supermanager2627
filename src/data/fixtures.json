@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-28T22:10:32.987Z",
+  "updatedAt": "2026-09-29",
   "source": "FCBQ calendar dump /tmp/fcbq-calendar-rows.json",
   "timezone": "Europe/Madrid",
   "notes": [
@@ -44,7 +44,7 @@
           "result": null,
           "teamPoints": null,
           "opponentPoints": null,
-          "jornada": null,
+          "jornada": 2,
           "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
           "homeTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A",
           "awayTeam": "CB CAPPONT"
@@ -406,7 +406,7 @@
           "result": null,
           "teamPoints": null,
           "opponentPoints": null,
-          "jornada": null,
+          "jornada": 2,
           "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
           "homeTeam": "LO SIFONET CB BALAGUER B",
           "awayTeam": "AGROLLOBERA PALAU D'ANGLESOLA"
@@ -704,7 +704,7 @@
           "result": null,
           "teamPoints": null,
           "opponentPoints": null,
-          "jornada": null,
+          "jornada": 2,
           "competition": "COPA CATALUNYA FEMENINA",
           "homeTeam": "FEMENÍ OSONA- OVA PROJECTS",
           "awayTeam": "CUDOS CONSULTORS CB BALAGUER A"
@@ -1130,7 +1130,7 @@
           "result": null,
           "teamPoints": null,
           "opponentPoints": null,
-          "jornada": null,
+          "jornada": 2,
           "competition": "C.C. SEGONA CATEGORIA FEMENINA",
           "homeTeam": "CB CASTELLET - MARMOLES MORATONAS",
           "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B"
