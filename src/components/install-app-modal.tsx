@@ -88,11 +88,52 @@ function IosShareIcon({ className }: { className?: string }) {
   );
 }
 
-function InlineIcon({ children }: { children: ReactNode }) {
+function IconChip({ children }: { children: ReactNode }) {
   return (
-    <span className="mx-0.5 inline-flex translate-y-[0.1em] items-center text-bone align-text-bottom [&_svg]:size-[1.05em]">
+    <span
+      className="mx-0.5 inline-flex size-6 shrink-0 translate-y-[0.05em] items-center justify-center rounded-md border border-line bg-ink align-text-bottom text-bone/85 [&_svg]:size-3"
+      aria-hidden
+    >
       {children}
     </span>
+  );
+}
+
+function PlatformLabel({ children }: { children: ReactNode }) {
+  return (
+    <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-mute">
+      {children}
+    </p>
+  );
+}
+
+function AndroidInstallSteps({ secondary }: { secondary?: boolean }) {
+  return (
+    <div className="space-y-1.5">
+      <PlatformLabel>Android</PlatformLabel>
+      <p className="text-sm leading-snug text-bone/85">
+        {secondary ? "O bé: menú" : "Menú"}
+        <IconChip>
+          <ChromeMenuIcon />
+        </IconChip>
+        → «Afegeix a la pantalla d&apos;inici»
+      </p>
+    </div>
+  );
+}
+
+function IphoneInstallSteps() {
+  return (
+    <div className="space-y-1.5">
+      <PlatformLabel>iPhone</PlatformLabel>
+      <p className="text-sm leading-snug text-bone/85">
+        Safari →
+        <IconChip>
+          <IosShareIcon />
+        </IconChip>
+        → «Afegeix a la pantalla d&apos;inici»
+      </p>
+    </div>
   );
 }
 
@@ -221,39 +262,23 @@ export function InstallAppModal() {
                 >
                   {installing ? "Instal·lant…" : "Instal·lar l'app"}
                 </Button>
-                <div className="flex items-center gap-2.5 px-0.5">
-                  <span
-                    className="inline-flex size-7 shrink-0 items-center justify-center rounded-md border border-line bg-ink text-bone/80"
-                    aria-hidden
-                  >
-                    <ChromeMenuIcon className="size-3.5" />
-                  </span>
-                  <p className="min-w-0 text-xs leading-snug text-bone/75">
-                    O bé: menú → Afegeix a la pantalla d&apos;inici
-                  </p>
+                <div className="space-y-3.5">
+                  <AndroidInstallSteps secondary />
+                  <IphoneInstallSteps />
                 </div>
               </>
             ) : ios ? (
-              <div className="space-y-1.5">
-                <p className="text-sm leading-snug text-mute">
-                  Toqueu
-                  <InlineIcon>
-                    <IosShareIcon />
-                  </InlineIcon>
-                  → Afegeix a la pantalla d&apos;inici.
-                </p>
+              <div className="space-y-3.5">
+                <IphoneInstallSteps />
                 <p className="text-xs leading-snug text-mute/80">
-                  A l&apos;iPhone cal fer-ho així.
+                  A l&apos;iPhone cal fer-ho així — no hi ha botó Instal·lar.
                 </p>
               </div>
             ) : (
-              <p className="text-sm leading-snug text-mute">
-                Menú
-                <InlineIcon>
-                  <ChromeMenuIcon />
-                </InlineIcon>
-                → Afegeix a la pantalla d&apos;inici
-              </p>
+              <div className="space-y-3.5">
+                <AndroidInstallSteps />
+                <IphoneInstallSteps />
+              </div>
             )}
 
             <label className="flex cursor-pointer items-start gap-2.5 pt-1 text-sm text-mute">
