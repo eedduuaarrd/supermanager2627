@@ -107,12 +107,12 @@ function PlatformLabel({ children }: { children: ReactNode }) {
   );
 }
 
-function AndroidInstallSteps({ secondary }: { secondary?: boolean }) {
+function AndroidInstallSteps() {
   return (
     <div className="space-y-1.5">
       <PlatformLabel>Android</PlatformLabel>
       <p className="text-sm leading-snug text-bone/85">
-        {secondary ? "O bé: menú" : "Menú"}
+        Menú
         <IconChip>
           <ChromeMenuIcon />
         </IconChip>
@@ -263,7 +263,7 @@ export function InstallAppModal() {
                   {installing ? "Instal·lant…" : "Instal·lar l'app"}
                 </Button>
                 <div className="space-y-3.5">
-                  <AndroidInstallSteps secondary />
+                  <AndroidInstallSteps />
                   <IphoneInstallSteps />
                 </div>
               </>
