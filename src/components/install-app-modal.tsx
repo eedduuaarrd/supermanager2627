@@ -124,15 +124,68 @@ function AndroidInstallSteps() {
 
 function IphoneInstallSteps() {
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       <PlatformLabel>iPhone</PlatformLabel>
-      <p className="text-sm leading-snug text-bone/85">
-        Safari →
-        <IconChip>
-          <IosShareIcon />
-        </IconChip>
-        → «Afegeix a la pantalla d&apos;inici»
-      </p>
+      <ol className="list-none space-y-2.5 text-sm leading-snug text-bone/85">
+        <li className="flex gap-2.5">
+          <span
+            className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-grana/90 text-[0.65rem] font-bold text-bone"
+            aria-hidden
+          >
+            1
+          </span>
+          <span>
+            Obriu{" "}
+            <span className="font-semibold text-bone">supercbb.com</span> amb{" "}
+            <span className="font-semibold text-bone">Safari</span> (no Chrome a
+            l&apos;iPhone).
+          </span>
+        </li>
+        <li className="flex gap-2.5">
+          <span
+            className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-grana/90 text-[0.65rem] font-bold text-bone"
+            aria-hidden
+          >
+            2
+          </span>
+          <span>
+            Toqueu el botó{" "}
+            <span className="font-semibold text-bone">Compartir</span> a la barra
+            inferior (quadrat amb fletxa cap amunt)
+            <IconChip>
+              <IosShareIcon />
+            </IconChip>
+            .
+          </span>
+        </li>
+        <li className="flex gap-2.5">
+          <span
+            className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-grana/90 text-[0.65rem] font-bold text-bone"
+            aria-hidden
+          >
+            3
+          </span>
+          <span>
+            Feu lliscar la llista i toqueu{" "}
+            <span className="font-semibold text-bone">
+              «Afegeix a la pantalla d&apos;inici»
+            </span>
+            .
+          </span>
+        </li>
+        <li className="flex gap-2.5">
+          <span
+            className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-grana/90 text-[0.65rem] font-bold text-bone"
+            aria-hidden
+          >
+            4
+          </span>
+          <span>
+            Confirmeu amb{" "}
+            <span className="font-semibold text-bone">«Afegeix»</span>.
+          </span>
+        </li>
+      </ol>
     </div>
   );
 }
@@ -227,7 +280,7 @@ export function InstallAppModal() {
         <DialogOverlay className="bg-ink/75 supports-backdrop-filter:backdrop-blur-sm" />
         <DialogPrimitive.Popup
           data-slot="dialog-content"
-          className="fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-0 rounded-xl border border-line bg-ink-soft p-0 text-sm text-bone outline-none ring-1 ring-line duration-100 sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"
+          className="fixed top-1/2 left-1/2 z-50 grid max-h-[min(90dvh,40rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-0 overflow-y-auto rounded-xl border border-line bg-ink-soft p-0 text-sm text-bone outline-none ring-1 ring-line duration-100 sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"
         >
           <DialogClose
             render={
