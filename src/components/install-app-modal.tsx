@@ -180,26 +180,30 @@ function IphoneInstallSteps() {
           <span>
             Obriu{" "}
             <span className="font-semibold text-bone">supercbb.com</span> amb{" "}
-            <span className="font-semibold text-bone">Safari</span> (no Chrome a
-            l&apos;iPhone).
+            <span className="font-semibold text-bone">Safari</span> (també{" "}
+            <span className="font-semibold text-bone">Chrome</span>/Firefox a
+            iOS 16.4+).
           </span>
         </li>
         <li className="flex gap-2.5">
           <StepNumber n={2} />
           <span>
-            Toqueu el botó{" "}
-            <span className="font-semibold text-bone">Compartir</span> a la barra
-            inferior (quadrat amb fletxa cap amunt)
+            Toqueu{" "}
+            <span className="font-semibold text-bone">Compartir</span> (quadrat
+            amb fletxa cap amunt)
             <IconChip>
               <IosShareIcon />
             </IconChip>
-            .
+            : sovint al centre de la barra inferior; en Compact,{" "}
+            <span className="font-semibold text-bone">⋯</span> (Més) →
+            Compartir. A Chrome: a la dreta de la barra d&apos;adreces.
           </span>
         </li>
         <li className="flex gap-2.5">
           <StepNumber n={3} />
           <span>
-            Feu lliscar la llista i toqueu{" "}
+            Feu lliscar (o{" "}
+            <span className="font-semibold text-bone">Més</span>) i toqueu{" "}
             <span className="font-semibold text-bone">
               «Afegeix a la pantalla d&apos;inici»
             </span>
@@ -209,8 +213,9 @@ function IphoneInstallSteps() {
         <li className="flex gap-2.5">
           <StepNumber n={4} />
           <span>
-            Confirmeu amb{" "}
-            <span className="font-semibold text-bone">«Afegeix»</span>.
+            Confirmeu{" "}
+            <span className="font-semibold text-bone">«Afegeix»</span> (a dalt a
+            la dreta).
           </span>
         </li>
       </ol>
