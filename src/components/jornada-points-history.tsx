@@ -111,19 +111,14 @@ export function JornadaPointsHistory() {
               <span className="font-display text-[1.35rem] leading-none tabular-nums tracking-wide text-bone">
                 {row.points}
               </span>
-              <span className="mt-1 flex items-center gap-1.5 text-[10px] tabular-nums leading-none text-mute/75">
-                <span title="Acumulat">Σ {row.cumulative}</span>
-                {row.rank != null ? (
-                  <>
-                    <span className="text-white/15" aria-hidden>
-                      |
-                    </span>
-                    <span title="Posició" className="text-mute/90">
-                      #{row.rank}
-                    </span>
-                  </>
-                ) : null}
-              </span>
+              {row.rank != null ? (
+                <span
+                  title="Posició"
+                  className="mt-1 text-[10px] tabular-nums leading-none text-mute/90"
+                >
+                  #{row.rank}
+                </span>
+              ) : null}
             </button>
           );
         })}
