@@ -1,7 +1,7 @@
 "use client";
 
 import { BootGate } from "@/components/boot-gate";
-import { InstallHint } from "@/components/install-hint";
+import { InstallReopenLink } from "@/components/install-app-modal";
 import { useManager } from "@/components/manager-provider";
 import { TeamChips } from "@/components/team-chips";
 import { Button } from "@/components/ui/button";
@@ -321,8 +321,12 @@ function JornadaContent() {
         </p>
       )}
 
-      {/* 6. PWA install — collapsed, dismissible */}
-      {!createOpen && <InstallHint />}
+      {/* 6. Reopen install tutorial (modal is primary) */}
+      {!createOpen && (
+        <div className="hub-fade-late border-t border-line/50 pt-3">
+          <InstallReopenLink />
+        </div>
+      )}
     </div>
   );
 }
