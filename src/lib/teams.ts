@@ -8,7 +8,11 @@ import {
   type TransferPhase,
 } from "@/lib/db";
 import { INITIAL_BUDGET } from "@/data/roster";
-import { isLineupLocked } from "@/lib/fixtures";
+import {
+  computeLineupLockAt,
+  isLineupLocked,
+  loadFixtures,
+} from "@/lib/fixtures";
 import { getLineupLockAt } from "@/lib/rounds";
 
 export type FantasyTeamSummary = {
@@ -163,26 +167,59 @@ export function getTeamTransferPhase(
 }
 
 /**
- * When tip-off lock is active, flip every `initial` fantasy team to `normal`.
- * Per-team: unlimited canvis only until the first tip-off they experience.
- * Returns how many teams were promoted.
+ * When tip-off lock is active, flip `initial` → `normal` only for teams that
+ * already existed at that tip-off (`created_at <= lockAt`).
+ *
+ * Teams created mid-lock (or after tip-off) stay `initial` until the *next*
+ * jornada tip-off — unlimited canvis once the window reopens.
  */
 export function promoteInitialTeamsIfLocked(
   now = new Date(),
   db = getDb(),
 ): number {
   const lockAt = getLineupLockAt(db);
-  if (!isLineupLocked(lockAt, now)) return 0;
+  if (!lockAt || !isLineupLocked(lockAt, now)) return 0;
+  const cutoff = new Date(lockAt).toISOString();
   const result = db
     .prepare(
       `UPDATE fantasy_teams SET transfer_phase = 'normal'
-       WHERE transfer_phase = 'initial'`,
+       WHERE transfer_phase = 'initial'
+         AND created_at <= ?`,
     )
-    .run();
+    .run(cutoff);
   return Number(result.changes ?? 0);
 }
 
-/** Force-promote all initial teams (e.g. after jornada close / lock job). */
+/**
+ * Repair teams wrongly stuck on `normal` before they experience tip-off.
+ * While the current tip-off has not fired, restore `initial` for any team
+ * created after the previous jornada's tip-off (empty snapshot / post-lock
+ * creates, migration DEFAULT, premature promote).
+ */
+export function restoreInitialPhaseUntilNextTipOff(
+  now = new Date(),
+  db = getDb(),
+): number {
+  const lockAt = getLineupLockAt(db);
+  if (isLineupLocked(lockAt, now)) return 0;
+
+  const round = getCurrentRound(db);
+  if (round <= 1) return 0;
+  const prevLock = computeLineupLockAt(round - 1, loadFixtures());
+  if (!prevLock) return 0;
+  const cutoff = new Date(prevLock).toISOString();
+
+  const result = db
+    .prepare(
+      `UPDATE fantasy_teams SET transfer_phase = 'initial'
+       WHERE transfer_phase = 'normal'
+         AND created_at > ?`,
+    )
+    .run(cutoff);
+  return Number(result.changes ?? 0);
+}
+
+/** Force-promote all initial teams (admin / tests). Prefer scoped promote. */
 export function promoteAllInitialTeams(db = getDb()): number {
   const result = db
     .prepare(

@@ -17,9 +17,10 @@
  * - `fantasy_teams.transfer_phase = 'initial'` al crear l'equip.
  * - Canvis il·limitats mentre la finestra/mercat permeti editar i no hi hagi
  *   bloqueig per tip-off.
- * - Quan el tip-off de la jornada arriba (`lineup_lock_at` assolit), tots els
- *   equips `initial` passen a `normal` (lock refresh, weekend sync, o lazy
- *   en GET/PUT alineació). La regla és per equip fantasy, no per usuari.
+ * - Quan el tip-off arriba (`lineup_lock_at` assolit), només els equips
+ *   `initial` amb `created_at <= lockAt` passen a `normal`. Equips creats
+ *   després del tip-off (finestra tancada) es queden `initial` fins al tip-off
+ *   de la *propera* jornada. Lazy en GET/PUT alineació + weekly lock.
  *
  * Finestra: diumenge 23:59 Europe/Madrid → primer tip-off de la jornada.
  * Fora de la finestra (després del tip-off fins al proper diumenge 23:59):

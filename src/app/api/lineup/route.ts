@@ -11,6 +11,7 @@ import {
   getTeamTransferPhase,
   promoteInitialTeamsIfLocked,
   requireActiveTeamId,
+  restoreInitialPhaseUntilNextTipOff,
 } from "@/lib/teams";
 import { INITIAL_BUDGET, LINEUP_SIZE, resolvePlayerId } from "@/data/roster";
 import { parsePlayerIds } from "@/lib/game";
@@ -46,8 +47,10 @@ function lockState() {
   const roundStatus = getRoundStatus();
   const lockAt = getLineupLockAt();
   const tipLocked = isLineupLocked(lockAt);
-  // Tip-off reached: flip initial → normal for all fantasy teams still open.
+  // Tip-off reached: flip initial → normal only for teams that existed then.
+  // Otherwise restore post-tip-off creates that were wrongly stuck on normal.
   if (tipLocked) promoteInitialTeamsIfLocked();
+  else restoreInitialPhaseUntilNextTipOff();
   const locked = roundStatus === "closed" || tipLocked;
   const tipMessage =
     tipLocked && lockAt

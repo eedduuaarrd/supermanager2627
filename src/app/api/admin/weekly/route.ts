@@ -104,7 +104,7 @@ export async function POST(req: Request) {
           lockAt == null
             ? "Sense tip-off publicat: alineació oberta."
             : isLineupLocked(lockAt)
-              ? "lineup_lock_at assolit: fase initial → normal."
+              ? "lineup_lock_at assolit: fase initial → normal (només equips creats abans del tip-off)."
               : "lineup_lock_at actualitzat des de fixtures.",
       });
     }

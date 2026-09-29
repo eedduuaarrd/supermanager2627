@@ -33,6 +33,7 @@ import {
   getTeamTransferPhase,
   promoteInitialTeamsIfLocked,
   requireActiveTeamId,
+  restoreInitialPhaseUntilNextTipOff,
 } from "@/lib/teams";
 import {
   MAX_TRANSFERS,
@@ -408,6 +409,7 @@ export function saveLineup(
       error: formatLockMessageCa(lockAt!),
     };
   }
+  restoreInitialPhaseUntilNextTipOff(new Date(), db);
   const existing = ensureLineupRow(teamId, round);
   if (existing.confirmed) {
     return {
