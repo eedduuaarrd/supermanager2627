@@ -17,6 +17,8 @@ export function BrandLogo({
   const heightClass = size === "md" ? "h-10" : "h-8";
 
   const img = (
+    // Brand SVG master — next/image adds little for local SVG wordmarks
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src="/brand/logo.svg"
       alt="Supermanager Balaguer"
@@ -53,6 +55,7 @@ export function BrandMark({
   size?: number;
 }) {
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src="/brand/mark.svg"
       alt=""
