@@ -3,6 +3,7 @@
 import { useManager } from "@/components/manager-provider";
 import { getPlayer, shortName } from "@/data/roster";
 import type { RoundScore } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { Crown } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -63,15 +64,17 @@ export function JornadaPointsHistory() {
   }
 
   const detail = selected != null ? history.find((h) => h.round === selected) : null;
+  const seasonTotal = history[history.length - 1]?.cumulative ?? 0;
 
   return (
     <div className="shrink-0 space-y-1.5 px-0.5">
       <div className="flex items-baseline justify-between gap-2">
-        <p className="text-[10px] uppercase tracking-[0.14em] text-mute">
+        <p className="text-[10px] uppercase tracking-[0.16em] text-mute">
           Punts de jornada
         </p>
-        <p className="font-display text-xs tabular-nums text-bone/80">
-          Total {history[history.length - 1]?.cumulative ?? 0}
+        <p className="text-[11px] tabular-nums text-mute">
+          Temporada{" "}
+          <span className="font-display text-xs text-bone/90">{seasonTotal}</span>
         </p>
       </div>
       <div
@@ -89,21 +92,37 @@ export function JornadaPointsHistory() {
               onClick={() =>
                 setSelected((cur) => (cur === row.round ? null : row.round))
               }
-              className={`flex min-w-[4.5rem] shrink-0 flex-col items-start rounded-md border px-2.5 py-1.5 text-left transition-colors ${
-                active
-                  ? "border-grana/60 bg-grana/15 text-bone"
-                  : "border-line/60 bg-panel-2/40 text-bone hover:border-line"
-              }`}
+              className={cn(
+                "group relative flex min-w-[4.75rem] shrink-0 flex-col items-stretch overflow-hidden rounded-sm px-2.5 py-1.5 text-left transition-[background-color,box-shadow,border-color] duration-200",
+                "border border-white/[0.08] bg-gradient-to-b from-white/[0.04] to-transparent",
+                "hover:border-white/15 hover:from-white/[0.06]",
+                active &&
+                  "border-white/18 from-white/[0.07] shadow-[inset_3px_0_0_0_var(--grana-bright)]",
+              )}
             >
-              <span className="text-[10px] uppercase tracking-[0.12em] text-mute">
+              <span
+                className={cn(
+                  "text-[9px] font-medium uppercase tracking-[0.18em] text-mute/80",
+                  active && "text-mute",
+                )}
+              >
                 J{row.round}
               </span>
-              <span className="font-display text-base leading-tight tabular-nums">
+              <span className="font-display text-[1.35rem] leading-none tabular-nums tracking-wide text-bone">
                 {row.points}
               </span>
-              <span className="mt-0.5 text-[10px] tabular-nums text-mute">
-                Σ {row.cumulative}
-                {row.rank != null ? ` · #${row.rank}` : ""}
+              <span className="mt-1 flex items-center gap-1.5 text-[10px] tabular-nums leading-none text-mute/75">
+                <span title="Acumulat">Σ {row.cumulative}</span>
+                {row.rank != null ? (
+                  <>
+                    <span className="text-white/15" aria-hidden>
+                      |
+                    </span>
+                    <span title="Posició" className="text-mute/90">
+                      #{row.rank}
+                    </span>
+                  </>
+                ) : null}
               </span>
             </button>
           );
@@ -111,7 +130,7 @@ export function JornadaPointsHistory() {
       </div>
 
       {detail ? (
-        <div className="rounded-md border border-line/50 bg-ink-soft/60 px-2.5 py-2">
+        <div className="rounded-sm border border-white/[0.08] bg-ink-soft/50 px-2.5 py-2">
           <div className="flex items-baseline justify-between gap-2">
             <p className="text-xs text-bone">
               Jornada {detail.round}

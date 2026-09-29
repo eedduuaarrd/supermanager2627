@@ -23,7 +23,7 @@ export const PRICE_CLAMP_PCT = 0.15;
 
 /** Catalan footnote for player page / Compte. */
 export const MARKET_PRICE_FOOTNOTE_CA =
-  "Sortida 15.000 €; després ≈ VAL mitjana × 1.000 € (mín. 500 €, màx. ±15% per actualització). Compres i vendes al preu actual.";
+  "Sortida 15.000 €; després preu teòric = mitjana VAL de temporada × 1.000 €, limitat a ±15% vs el preu anterior (mín. 500 €). Compres i vendes al preu actual.";
 
 export const BUY_SELL_RULE_CA = "Compra i venda al preu de mercat actual.";
 
@@ -137,45 +137,101 @@ export function round1(value: number): number {
 }
 
 export type NextValThresholds = {
-  /** Game VAL to push quote to the +15% band. */
+  /** Next-game VAL to push quote to the +15% band. */
   valUp: number;
-  /** Game VAL that holds the quote (theoretical ≈ P). */
+  /** Next-game VAL that holds the quote (theoretical ≈ P). */
   valHold: number;
-  /** Game VAL at/below which quote hits the −15% band. */
+  /** Next-game VAL at/below which quote hits the −15% band. */
   valDown: number;
   /** Next printed prices if move max up / hold / max down. */
   priceUp: number;
   priceHold: number;
   priceDown: number;
+  /**
+   * true when thresholds solve season avg after the next game
+   * (newAvg = (sumVal+S)/(n+1)); false = first-game / P÷k approximation.
+   */
+  usesSeasonAvg: boolean;
+};
+
+export type NextValThresholdOpts = {
+  k?: number;
+  /** Sum of fantasy VAL over scored games so far (same basis as avgVal). */
+  sumVal?: number | null;
+  /** Number of scored games so far. */
+  gamesPlayed?: number | null;
 };
 
 /**
- * ACB-like single-game VAL thresholds for the *next* price tick.
+ * Next-game VAL thresholds for the *next* price tick.
  *
- * With current quote P and PRICE_PER_VAL k:
- *   +15%: VAL ≥ round1(P × 1.15 / k)
- *   hold: VAL ≈ round1(P / k)
- *   −15%: VAL ≤ round1(P × 0.85 / k)
+ * Refresh math (unchanged): theoretical = max(0, seasonAvg) × k, then clamp
+ * ±15% vs previous printed price P. Thresholds invert that for the next score S:
  *
- * Next prices: round500(P×1.15), round500(P), round500(P×0.85), then floor 500.
- * Actual refresh still uses season avgVal × k clamped ±15% (see computeMarketPrice).
+ *   newAvg = (sumVal + S) / (n + 1)
+ *   theoretical = max(0, newAvg) × k
+ *   +15% when theoretical ≥ P×1.15  →  S ≥ (n+1)×(P×1.15)/k − sumVal
+ *   hold when theoretical ≈ P       →  S ≈ (n+1)×P/k − sumVal
+ *   −15% when theoretical ≤ P×0.85  →  S ≤ (n+1)×(P×0.85)/k − sumVal
+ *
+ * When n=0 (no games yet), this collapses to the classic P×1.15/k table.
+ * After a breakout, theoretical ≫ P, so S_up can be modest — later ticks can
+ * keep hitting +15% until the printed quote catches the season-avg target.
  */
 export function nextValThresholds(
   currentPrice: number,
-  k: number = PRICE_PER_VAL,
+  optsOrK: number | NextValThresholdOpts = PRICE_PER_VAL,
 ): NextValThresholds {
+  const opts: NextValThresholdOpts =
+    typeof optsOrK === "number" ? { k: optsOrK } : (optsOrK ?? {});
   const P =
     !Number.isFinite(currentPrice) || currentPrice <= 0
       ? INITIAL_PRICE
       : currentPrice;
-  const perVal = Number.isFinite(k) && k > 0 ? k : PRICE_PER_VAL;
+  const perVal =
+    Number.isFinite(opts.k) && (opts.k as number) > 0
+      ? (opts.k as number)
+      : PRICE_PER_VAL;
+
+  const n =
+    typeof opts.gamesPlayed === "number" &&
+    Number.isFinite(opts.gamesPlayed) &&
+    opts.gamesPlayed > 0
+      ? Math.floor(opts.gamesPlayed)
+      : 0;
+  const sum =
+    typeof opts.sumVal === "number" && Number.isFinite(opts.sumVal)
+      ? opts.sumVal
+      : null;
+
+  const priceUp = applyPriceFloor(roundToPriceStep(P * (1 + PRICE_CLAMP_PCT)));
+  const priceHold = applyPriceFloor(roundToPriceStep(P));
+  const priceDown = applyPriceFloor(roundToPriceStep(P * (1 - PRICE_CLAMP_PCT)));
+
+  // First game / unknown history → single-game P÷k table (valid when n=0).
+  if (n <= 0 || sum == null) {
+    return {
+      valUp: round1((P * (1 + PRICE_CLAMP_PCT)) / perVal),
+      valHold: round1(P / perVal),
+      valDown: round1((P * (1 - PRICE_CLAMP_PCT)) / perVal),
+      priceUp,
+      priceHold,
+      priceDown,
+      usesSeasonAvg: false,
+    };
+  }
+
+  const nextN = n + 1;
+  const solveS = (targetPrice: number) =>
+    round1((targetPrice / perVal) * nextN - sum);
 
   return {
-    valUp: round1((P * (1 + PRICE_CLAMP_PCT)) / perVal),
-    valHold: round1(P / perVal),
-    valDown: round1((P * (1 - PRICE_CLAMP_PCT)) / perVal),
-    priceUp: applyPriceFloor(roundToPriceStep(P * (1 + PRICE_CLAMP_PCT))),
-    priceHold: applyPriceFloor(roundToPriceStep(P)),
-    priceDown: applyPriceFloor(roundToPriceStep(P * (1 - PRICE_CLAMP_PCT))),
+    valUp: solveS(P * (1 + PRICE_CLAMP_PCT)),
+    valHold: solveS(P),
+    valDown: solveS(P * (1 - PRICE_CLAMP_PCT)),
+    priceUp,
+    priceHold,
+    priceDown,
+    usesSeasonAvg: true,
   };
 }

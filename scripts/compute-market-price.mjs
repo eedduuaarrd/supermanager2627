@@ -70,19 +70,56 @@ export function round1(value) {
   return Math.round(value * 10) / 10;
 }
 
-/** Single-game VAL thresholds for next tick (ACB-like broker tables). */
-export function nextValThresholds(currentPrice, k = PRICE_PER_VAL) {
+/**
+ * Next-game VAL thresholds. Prefer season-avg solve when n>0:
+ *   S = (n+1)×(target)/k − sumVal  for target ∈ {P×1.15, P, P×0.85}
+ * Else first-game P÷k table. Keep in sync with src/lib/market-price.ts.
+ */
+export function nextValThresholds(currentPrice, optsOrK = PRICE_PER_VAL) {
+  const opts = typeof optsOrK === "number" ? { k: optsOrK } : optsOrK ?? {};
   const P =
     !Number.isFinite(currentPrice) || currentPrice <= 0
       ? INITIAL_PRICE
       : currentPrice;
-  const perVal = Number.isFinite(k) && k > 0 ? k : PRICE_PER_VAL;
+  const perVal = Number.isFinite(opts.k) && opts.k > 0 ? opts.k : PRICE_PER_VAL;
+  const n =
+    typeof opts.gamesPlayed === "number" &&
+    Number.isFinite(opts.gamesPlayed) &&
+    opts.gamesPlayed > 0
+      ? Math.floor(opts.gamesPlayed)
+      : 0;
+  const sum =
+    typeof opts.sumVal === "number" && Number.isFinite(opts.sumVal)
+      ? opts.sumVal
+      : null;
+
+  const priceUp = applyPriceFloor(roundToPriceStep(P * (1 + PRICE_CLAMP_PCT)));
+  const priceHold = applyPriceFloor(roundToPriceStep(P));
+  const priceDown = applyPriceFloor(roundToPriceStep(P * (1 - PRICE_CLAMP_PCT)));
+
+  if (n <= 0 || sum == null) {
+    return {
+      valUp: round1((P * (1 + PRICE_CLAMP_PCT)) / perVal),
+      valHold: round1(P / perVal),
+      valDown: round1((P * (1 - PRICE_CLAMP_PCT)) / perVal),
+      priceUp,
+      priceHold,
+      priceDown,
+      usesSeasonAvg: false,
+    };
+  }
+
+  const nextN = n + 1;
+  const solveS = (targetPrice) =>
+    round1((targetPrice / perVal) * nextN - sum);
+
   return {
-    valUp: round1((P * (1 + PRICE_CLAMP_PCT)) / perVal),
-    valHold: round1(P / perVal),
-    valDown: round1((P * (1 - PRICE_CLAMP_PCT)) / perVal),
-    priceUp: applyPriceFloor(roundToPriceStep(P * (1 + PRICE_CLAMP_PCT))),
-    priceHold: applyPriceFloor(roundToPriceStep(P)),
-    priceDown: applyPriceFloor(roundToPriceStep(P * (1 - PRICE_CLAMP_PCT))),
+    valUp: solveS(P * (1 + PRICE_CLAMP_PCT)),
+    valHold: solveS(P),
+    valDown: solveS(P * (1 - PRICE_CLAMP_PCT)),
+    priceUp,
+    priceHold,
+    priceDown,
+    usesSeasonAvg: true,
   };
 }

@@ -135,7 +135,12 @@ export default async function JugadorPage({
         </div>
       </section>
 
-      <ValorBlock price={player.price} prevPrice={player.prevPrice} />
+      <ValorBlock
+        price={player.price}
+        prevPrice={player.prevPrice}
+        sumVal={summary.totalVal}
+        gamesPlayed={summary.gamesPlayed}
+      />
 
       {nextMatch && (
         <section className="border-b border-line/60 pb-3">

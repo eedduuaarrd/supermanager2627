@@ -1,5 +1,10 @@
 import { formatPrice } from "@/data/roster";
-import { nextValThresholds, priceDelta, priceTrend } from "@/lib/market-price";
+import {
+  nextValThresholds,
+  priceDelta,
+  priceTrend,
+  type NextValThresholdOpts,
+} from "@/lib/market-price";
 import { cn } from "@/lib/utils";
 
 function fmtVal(n: number): string {
@@ -9,15 +14,26 @@ function fmtVal(n: number): string {
 interface ValorBlockProps {
   price: number;
   prevPrice?: number | null;
+  /** Season VAL sum so far — enables accurate next-game thresholds. */
+  sumVal?: number | null;
+  /** Scored games so far. */
+  gamesPlayed?: number | null;
   className?: string;
 }
 
 /**
- * Player-page market block: current quote + ↑↓ + three VAL thresholds
- * for the next price tick (+15% / hold / −15%). Inspiration only — no ACB copy.
+ * Player-page market block: current quote + ↑↓ + three next-game VAL
+ * thresholds (+15% / hold / −15%). Uses season-avg solve when history exists.
  */
-export function ValorBlock({ price, prevPrice, className }: ValorBlockProps) {
-  const t = nextValThresholds(price);
+export function ValorBlock({
+  price,
+  prevPrice,
+  sumVal,
+  gamesPlayed,
+  className,
+}: ValorBlockProps) {
+  const opts: NextValThresholdOpts = { sumVal, gamesPlayed };
+  const t = nextValThresholds(price, opts);
   const trend = priceTrend(price, prevPrice);
   const delta = priceDelta(price, prevPrice);
 
@@ -68,6 +84,11 @@ export function ValorBlock({ price, prevPrice, className }: ValorBlockProps) {
       <p className="mt-5 text-[10px] uppercase tracking-[0.14em] text-mute">
         Proper moviment · VAL del partit
       </p>
+      {t.usesSeasonAvg ? (
+        <p className="mt-1 text-[10px] leading-snug text-mute/80">
+          Segons mitjana de temporada (després del proper partit)
+        </p>
+      ) : null}
 
       <div className="mt-3 grid grid-cols-3 gap-2">
         <ThresholdCol
