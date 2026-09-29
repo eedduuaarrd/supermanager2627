@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { readSession } from "@/lib/auth";
-import { ROSTER, TEAMS, TEAM_ORDER, INITIAL_BUDGET, LINEUP_SIZE } from "@/data/roster";
+import {
+  ROSTER,
+  TEAMS,
+  TEAM_ORDER,
+  INITIAL_BUDGET,
+  LINEUP_SIZE,
+  LINEUP_SLOTS,
+  POSITION_LABEL,
+} from "@/data/roster";
 
 export const runtime = "nodejs";
 
@@ -15,6 +23,8 @@ export async function GET() {
     rules: {
       budget: INITIAL_BUDGET,
       lineupSize: LINEUP_SIZE,
+      lineupSlots: LINEUP_SLOTS,
+      positionLabels: POSITION_LABEL,
     },
   });
 }

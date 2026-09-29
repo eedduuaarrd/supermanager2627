@@ -1,7 +1,7 @@
 import { PlayerAvatar } from "@/components/player-avatar";
 import { Badge } from "@/components/ui/badge";
 import { ValorBlock } from "@/components/valor-block";
-import { teamLabel } from "@/data/roster";
+import { POSITION_LABEL, teamLabel } from "@/data/roster";
 import {
   dateForGame,
   formatMatchupLine,
@@ -125,6 +125,12 @@ export default async function JugadorPage({
             {player.name}
           </h1>
           <div className="mt-2 flex flex-wrap gap-1.5">
+            <Badge
+              variant="outline"
+              className="border-white/15 text-[10px] uppercase tracking-wide text-mute"
+            >
+              {POSITION_LABEL[player.position]}
+            </Badge>
             <Badge
               variant="outline"
               className="max-w-full border-white/15 text-[10px] uppercase tracking-wide text-mute"

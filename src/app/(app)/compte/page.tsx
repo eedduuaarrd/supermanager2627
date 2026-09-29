@@ -61,7 +61,7 @@ export default function ComptePage() {
         </p>
         <ul className="mt-3 space-y-2 text-sm text-mute">
           <li>Fins a {maxTeams} equips per compte</li>
-          <li>8 jugadors per alineació (qualsevol mix)</li>
+          <li>8 jugadors per alineació (3 pivots, 3 alers, 2 bases)</li>
           <li>Pressupost 100.000 € per equip</li>
           <li>{BUY_SELL_RULE_CA}</li>
           <li>Capità ×2 als punts de jornada</li>

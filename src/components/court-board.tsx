@@ -2,8 +2,13 @@
 
 import { PlayerAvatar } from "@/components/player-avatar";
 import { PriceLabel } from "@/components/price-label";
-import { displayFirstName, LINEUP_SIZE } from "@/data/roster";
-import type { Player } from "@/lib/types";
+import {
+  COURT_SLOT_POSITIONS,
+  displayFirstName,
+  LINEUP_SLOTS,
+  POSITION_LABEL,
+} from "@/data/roster";
+import type { Player, Position } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Crown, Plus } from "lucide-react";
 import Link from "next/link";
@@ -11,29 +16,48 @@ import type { CSSProperties } from "react";
 
 type SlotDef = {
   key: string;
+  position: Position;
   left: string;
   top: string;
 };
 
 /**
  * Flat half-court grid (looking toward the hoop).
- * 8 equal slots — any mix of players; no position labels.
+ * Top 3 = Pivot, middle 3 = Aler, bottom 2 = Base.
  * left/top mark the CHIP CIRCLE center; labels sit below outside the circle.
  */
-const SLOTS: SlotDef[] = [
-  { key: "s0", left: "16%", top: "18%" },
-  { key: "s1", left: "50%", top: "18%" },
-  { key: "s2", left: "84%", top: "18%" },
-  { key: "s3", left: "16%", top: "48%" },
-  { key: "s4", left: "50%", top: "48%" },
-  { key: "s5", left: "84%", top: "48%" },
-  { key: "s6", left: "30%", top: "78%" },
-  { key: "s7", left: "70%", top: "78%" },
-];
+const SLOTS: SlotDef[] = COURT_SLOT_POSITIONS.map((position, i) => {
+  const row = i < 3 ? 0 : i < 6 ? 1 : 2;
+  const colInRow = i < 3 ? i : i < 6 ? i - 3 : i - 6;
+  const left =
+    row < 2
+      ? (["16%", "50%", "84%"] as const)[colInRow]
+      : (["30%", "70%"] as const)[colInRow];
+  const top = (["18%", "48%", "78%"] as const)[row];
+  return {
+    key: `${position}-${colInRow}`,
+    position,
+    left,
+    top,
+  };
+});
 
-/** Dense playerIds map to slots in order; trailing slots stay empty. */
+/** Place players into fixed position slots (P→A→B pools). */
 function assignSlots(players: Player[]): (Player | null)[] {
-  return SLOTS.map((_, i) => players[i] ?? null);
+  const pools: Record<Position, Player[]> = {
+    P: players.filter((p) => p.position === "P"),
+    A: players.filter((p) => p.position === "A"),
+    B: players.filter((p) => p.position === "B"),
+  };
+  return SLOTS.map((slot) => pools[slot.position].shift() ?? null);
+}
+
+function countByPosition(players: Player[]): Record<Position, number> {
+  return {
+    P: players.filter((p) => p.position === "P").length,
+    A: players.filter((p) => p.position === "A").length,
+    B: players.filter((p) => p.position === "B").length,
+  };
 }
 
 interface CourtBoardProps {
@@ -41,7 +65,7 @@ interface CourtBoardProps {
   captainId: string | null;
   selectedId?: string | null;
   onSelect?: (id: string | null) => void;
-  onEmptySlot?: (slot: { slotIndex: number }) => void;
+  onEmptySlot?: (slot: { slotIndex: number; position: Position }) => void;
   /** Fill remaining flex height without forcing page scroll. */
   fillHeight?: boolean;
 }
@@ -55,6 +79,7 @@ export function CourtBoard({
   fillHeight,
 }: CourtBoardProps) {
   const filled = assignSlots(players);
+  const counts = countByPosition(players);
 
   return (
     <div
@@ -191,6 +216,7 @@ export function CourtBoard({
             const player = filled[i];
             const isCaptain = player != null && captainId === player.id;
             const isSelected = player != null && selectedId === player.id;
+            const posFull = counts[slot.position] >= LINEUP_SLOTS[slot.position];
             return (
               <div
                 key={slot.key}
@@ -213,12 +239,16 @@ export function CourtBoard({
                   />
                 ) : (
                   <EmptySlot
-                    slotIndex={i}
-                    disabled={players.length >= LINEUP_SIZE}
+                    position={slot.position}
+                    disabled={posFull}
                     onClick={
                       !onEmptySlot
                         ? undefined
-                        : () => onEmptySlot({ slotIndex: i })
+                        : () =>
+                            onEmptySlot({
+                              slotIndex: i,
+                              position: slot.position,
+                            })
                     }
                   />
                 )}
@@ -232,11 +262,11 @@ export function CourtBoard({
 }
 
 function EmptySlot({
-  slotIndex,
+  position,
   disabled,
   onClick,
 }: {
-  slotIndex: number;
+  position: Position;
   disabled?: boolean;
   onClick?: () => void;
 }) {
@@ -250,7 +280,7 @@ function EmptySlot({
         "touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grana-bright",
         "disabled:cursor-default",
       )}
-      aria-label={`Afegir jugador (slot ${slotIndex + 1})`}
+      aria-label={`Afegir ${POSITION_LABEL[position]}`}
     >
       <div
         className={cn(
@@ -262,6 +292,9 @@ function EmptySlot({
       >
         <Plus className="size-5 text-bone/90 sm:size-6" strokeWidth={2.25} />
       </div>
+      <span className="pointer-events-none absolute left-1/2 top-[calc(100%+0.35rem)] -translate-x-1/2 text-[9px] font-medium tracking-[0.14em] text-bone/55">
+        {position}
+      </span>
     </button>
   );
 }

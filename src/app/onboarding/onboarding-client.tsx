@@ -31,10 +31,10 @@ export function OnboardingClient() {
         es desa sola; es puntua quan es tanqui la jornada.
       </p>
       <ul className="mt-6 space-y-3 border-l border-grana pl-4 text-sm text-bone">
-        <li>8 jugadors (qualsevol mix)</li>
+        <li>8 jugadors: 3 pivots, 3 alers, 2 bases</li>
         <li>Pressupost 100.000 €</li>
         <li>Capità ×2</li>
-        <li>Toca + a la pista per triar per equip del club</li>
+        <li>Toca + a la pista (només la posició d&apos;aquell slot)</li>
       </ul>
       <Button
         type="button"

@@ -30,7 +30,7 @@ npm run start
 1. Obre la URL pública i **Registra’t** (nom, equip fantasy, correu, contrasenya ≥ 8).
 2. El **primer compte** del servidor és administrador (pot tancar jornades).
 3. A **Inici**: gestiona equips fantasy (fins a 5) i mira l’estat de la jornada.
-4. A **Equip**: afegeix fins a 8 jugadors (qualsevol mix) i tria capità — l’alineació es desa sola.
+4. A **Equip**: afegeix 8 jugadors (3 pivots, 3 alers, 2 bases) i tria capità — l’alineació es desa sola.
 5. Classificació **general** i d’**última jornada** a Classificació.
 
 ## Model de jornada (setmanal FCBQ)

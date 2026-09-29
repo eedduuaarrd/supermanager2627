@@ -20,7 +20,7 @@ import marketPricesJson from "@/data/market-prices.json";
  * Noms = title-case de la Plantilla FCBQ (accents només si surten a Fede).
  * Dorsal = número de samarreta a la Plantilla (badge / columna).
  * VAL fantasy = PTS − FC − max(0, TLI−TLC) + PM (FCBQ Plantilla VAL ignora).
- * Sense posicions: alineació de 8 lliures.
+ * Posicions B/A/P (Base/Aler/Pivot): pista 3P + 3A + 2B.
  * Preus broker: sortida flat INITIAL_PRICE 15.000 € per a tothom; només es mouen
  *   quan es refresquen VAL / jornada (clamp ±15% vs prev, rodona 500, mín. 500).
  *   Compra/venda al preu de mercat actual. Veure market-prices.json.
@@ -99,6 +99,7 @@ export const ROSTER_SEED: Player[] = [
   // —— Teixidó Associats CB Balaguer A (masculí) ——
   {
     id: "hector-lozano",
+    position: "A",
     name: "Hector Lozano Martinez",
     number: 19,
     pts: 15,
@@ -112,6 +113,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "eduard-bernat",
+    position: "P",
     name: "Eduard Bernat Sucarrat",
     number: 20,
     pts: 10,
@@ -125,6 +127,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "toni-salud",
+    position: "A",
     name: "Toni Salud Garcia",
     number: 43,
     pts: 9,
@@ -138,6 +141,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "ivan-franco",
+    position: "B",
     name: "Ivan Franco Guerrero",
     number: 6,
     pts: 9,
@@ -151,6 +155,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "gerard-garcia",
+    position: "A",
     name: "Gerard Garcia Rosauro",
     number: 0,
     pts: 8,
@@ -164,6 +169,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "marc-escoda",
+    position: "A",
     name: "Marc Escoda Angerri",
     number: 24,
     pts: 6,
@@ -177,6 +183,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "babacar-toure",
+    position: "P",
     name: "Babacar Toure Gassama",
     number: 68,
     pts: 6,
@@ -190,6 +197,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "gerard-soldevila",
+    position: "B",
     name: "Gerard Soldevila Casas",
     number: 26,
     pts: 0,
@@ -203,6 +211,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "roger-companys",
+    position: "P",
     name: "Roger Companys Solà",
     number: 8,
     pts: 0,
@@ -217,6 +226,7 @@ export const ROSTER_SEED: Player[] = [
   // —— Cudos Consultors CB Balaguer A (femení) ——
   {
     id: "ares-bunol",
+    position: "A",
     name: "Ares Buñol Perelló",
     number: 11,
     pts: 15,
@@ -230,6 +240,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "julia-pla__cudos-a",
+    position: "P",
     name: "Júlia Pla Pla",
     number: 13,
     pts: 13,
@@ -244,6 +255,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "andrea-perat",
+    position: "A",
     name: "Andrea Perat Gracia",
     number: 21,
     pts: 8,
@@ -257,6 +269,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "neus-escoda",
+    position: "P",
     name: "Neus Escoda Angerri",
     number: 88,
     pts: 8,
@@ -270,6 +283,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "monica-fontanet",
+    position: "B",
     name: "Monica Fontanet Mallol",
     number: 95,
     pts: 6,
@@ -283,6 +297,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "queralt-sole__cudos-a",
+    position: "P",
     name: "Queralt Sole Torres",
     number: 23,
     pts: 5,
@@ -297,6 +312,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "clara-paniagua",
+    position: "A",
     name: "Clara Paniagua Marvà",
     number: 10,
     pts: 2,
@@ -310,6 +326,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "mariama-mballo__cudos-a",
+    position: "P",
     name: "Mariama Mballo Diallo",
     number: 27,
     pts: 1,
@@ -324,6 +341,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "martina-benitez",
+    position: "B",
     name: "Martina Benítez Farrando",
     number: 79,
     pts: 1,
@@ -337,6 +355,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "ada-domene",
+    position: "B",
     name: "Ada Domene Moraleda",
     number: 24,
     pts: 0,
@@ -351,6 +370,7 @@ export const ROSTER_SEED: Player[] = [
   // —— Farratges La Noguera CB Balaguer B (femení) ——
   {
     id: "queralt-sole__farratges-b",
+    position: "P",
     name: "Queralt Sole Torres",
     number: 23,
     pts: 29,
@@ -365,6 +385,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "julia-pla__farratges-b",
+    position: "P",
     name: "Júlia Pla Pla",
     number: 13,
     pts: 15,
@@ -379,6 +400,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "jana-roldan",
+    position: "A",
     name: "Jana Roldan Arandilla",
     number: 8,
     pts: 5,
@@ -392,6 +414,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "nuria-jimenez",
+    position: "A",
     name: "Núria Jiménez Aran",
     number: 30,
     pts: 2,
@@ -405,6 +428,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "mariama-mballo__farratges-b",
+    position: "P",
     name: "Mariama Mballo Diallo",
     number: 27,
     pts: 2,
@@ -419,6 +443,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "abril-gracia",
+    position: "B",
     name: "Abril Gràcia Palacín",
     number: 33,
     pts: 2,
@@ -432,6 +457,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "xenia-andreu",
+    position: "P",
     name: "Xenia Andreu Monell",
     number: 93,
     pts: 1,
@@ -445,6 +471,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "gina-betbese",
+    position: "P",
     name: "Gina Betbesé Sánchez",
     number: 11,
     pts: 0,
@@ -458,6 +485,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "gina-trilla",
+    position: "B",
     name: "Gina Trilla Piniés",
     number: 25,
     pts: 0,
@@ -471,6 +499,7 @@ export const ROSTER_SEED: Player[] = [
   },
   {
     id: "jana-alarcon",
+    position: "A",
     name: "Jana Alarcon Solanes",
     number: 24,
     pts: 0,
@@ -518,14 +547,39 @@ function applyMarketPrices(seed: Player[]): Player[] {
 
 export const ROSTER: Player[] = applyMarketPrices(ROSTER_SEED);
 
+export const POSITION_LABEL: Record<Player["position"], string> = {
+  B: "Base",
+  A: "Aler",
+  P: "Pivot",
+};
+
+/** Court formation: top 3 pivots, middle 3 alers, bottom 2 bases. */
+export const LINEUP_SLOTS = {
+  P: 3,
+  A: 3,
+  B: 2,
+} as const;
+
+/** Slot index → required position (ordered 8-slot court). */
+export const COURT_SLOT_POSITIONS: Player["position"][] = [
+  "P",
+  "P",
+  "P",
+  "A",
+  "A",
+  "A",
+  "B",
+  "B",
+];
+
 export const LINEUP_SIZE = 8;
 /** Pressupost amb mercat multi-equip. */
 export const INITIAL_BUDGET = 100_000;
 export const CAPTAIN_MULTIPLIER = 2;
 export const WIN_BONUS = 0.2;
 
-/** GameState.version — bump when roster ids / dual-team / pricing rule change. */
-export const GAME_VERSION = 11;
+/** GameState.version — bump when roster ids / dual-team / positions / pricing change. */
+export const GAME_VERSION = 12;
 
 export const OPPONENTS = [
   "CB Cervera",

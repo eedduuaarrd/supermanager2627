@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { PriceLabel } from "@/components/price-label";
-import { teamLabel } from "@/data/roster";
+import { POSITION_LABEL, teamLabel } from "@/data/roster";
 import type { Player } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Crown, Plus, X } from "lucide-react";
@@ -71,6 +71,12 @@ export function PlayerRow({
                 <Crown className="size-3" /> Capità
               </Badge>
             )}
+            <Badge
+              variant="outline"
+              className="border-white/15 text-[10px] uppercase tracking-wide text-mute"
+            >
+              {POSITION_LABEL[player.position]}
+            </Badge>
             <Badge
               variant="outline"
               className="border-white/15 text-[10px] uppercase tracking-wide text-mute"

@@ -21,7 +21,14 @@ import {
 } from "@/lib/rounds";
 import { formatLockMessageCa, isLineupLocked } from "@/lib/fixtures";
 import type { RoundScore } from "@/lib/types";
-import { parsePlayerIds, validateLineupSave, spentBudget } from "@/lib/game";
+import {
+  applyMarketTransfers,
+  migrateLineupToPositions,
+  migratePlayerIdList,
+  parsePlayerIds,
+  spentBudget,
+  validateLineupSave,
+} from "@/lib/game";
 import {
   getTeamTransferPhase,
   promoteInitialTeamsIfLocked,
@@ -321,16 +328,62 @@ function migrateLineupRowIfNeeded(row: DbLineup): DbLineup {
       return false;
     }
   })();
-  if (sameIds && captainId === row.captain_id) return row;
+
+  let nextBudget = row.budget;
+  let budgetChanged = false;
+  if (!sameIds) {
+    // Refund market price of players dropped by id/position migration.
+    try {
+      const raw = JSON.parse(row.player_ids) as unknown;
+      let previous: string[] = [];
+      if (Array.isArray(raw)) {
+        previous = raw.filter(
+          (x): x is string => typeof x === "string" && x.length > 0,
+        );
+      } else if (raw && typeof raw === "object") {
+        const obj = raw as Record<string, unknown>;
+        if (Array.isArray(obj.playerIds)) {
+          previous = obj.playerIds.filter(
+            (x): x is string => typeof x === "string" && x.length > 0,
+          );
+        } else if (Array.isArray(obj.slots)) {
+          previous = obj.slots.filter(
+            (x): x is string => typeof x === "string" && x.length > 0,
+          );
+        } else if (obj.slots && typeof obj.slots === "object") {
+          const slots = obj.slots as Record<string, unknown>;
+          for (const key of ["pivot", "P", "aler", "A", "base", "B"]) {
+            const arr = slots[key];
+            if (!Array.isArray(arr)) continue;
+            for (const id of arr) {
+              if (typeof id === "string" && id.length > 0) previous.push(id);
+            }
+          }
+        }
+      }
+      const before = migratePlayerIdList(previous);
+      const transfer = applyMarketTransfers(row.budget, before, flat);
+      if (transfer.cash !== row.budget) {
+        nextBudget = Math.max(0, transfer.cash);
+        budgetChanged = true;
+      }
+    } catch {
+      /* keep budget */
+    }
+  }
+
+  if (sameIds && captainId === row.captain_id && !budgetChanged) return row;
 
   const db = getDb();
   db.prepare(
-    `UPDATE lineups SET player_ids = ?, captain_id = ? WHERE team_id = ? AND round = ?`,
-  ).run(JSON.stringify(flat), captainId, row.team_id, row.round);
+    `UPDATE lineups SET player_ids = ?, captain_id = ?, budget = ?
+     WHERE team_id = ? AND round = ?`,
+  ).run(JSON.stringify(flat), captainId, nextBudget, row.team_id, row.round);
   return {
     ...row,
     player_ids: JSON.stringify(flat),
     captain_id: captainId,
+    budget: nextBudget,
   };
 }
 
@@ -362,11 +415,13 @@ export function saveLineup(
       error: "L'alineació d'aquesta jornada està bloquejada.",
     };
   }
+  // Normalize to ordered P→A→B groups; drop overflow / unknown ids.
+  const normalizedIds = migrateLineupToPositions(playerIds);
   // Migrate collapsed dual-team captain ids the same way as playerIds.
-  const resolvedCaptain = resolveCaptainId(captainId, playerIds);
+  const resolvedCaptain = resolveCaptainId(captainId, normalizedIds);
   const previousIds = parsePlayerIds(existing.player_ids);
   const check = validateLineupSave(
-    playerIds,
+    normalizedIds,
     resolvedCaptain,
     existing.budget,
     previousIds,
@@ -375,7 +430,7 @@ export function saveLineup(
 
   const phase = getTeamTransferPhase(teamId, db);
   const snapshotIds = parseSnapshotIds(existing.snapshot_ids);
-  const changesUsed = countChangesUsed(snapshotIds, playerIds);
+  const changesUsed = countChangesUsed(snapshotIds, normalizedIds);
   // Initial roster: unlimited canvis until first tip-off lock flips phase.
   if (phase !== "initial" && changesUsed > MAX_TRANSFERS) {
     return { ok: false, error: maxChangesExceededCa(MAX_TRANSFERS) };
@@ -387,7 +442,7 @@ export function saveLineup(
          changes_used = ?, budget = ?
      WHERE team_id = ? AND round = ?`,
   ).run(
-    JSON.stringify(playerIds),
+    JSON.stringify(normalizedIds),
     resolvedCaptain,
     changesUsed,
     check.cash,

@@ -4,14 +4,20 @@ import { CourtBoard } from "@/components/court-board";
 import { MarketSheet } from "@/components/market-sheet";
 import type { SaveStatus } from "@/components/manager-provider";
 import { Button } from "@/components/ui/button";
-import { formatPrice, LINEUP_SIZE } from "@/data/roster";
 import {
+  formatPrice,
+  LINEUP_SIZE,
+  LINEUP_SLOTS,
+  POSITION_LABEL,
+} from "@/data/roster";
+import {
+  countByPosition,
   issueMessage,
   projectedPoints,
   remainingBudget,
   validateLineup,
 } from "@/lib/game";
-import type { Lineup, Player } from "@/lib/types";
+import type { Lineup, Player, Position } from "@/lib/types";
 import { AlertCircle, Crown, UserMinus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -31,11 +37,22 @@ interface LineupBuilderProps {
   lockMessage?: string | null;
 }
 
-function softHint(filled: number, hasCaptain: boolean): string | null {
+function softHint(
+  filled: number,
+  hasCaptain: boolean,
+  counts: Record<Position, number>,
+): string | null {
   if (filled === 0) return "Toca + per afegir";
   if (filled < LINEUP_SIZE) {
-    const missing = LINEUP_SIZE - filled;
-    return `Falten ${missing}`;
+    const missing: string[] = [];
+    (Object.keys(LINEUP_SLOTS) as Position[]).forEach((pos) => {
+      const need = LINEUP_SLOTS[pos] - counts[pos];
+      if (need > 0) {
+        const label = POSITION_LABEL[pos].toLowerCase();
+        missing.push(need === 1 ? label : `${need} ${label}s`);
+      }
+    });
+    return missing.length ? `Falta ${missing.join(", ")}` : `Falten ${LINEUP_SIZE - filled}`;
   }
   if (!hasCaptain) return "Tria capità";
   return null;
@@ -64,9 +81,12 @@ export function LineupBuilder({
   lockMessage = null,
 }: LineupBuilderProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerSlot, setPickerSlot] = useState<null | {
+    slotIndex: number;
+    position: Position;
+  }>(null);
 
-  const sheetOpen = selectedId != null && !pickerOpen;
+  const sheetOpen = selectedId != null && pickerSlot == null;
 
   useEffect(() => {
     if (!sheetOpen) return;
@@ -79,14 +99,17 @@ export function LineupBuilder({
 
   const committedIds = savedPlayerIds ?? lineup.playerIds;
   const remaining = remainingBudget(budget, lineup.playerIds, committedIds);
+  const counts = countByPosition(lineup.playerIds);
   const validation = validateLineup(lineup, budget, committedIds);
   const projected = projectedPoints(lineup);
   const filled = lineup.playerIds.length;
   const overBudget = remaining < 0;
   const showHarshValidation =
-    overBudget || validation.issues.includes("duplicate");
+    overBudget ||
+    validation.issues.includes("duplicate") ||
+    validation.issues.includes("positions");
   const feedback = saveFeedback(saveStatus, error);
-  const hint = softHint(filled, Boolean(lineup.captainId));
+  const hint = softHint(filled, Boolean(lineup.captainId), counts);
 
   const selectedPlayers = lineup.playerIds
     .map((id) => roster.find((p) => p.id === id))
@@ -114,12 +137,14 @@ export function LineupBuilder({
     applyLineup(playerIds, captainId);
   }
 
-  function addPlayer(id: string) {
+  function addPlayer(id: string, position: Position) {
     if (readOnly) return;
     if (lineup.playerIds.includes(id)) return;
     if (lineup.playerIds.length >= LINEUP_SIZE) return;
     const player = roster.find((p) => p.id === id);
     if (!player) return;
+    if (player.position !== position) return;
+    if (counts[position] >= LINEUP_SLOTS[position]) return;
     if (remaining < player.price) return;
     applyLineup([...lineup.playerIds, id], lineup.captainId);
     setSelectedId(null);
@@ -135,15 +160,16 @@ export function LineupBuilder({
     });
   }
 
-  function handleEmptySlot() {
+  function handleEmptySlot(slot: { slotIndex: number; position: Position }) {
     if (readOnly) return;
     setSelectedId(null);
-    setPickerOpen(true);
+    setPickerSlot(slot);
   }
 
   function handlePickFromSheet(playerId: string) {
-    addPlayer(playerId);
-    setPickerOpen(false);
+    if (!pickerSlot) return;
+    addPlayer(playerId, pickerSlot.position);
+    setPickerSlot(null);
   }
 
   return (
@@ -198,7 +224,10 @@ export function LineupBuilder({
           <AlertCircle className="mt-0.5 size-3.5 shrink-0" />
           <ul className="space-y-0.5">
             {validation.issues
-              .filter((i) => i === "budget" || i === "duplicate")
+              .filter(
+                (i) =>
+                  i === "budget" || i === "duplicate" || i === "positions",
+              )
               .map((issue) => (
                 <li key={issue}>{issueMessage(issue)}</li>
               ))}
@@ -218,13 +247,15 @@ export function LineupBuilder({
 
       {!readOnly && (
         <MarketSheet
-          open={pickerOpen}
+          open={pickerSlot != null}
+          position={pickerSlot?.position ?? null}
           roster={roster}
           takenIds={lineup.playerIds}
           remainingBudget={remaining}
+          positionCounts={counts}
           lineupFull={filled >= LINEUP_SIZE}
           onPick={handlePickFromSheet}
-          onClose={() => setPickerOpen(false)}
+          onClose={() => setPickerSlot(null)}
         />
       )}
 

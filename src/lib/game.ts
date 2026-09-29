@@ -3,6 +3,7 @@ import {
   GAME_VERSION,
   INITIAL_BUDGET,
   LINEUP_SIZE,
+  LINEUP_SLOTS,
   OPPONENTS,
   WIN_BONUS,
   getPlayer,
@@ -12,6 +13,7 @@ import type {
   GameState,
   LeagueMember,
   Lineup,
+  Position,
   RoundResult,
   RoundScore,
 } from "@/lib/types";
@@ -28,6 +30,25 @@ export function migratePlayerIdList(ids: string[]): string[] {
     if (out.length >= LINEUP_SIZE) break;
   }
   return out;
+}
+
+/**
+ * Rebuild lineup into ordered position groups (P×3, A×3, B×2).
+ * Extra players that overflow a position are dropped.
+ */
+export function migrateLineupToPositions(ids: string[]): string[] {
+  const resolved = migratePlayerIdList(ids);
+  const pools: Record<Position, string[]> = { P: [], A: [], B: [] };
+  for (const id of resolved) {
+    const player = getPlayer(id);
+    if (!player) continue;
+    pools[player.position].push(id);
+  }
+  return [
+    ...pools.P.slice(0, LINEUP_SLOTS.P),
+    ...pools.A.slice(0, LINEUP_SLOTS.A),
+    ...pools.B.slice(0, LINEUP_SLOTS.B),
+  ];
 }
 
 export function emptyLineup(): Lineup {
@@ -112,10 +133,20 @@ export function patrimoni(cash: number, playerIds: string[]): number {
   return cash + squadMarketValue(playerIds);
 }
 
+export function countByPosition(playerIds: string[]): Record<Position, number> {
+  const counts: Record<Position, number> = { P: 0, A: 0, B: 0 };
+  for (const id of playerIds) {
+    const p = getPlayer(id);
+    if (p) counts[p.position] += 1;
+  }
+  return counts;
+}
+
 /**
  * Normalize lineup player ids from DB / API JSON.
  * Supports legacy position-keyed `{ slots: { base, aler, pivot } }` and
  * flat arrays / `{ playerIds }` / `{ slots: (string|null)[] }`.
+ * Always rebuilds into ordered P→A→B groups with slot caps.
  */
 export function parsePlayerIds(raw: unknown): string[] {
   let data: unknown = raw;
@@ -127,49 +158,44 @@ export function parsePlayerIds(raw: unknown): string[] {
     }
   }
 
+  let ids: string[] = [];
+
   if (Array.isArray(data)) {
-    return migratePlayerIdList(
-      data.filter((x): x is string => typeof x === "string" && x.length > 0),
-    );
-  }
+    ids = data.filter((x): x is string => typeof x === "string" && x.length > 0);
+  } else if (data && typeof data === "object") {
+    const obj = data as Record<string, unknown>;
 
-  if (!data || typeof data !== "object") return [];
-
-  const obj = data as Record<string, unknown>;
-
-  if (Array.isArray(obj.playerIds)) {
-    return migratePlayerIdList(
-      obj.playerIds.filter(
+    if (Array.isArray(obj.playerIds)) {
+      ids = obj.playerIds.filter(
         (x): x is string => typeof x === "string" && x.length > 0,
-      ),
-    );
-  }
-
-  if (Array.isArray(obj.slots)) {
-    return migratePlayerIdList(
-      obj.slots.filter((x): x is string => typeof x === "string" && x.length > 0),
-    );
-  }
-
-  if (obj.slots && typeof obj.slots === "object" && !Array.isArray(obj.slots)) {
-    const slots = obj.slots as Record<string, unknown>;
-    const ids: string[] = [];
-    for (const key of ["base", "aler", "pivot"]) {
-      const arr = slots[key];
-      if (!Array.isArray(arr)) continue;
-      for (const id of arr) {
-        if (typeof id === "string" && id.length > 0) ids.push(id);
+      );
+    } else if (Array.isArray(obj.slots)) {
+      ids = obj.slots.filter(
+        (x): x is string => typeof x === "string" && x.length > 0,
+      );
+    } else if (
+      obj.slots &&
+      typeof obj.slots === "object" &&
+      !Array.isArray(obj.slots)
+    ) {
+      const slots = obj.slots as Record<string, unknown>;
+      // Legacy Catalan keys + short B/A/P keys
+      for (const key of ["pivot", "P", "aler", "A", "base", "B"]) {
+        const arr = slots[key];
+        if (!Array.isArray(arr)) continue;
+        for (const id of arr) {
+          if (typeof id === "string" && id.length > 0) ids.push(id);
+        }
       }
     }
-    return migratePlayerIdList(ids);
   }
 
-  return [];
+  return migrateLineupToPositions(ids);
 }
 
 /**
  * True when stored lineup JSON needs a rewrite: legacy shapes, collapsed
- * dual-team ids, or ids missing from the current roster.
+ * dual-team ids, position overflow, or ids missing from the current roster.
  */
 export function needsPlayerIdsMigration(raw: string): boolean {
   try {
@@ -178,7 +204,7 @@ export function needsPlayerIdsMigration(raw: string): boolean {
     const asStrings = data.filter(
       (x): x is string => typeof x === "string" && x.length > 0,
     );
-    const migrated = migratePlayerIdList(asStrings);
+    const migrated = migrateLineupToPositions(asStrings);
     if (migrated.length !== asStrings.length) return true;
     return migrated.some((id, i) => id !== asStrings[i]);
   } catch {
@@ -186,9 +212,14 @@ export function needsPlayerIdsMigration(raw: string): boolean {
   }
 }
 
-export type LineupIssue = "incomplete" | "budget" | "captain" | "duplicate";
+export type LineupIssue =
+  | "incomplete"
+  | "budget"
+  | "positions"
+  | "captain"
+  | "duplicate";
 
-/** Soft / full checklist (8 + captain). UI hints only — does not block autosave. */
+/** Soft / full checklist (8 + captain + 3P/3A/2B). UI hints only — does not block autosave. */
 export function validateLineup(
   lineup: Lineup,
   cash: number,
@@ -203,6 +234,19 @@ export function validateLineup(
     issues.push("budget");
   }
 
+  const counts = countByPosition(lineup.playerIds);
+  if (
+    counts.P > LINEUP_SLOTS.P ||
+    counts.A > LINEUP_SLOTS.A ||
+    counts.B > LINEUP_SLOTS.B ||
+    (lineup.playerIds.length === LINEUP_SIZE &&
+      (counts.P !== LINEUP_SLOTS.P ||
+        counts.A !== LINEUP_SLOTS.A ||
+        counts.B !== LINEUP_SLOTS.B))
+  ) {
+    issues.push("positions");
+  }
+
   if (!lineup.captainId || !lineup.playerIds.includes(lineup.captainId)) {
     issues.push("captain");
   }
@@ -212,7 +256,7 @@ export function validateLineup(
 
 /**
  * Hard rules for persisting a lineup (partial OK: 0–8).
- * Blocks only duplicates, overspend on the transfer, and captain not in roster.
+ * Blocks duplicates, overspend, captain not in roster, and position overflow.
  * `cash` / `previousIds` are the last persisted row (buy/sell at current quotes).
  */
 export function validateLineupSave(
@@ -226,6 +270,22 @@ export function validateLineupSave(
   }
   if (new Set(playerIds).size !== playerIds.length) {
     return { ok: false, error: "No pots repetir jugadors." };
+  }
+  for (const id of playerIds) {
+    if (!getPlayer(id)) {
+      return { ok: false, error: "Jugador desconegut a l'alineació." };
+    }
+  }
+  const counts = countByPosition(playerIds);
+  if (
+    counts.P > LINEUP_SLOTS.P ||
+    counts.A > LINEUP_SLOTS.A ||
+    counts.B > LINEUP_SLOTS.B
+  ) {
+    return {
+      ok: false,
+      error: "Posició incorrecta: cal 3 pivots, 3 alers i 2 bases.",
+    };
   }
   const transfer = applyMarketTransfers(cash, previousIds, playerIds);
   if (!transfer.ok) {
@@ -349,9 +409,11 @@ export function projectedPoints(lineup: Lineup): number {
 export function issueMessage(issue: LineupIssue): string {
   switch (issue) {
     case "incomplete":
-      return `Calen ${LINEUP_SIZE} jugadors.`;
+      return `Calen ${LINEUP_SIZE} jugadors (3 pivots, 3 alers, 2 bases).`;
     case "budget":
       return "Has superat el pressupost disponible.";
+    case "positions":
+      return "La distribució de posicions no és correcta (3P · 3A · 2B).";
     case "captain":
       return "Tria un capità de l'alineació (x2 punts).";
     case "duplicate":

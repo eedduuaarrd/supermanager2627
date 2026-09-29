@@ -2,16 +2,29 @@
 
 import { PlayerRow } from "@/components/player-row";
 import { Button } from "@/components/ui/button";
-import { TEAM_ORDER, TEAMS } from "@/data/roster";
-import type { Player, TeamId } from "@/lib/types";
+import {
+  LINEUP_SLOTS,
+  POSITION_LABEL,
+  TEAM_ORDER,
+  TEAMS,
+} from "@/data/roster";
+import type { Player, Position, TeamId } from "@/lib/types";
 import { X } from "lucide-react";
 import { useEffect, useMemo } from "react";
 
+const TITLE: Record<Position, string> = {
+  B: "Tria un base",
+  A: "Tria un aler",
+  P: "Tria un pivot",
+};
+
 interface MarketSheetProps {
   open: boolean;
+  position: Position | null;
   roster: Player[];
   takenIds: string[];
   remainingBudget: number;
+  positionCounts: Record<Position, number>;
   lineupFull: boolean;
   onPick: (playerId: string) => void;
   onClose: () => void;
@@ -19,17 +32,20 @@ interface MarketSheetProps {
 
 export function MarketSheet({
   open,
+  position,
   roster,
   takenIds,
   remainingBudget,
+  positionCounts,
   lineupFull,
   onPick,
   onClose,
 }: MarketSheetProps) {
   const sections = useMemo(() => {
-    if (!open) return [] as { teamId: TeamId; players: Player[] }[];
+    if (!open || !position) return [] as { teamId: TeamId; players: Player[] }[];
 
     const available = roster
+      .filter((p) => p.position === position)
       .filter((p) => !takenIds.includes(p.id))
       .sort((a, b) => b.price - a.price);
 
@@ -37,7 +53,7 @@ export function MarketSheet({
       teamId,
       players: available.filter((p) => p.teamId === teamId),
     })).filter((s) => s.players.length > 0);
-  }, [open, roster, takenIds]);
+  }, [open, position, roster, takenIds]);
 
   useEffect(() => {
     if (!open) return;
@@ -53,7 +69,9 @@ export function MarketSheet({
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !position) return null;
+
+  const posFull = positionCounts[position] >= LINEUP_SLOTS[position];
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end" role="dialog" aria-modal="true">
@@ -69,10 +87,11 @@ export function MarketSheet({
           <div className="flex w-full items-start justify-between gap-3">
             <div className="min-w-0">
               <h2 className="font-display text-xl tracking-wide text-bone">
-                Tria un jugador
+                {TITLE[position]}
               </h2>
               <p className="mt-0.5 text-xs text-mute">
-                Agrupats per equip · Compra al preu de mercat actual
+                Només {POSITION_LABEL[position].toLowerCase()}s · agrupats per
+                equip
               </p>
             </div>
             <Button
@@ -91,7 +110,7 @@ export function MarketSheet({
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-[max(1rem,env(safe-area-inset-bottom))]">
           {sections.length === 0 ? (
             <div className="px-4 py-10 text-center text-sm text-mute">
-              No hi ha més jugadors disponibles.
+              No hi ha més {POSITION_LABEL[position].toLowerCase()}s disponibles.
             </div>
           ) : (
             sections.map(({ teamId, players }) => (
@@ -109,7 +128,7 @@ export function MarketSheet({
                 <div>
                   {players.map((player) => {
                     const tooExpensive = remainingBudget < player.price;
-                    const disabled = tooExpensive || lineupFull;
+                    const disabled = posFull || tooExpensive || lineupFull;
                     return (
                       <PlayerRow
                         key={player.id}

@@ -1,5 +1,8 @@
 export type PlayerSource = "fcbq" | "documentat" | "placeholder";
 
+/** Fantasy court position: Base / Aler / Pivot. */
+export type Position = "B" | "A" | "P";
+
 /** Short keys for the four CB Balaguer senior sides on FCBQ. */
 export type TeamId = "masc-a" | "masc-b" | "fem-a" | "fem-b";
 
@@ -7,6 +10,7 @@ export interface Player {
   id: string;
   name: string;
   number: number | null;
+  position: Position;
   /** Current broker market quote (€). */
   price: number;
   /** Previous quote for ↑/↓ UI; null on first seed. */
