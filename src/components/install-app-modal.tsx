@@ -221,13 +221,17 @@ export function InstallAppModal() {
                 >
                   {installing ? "Instal·lant…" : "Instal·lar l'app"}
                 </Button>
-                <p className="text-xs leading-snug text-mute">
-                  O: menú
-                  <InlineIcon>
-                    <ChromeMenuIcon />
-                  </InlineIcon>
-                  → Afegeix a la pantalla d&apos;inici
-                </p>
+                <div className="flex items-center gap-2.5 px-0.5">
+                  <span
+                    className="inline-flex size-7 shrink-0 items-center justify-center rounded-md border border-line bg-ink text-bone/80"
+                    aria-hidden
+                  >
+                    <ChromeMenuIcon className="size-3.5" />
+                  </span>
+                  <p className="min-w-0 text-xs leading-snug text-bone/75">
+                    O bé: menú → Afegeix a la pantalla d&apos;inici
+                  </p>
+                </div>
               </>
             ) : ios ? (
               <div className="space-y-1.5">
