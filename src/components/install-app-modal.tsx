@@ -123,7 +123,6 @@ export function InstallAppModal() {
   const [manualOpen, setManualOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const [installing, setInstalling] = useState(false);
-  const [showManual, setShowManual] = useState(false);
 
   const canNativeInstall = deferredPrompt != null;
   const open = manualOpen || (autoShow && !dismissed);
@@ -132,7 +131,6 @@ export function InstallAppModal() {
     function onOpenRequest() {
       if (isStandaloneDisplay()) return;
       setDontShowAgain(false);
-      setShowManual(false);
       setManualOpen(true);
     }
 
@@ -153,7 +151,6 @@ export function InstallAppModal() {
     }
     setDismissed(true);
     setManualOpen(false);
-    setShowManual(false);
   }
 
   function handleOpenChange(next: boolean) {
@@ -206,10 +203,10 @@ export function InstallAppModal() {
 
           <DialogHeader className="gap-1.5 border-b border-line px-5 pb-4 pt-5 pr-12">
             <DialogTitle className="font-display text-lg tracking-tight text-bone">
-              Instal·la l&apos;app
+              Instal·leu Supermanager
             </DialogTitle>
             <DialogDescription className="text-sm leading-snug text-mute">
-              Accés ràpid des de la pantalla d&apos;inici, com una app nativa.
+              Accediu des de la pantalla d&apos;inici, com una app.
             </DialogDescription>
           </DialogHeader>
 
@@ -224,67 +221,35 @@ export function InstallAppModal() {
                 >
                   {installing ? "Instal·lant…" : "Instal·lar l'app"}
                 </Button>
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => setShowManual((v) => !v)}
-                    className="text-xs text-mute underline-offset-4 hover:text-bone hover:underline"
-                  >
-                    {showManual ? "Amaga els passos" : "O manualment"}
-                  </button>
-                  {showManual ? (
-                    <p className="mt-2 text-sm leading-snug text-mute">
-                      Chrome → menú
-                      <InlineIcon>
-                        <ChromeMenuIcon />
-                      </InlineIcon>
-                      → «Afegeix a la pantalla d&apos;inici» o «Instal·la
-                      l&apos;app».
-                    </p>
-                  ) : null}
-                </div>
+                <p className="text-xs leading-snug text-mute">
+                  O: menú
+                  <InlineIcon>
+                    <ChromeMenuIcon />
+                  </InlineIcon>
+                  → Afegeix a la pantalla d&apos;inici
+                </p>
               </>
             ) : ios ? (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <p className="text-sm leading-snug text-mute">
-                  Safari →
+                  Toqueu
                   <InlineIcon>
                     <IosShareIcon />
                   </InlineIcon>
-                  Compartir → «Afegeix a la pantalla d&apos;inici».
+                  → Afegeix a la pantalla d&apos;inici.
                 </p>
                 <p className="text-xs leading-snug text-mute/80">
-                  A l&apos;iPhone, Apple només permet instal·lar-la així.
+                  A l&apos;iPhone cal fer-ho així.
                 </p>
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-grana-bright">
-                    Android
-                  </p>
-                  <p className="text-sm leading-snug text-mute">
-                    Chrome → menú
-                    <InlineIcon>
-                      <ChromeMenuIcon />
-                    </InlineIcon>
-                    → «Afegeix a la pantalla d&apos;inici» o «Instal·la
-                    l&apos;app».
-                  </p>
-                </div>
-                <div className="space-y-1.5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-grana-bright">
-                    iPhone
-                  </p>
-                  <p className="text-sm leading-snug text-mute">
-                    Safari →
-                    <InlineIcon>
-                      <IosShareIcon />
-                    </InlineIcon>
-                    Compartir → «Afegeix a la pantalla d&apos;inici».
-                  </p>
-                </div>
-              </div>
+              <p className="text-sm leading-snug text-mute">
+                Menú
+                <InlineIcon>
+                  <ChromeMenuIcon />
+                </InlineIcon>
+                → Afegeix a la pantalla d&apos;inici
+              </p>
             )}
 
             <label className="flex cursor-pointer items-start gap-2.5 pt-1 text-sm text-mute">
