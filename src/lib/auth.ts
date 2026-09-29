@@ -54,18 +54,11 @@ export async function readSession(): Promise<SessionUser | null> {
     if (!payload.sub || typeof payload.email !== "string") return null;
 
     // Prefer live DB state (active team can change without re-login).
+    // Never trust JWT alone — purged / deleted accounts must re-login
+    // (ghost sessions used to hit /api/lineup → 500 «No hi ha cap equip actiu»).
     const row = findUserById(payload.sub);
-    if (row) return toSessionUser(row);
-
-    return {
-      id: payload.sub,
-      email: payload.email,
-      displayName: String(payload.displayName ?? ""),
-      teamName: String(payload.teamName ?? ""),
-      activeTeamId:
-        typeof payload.activeTeamId === "string" ? payload.activeTeamId : null,
-      isAdmin: Boolean(payload.isAdmin),
-    };
+    if (!row) return null;
+    return toSessionUser(row);
   } catch {
     return null;
   }

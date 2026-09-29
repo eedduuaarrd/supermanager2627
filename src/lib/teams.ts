@@ -97,6 +97,35 @@ export function requireActiveTeamId(userId: string): string {
   return team.id;
 }
 
+/**
+ * Return active team id, creating a default fantasy team when the user
+ * exists but has none (migration / purge edge cases).
+ */
+export function ensureActiveTeamId(
+  userId: string,
+  fallbackName = "Equip 1",
+): string {
+  const existing = getActiveTeam(userId);
+  if (existing) return existing.id;
+
+  const db = getDb();
+  const user = db.prepare(`SELECT * FROM users WHERE id = ?`).get(userId) as
+    | DbUser
+    | undefined;
+  if (!user) {
+    throw new Error("No hi ha cap equip actiu.");
+  }
+  const name =
+    (user.team_name && user.team_name.trim()) ||
+    (user.display_name && user.display_name.trim()) ||
+    fallbackName;
+  const created = createTeamForUser(userId, name, { setActive: true });
+  if (!created.ok) {
+    throw new Error(created.error || "No hi ha cap equip actiu.");
+  }
+  return created.team.id;
+}
+
 export function createTeamForUser(
   userId: string,
   name: string,

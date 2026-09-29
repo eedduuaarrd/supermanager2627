@@ -8,9 +8,9 @@ import {
 import { getLineupLockAt, getRoundStatus } from "@/lib/rounds";
 import { ensureLineupRow, saveLineup } from "@/lib/scoring";
 import {
+  ensureActiveTeamId,
   getTeamTransferPhase,
   promoteInitialTeamsIfLocked,
-  requireActiveTeamId,
   restoreInitialPhaseUntilNextTipOff,
 } from "@/lib/teams";
 import { INITIAL_BUDGET, LINEUP_SIZE, resolvePlayerId } from "@/data/roster";
@@ -94,7 +94,14 @@ export async function GET() {
   if (!user) {
     return NextResponse.json({ error: "Cal iniciar sessió." }, { status: 401 });
   }
-  const teamId = requireActiveTeamId(user.id);
+  let teamId: string;
+  try {
+    teamId = ensureActiveTeamId(user.id, user.teamName || user.displayName);
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "No hi ha cap equip actiu.";
+    return NextResponse.json({ error: message }, { status: 409 });
+  }
   const round = getCurrentRound();
   const lock = lockState();
   const row = ensureLineupRow(teamId, round);
@@ -139,7 +146,14 @@ export async function PUT(req: Request) {
       { status: 403 },
     );
   }
-  const teamId = requireActiveTeamId(user.id);
+  let teamId: string;
+  try {
+    teamId = ensureActiveTeamId(user.id, user.teamName || user.displayName);
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "No hi ha cap equip actiu.";
+    return NextResponse.json({ error: message }, { status: 409 });
+  }
   const body = (await req.json()) as {
     playerIds?: string[];
     captainId?: string | null;
