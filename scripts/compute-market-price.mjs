@@ -1,14 +1,15 @@
 /**
  * Keep in sync with src/lib/market-price.ts
- * Seed: every id at INITIAL_PRICE 15000 (prevPrice = 15000).
+ * Seed: every id at INITIAL_PRICE 10000 (prevPrice = 10000).
  * Refresh: theoretical = max(0, avgVal) × 1000; clamp ±15% vs prev;
  * round €500; floor MIN_PRICE 500 € (never 0 €).
+ * Skip re-tick when pricedGames >= current gamesPlayed (unless force).
  */
 
 export const EUR_PER_VAL = 1_000;
 export const PRICE_PER_VAL = EUR_PER_VAL;
 export const PRICE_STEP = 500;
-export const INITIAL_PRICE = 15_000;
+export const INITIAL_PRICE = 10_000;
 export const MIN_PRICE = PRICE_STEP;
 export const PRICE_CLAMP_PCT = 0.15;
 
@@ -38,7 +39,12 @@ export function computeMarketPrice(avgVal, prevPrice) {
   return applyPriceFloor(roundToPriceStep(clamped));
 }
 
-export function nextMarketEntry(avgVal, current, updatedAt = new Date().toISOString()) {
+export function nextMarketEntry(
+  avgVal,
+  current,
+  updatedAt = new Date().toISOString(),
+  pricedGames = 0,
+) {
   const avg = avgVal == null || !Number.isFinite(avgVal) ? null : avgVal;
   const theoretical = applyPriceFloor(
     roundToPriceStep(theoreticalPrice(avgVal)),
@@ -51,6 +57,7 @@ export function nextMarketEntry(avgVal, current, updatedAt = new Date().toISOStr
       avgVal: avg,
       theoretical,
       updatedAt,
+      pricedGames: 0,
     };
   }
 
@@ -62,7 +69,16 @@ export function nextMarketEntry(avgVal, current, updatedAt = new Date().toISOStr
     avgVal: avg,
     theoretical,
     updatedAt,
+    pricedGames,
   };
+}
+
+export function shouldTickPrice(current, gamesPlayed, force = false) {
+  if (force) return true;
+  if (current == null) return true;
+  const prevN = current.pricedGames;
+  if (prevN == null || !Number.isFinite(prevN)) return true;
+  return gamesPlayed > prevN;
 }
 
 export function round1(value) {

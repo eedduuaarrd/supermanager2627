@@ -43,6 +43,18 @@ Cada **jornada fantasy ≈ els partits d’aquella setmana** dels 4 equips sèni
 - Variants dual-team (`persona__equip`) es puntuen només amb el partit **del seu** equip.
 - L’historial a la fitxa del jugador creix setmana a setmana (append).
 
+### Broker / preus
+
+- Sortida flat **10.000 €** per a tothom.
+- Preu teòric = mitjana VAL de temporada × **1.000 €**; cotització limitada a **±15%** vs el preu anterior (rodona 500 €, mín. 500 €).
+- Els preus només es mouen quan creix el nombre de partits amb VAL (`update-market-prices.mjs`; `--force` per forçar).
+- A la fitxa del jugador: llindars «pujar / mantenir / baixar» el 15%.
+
+```bash
+node scripts/update-market-prices.mjs --seed   # flat 10.000 €
+node scripts/update-market-prices.mjs          # un tick si hi ha partits nous
+```
+
 ### Esquema (SQLite)
 
 | Peça | Contingut |

@@ -1,220 +1,250 @@
 {
   "updatedAt": "2026-09-29",
-  "formula": "seed INITIAL_PRICE 15000; refresh: theoretical = max(0, avgVal) × 1000; clamp ±15% vs prev; round 500; floor MIN_PRICE 500",
+  "formula": "seed INITIAL_PRICE 10000; refresh: theoretical = max(0, avgVal) × 1000; clamp ±15% vs prev; round 500; floor MIN_PRICE 500; tick only when gamesPlayed increases",
   "notes": [
     "Club-scale broker pricing for Supermanager Balaguer.",
-    "Every fantasy id seeds at INITIAL_PRICE 15000 (prevPrice = 15000).",
-    "Prices only move on VAL / jornada refresh (weekend sync, weekly close, FCBQ stats).",
+    "Every fantasy id seeds at INITIAL_PRICE 10000 (prevPrice = 10000).",
+    "Prices only move when scored game count grows (or --force).",
     "Dual-team fantasy ids are priced separately.",
     "Never list 0 € — floor is MIN_PRICE (500 €).",
-    "Budget stays 100000: 8×15000=120000 > 100000 is intentional scarcity.",
+    "Budget stays 100000: 8×10000=80000 leaves headroom under 100k.",
     "Roster overlays these quotes at runtime (applyMarketPrices).",
     "Refresh: node scripts/update-market-prices.mjs",
-    "Seed (flat 15000): node scripts/update-market-prices.mjs --seed"
+    "Seed (flat 10000): node scripts/update-market-prices.mjs --seed",
+    "Force tick: node scripts/update-market-prices.mjs --force"
   ],
   "prices": {
     "hector-lozano": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 9000,
+      "prevPrice": 10000,
       "avgVal": 9,
       "theoretical": 9000,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "eduard-bernat": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": -1,
       "theoretical": 500,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "toni-salud": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": 8,
       "theoretical": 8000,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "ivan-franco": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": -8,
       "theoretical": 500,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "gerard-garcia": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": 1,
       "theoretical": 1000,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "marc-escoda": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": 7,
       "theoretical": 7000,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "babacar-toure": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": -12,
       "theoretical": 500,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "gerard-soldevila": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": -5,
       "theoretical": 500,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "roger-companys": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": -5,
       "theoretical": 500,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "ares-bunol": {
-      "price": 17500,
-      "prevPrice": 15000,
+      "price": 11500,
+      "prevPrice": 10000,
       "avgVal": 34,
       "theoretical": 34000,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "julia-pla__cudos-a": {
-      "price": 17500,
-      "prevPrice": 15000,
+      "price": 11500,
+      "prevPrice": 10000,
       "avgVal": 27,
       "theoretical": 27000,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "andrea-perat": {
-      "price": 17500,
-      "prevPrice": 15000,
+      "price": 11500,
+      "prevPrice": 10000,
       "avgVal": 22,
       "theoretical": 22000,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "neus-escoda": {
-      "price": 17500,
-      "prevPrice": 15000,
+      "price": 11500,
+      "prevPrice": 10000,
       "avgVal": 20,
       "theoretical": 20000,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "monica-fontanet": {
-      "price": 17000,
-      "prevPrice": 15000,
+      "price": 11500,
+      "prevPrice": 10000,
       "avgVal": 17,
       "theoretical": 17000,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "queralt-sole__cudos-a": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": -11,
       "theoretical": 500,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "clara-paniagua": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": -5,
       "theoretical": 500,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "mariama-mballo__cudos-a": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": -12,
       "theoretical": 500,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "martina-benitez": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": -16,
       "theoretical": 500,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "ada-domene": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": -17,
       "theoretical": 500,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "queralt-sole__farratges-b": {
-      "price": 17500,
-      "prevPrice": 15000,
+      "price": 11500,
+      "prevPrice": 10000,
       "avgVal": 20,
       "theoretical": 20000,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "julia-pla__farratges-b": {
-      "price": 16000,
-      "prevPrice": 15000,
+      "price": 11500,
+      "prevPrice": 10000,
       "avgVal": 16,
       "theoretical": 16000,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "jana-roldan": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": 4,
       "theoretical": 4000,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "nuria-jimenez": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": 1,
       "theoretical": 1000,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "mariama-mballo__farratges-b": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 10000,
+      "prevPrice": 10000,
       "avgVal": 10,
       "theoretical": 10000,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "abril-gracia": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": -2,
       "theoretical": 500,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "xenia-andreu": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": -10,
       "theoretical": 500,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "gina-betbese": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": -7,
       "theoretical": 500,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "gina-trilla": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": 7,
       "theoretical": 7000,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     },
     "jana-alarcon": {
-      "price": 13000,
-      "prevPrice": 15000,
+      "price": 8500,
+      "prevPrice": 10000,
       "avgVal": -3,
       "theoretical": 500,
-      "updatedAt": "2026-09-29T07:39:40.458Z"
+      "updatedAt": "2026-09-29T16:02:59.185Z",
+      "pricedGames": 1
     }
   }
 }

@@ -4,11 +4,11 @@
  * Inspired by public ACB SuperManager market mechanics at a high level only —
  * not a copy of ACB trademarks, assets, or verbatim rules.
  *
- * Seed: every fantasy id starts at INITIAL_PRICE (15.000 €).
+ * Seed: every fantasy id starts at INITIAL_PRICE (10.000 €).
  * On VAL / jornada refresh: theoretical = max(0, avgVal) × €1.000 / VAL point,
  * then clamp ±15% vs previous quote, round to €500, floor ≥ 500.
- * Buy/sell at the current quote. Budget stays 100.000 € (8×15k = 120k >
- * 100k is intentional scarcity).
+ * Buy/sell at the current quote. Budget stays 100.000 € (8×10k = 80k
+ * leaves headroom under 100k).
  */
 
 export const EUR_PER_VAL = 1_000;
@@ -16,14 +16,14 @@ export const EUR_PER_VAL = 1_000;
 export const PRICE_PER_VAL = EUR_PER_VAL;
 export const PRICE_STEP = 500;
 /** Flat opening quote for every fantasy id until the first scoring refresh. */
-export const INITIAL_PRICE = 15_000;
+export const INITIAL_PRICE = 10_000;
 /** Floor quote — never list a player at 0 €. */
 export const MIN_PRICE = PRICE_STEP;
 export const PRICE_CLAMP_PCT = 0.15;
 
 /** Catalan footnote for player page / Compte. */
 export const MARKET_PRICE_FOOTNOTE_CA =
-  "Sortida 15.000 €; després preu teòric = mitjana VAL de temporada × 1.000 €, limitat a ±15% vs el preu anterior (mín. 500 €). Compres i vendes al preu actual.";
+  "Sortida 10.000 €; després preu teòric = mitjana VAL de temporada × 1.000 €, limitat a ±15% vs el preu anterior (mín. 500 €). Compres i vendes al preu actual.";
 
 export const BUY_SELL_RULE_CA = "Compra i venda al preu de mercat actual.";
 
@@ -45,7 +45,7 @@ export function theoreticalPrice(avgVal: number | null | undefined): number {
 
 /**
  * Next market quote from theoretical + optional previous quote.
- * - No usable previous → flat INITIAL_PRICE (15.000 € seed for everyone).
+ * - No usable previous → flat INITIAL_PRICE (10.000 € seed for everyone).
  * - Previous ≤ 0 → re-seed at INITIAL_PRICE (avoids ±15% lock at 0).
  * - Else clamp theoretical into [prev×0.85, prev×1.15], then round to €500.
  * - Always ≥ MIN_PRICE (500 €) after a performance tick.
@@ -71,6 +71,11 @@ export type MarketPriceEntry = {
   avgVal: number | null;
   theoretical: number;
   updatedAt: string;
+  /**
+   * Games counted into the last price tick. Used to skip re-ticks when
+   * stats refresh without a new scored game (ACB: no play → price quiet).
+   */
+  pricedGames?: number;
 };
 
 /**
@@ -79,8 +84,9 @@ export type MarketPriceEntry = {
  */
 export function nextMarketEntry(
   avgVal: number | null | undefined,
-  current?: { price: number; prevPrice?: number | null } | null,
+  current?: { price: number; prevPrice?: number | null; pricedGames?: number } | null,
   updatedAt = new Date().toISOString(),
+  pricedGames = 0,
 ): MarketPriceEntry {
   const avg =
     avgVal == null || !Number.isFinite(avgVal) ? null : avgVal;
@@ -95,6 +101,7 @@ export function nextMarketEntry(
       avgVal: avg,
       theoretical,
       updatedAt,
+      pricedGames: 0,
     };
   }
 
@@ -106,7 +113,27 @@ export function nextMarketEntry(
     avgVal: avg,
     theoretical,
     updatedAt,
+    pricedGames,
   };
+}
+
+/**
+ * Whether a refresh should move the printed quote.
+ * - Seed / missing current → yes (caller seeds).
+ * - More scored games than last tick → yes.
+ * - Same or fewer games → no (prevents phantom +15% catch-up).
+ * - `force` → always tick.
+ */
+export function shouldTickPrice(
+  current: { pricedGames?: number | null } | null | undefined,
+  gamesPlayed: number,
+  force = false,
+): boolean {
+  if (force) return true;
+  if (current == null) return true;
+  const prevN = current.pricedGames;
+  if (prevN == null || !Number.isFinite(prevN)) return true;
+  return gamesPlayed > prevN;
 }
 
 /** ↑ / ↓ / flat vs previous quote. */

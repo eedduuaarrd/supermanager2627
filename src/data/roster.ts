@@ -21,11 +21,11 @@ import marketPricesJson from "@/data/market-prices.json";
  * Dorsal = número de samarreta a la Plantilla (badge / columna).
  * VAL fantasy = PTS − FC − max(0, TLI−TLC) + PM (FCBQ Plantilla VAL ignora).
  * Posicions B/A/P (Base/Aler/Pivot): pista 3P + 3A + 2B.
- * Preus broker: sortida flat INITIAL_PRICE 15.000 € per a tothom; només es mouen
- *   quan es refresquen VAL / jornada (clamp ±15% vs prev, rodona 500, mín. 500).
+ * Preus broker: sortida flat INITIAL_PRICE 10.000 €; només es mouen quan creix
+ *   el nombre de partits amb VAL (clamp ±15% vs prev, rodona 500, mín. 500).
  *   Compra/venda al preu de mercat actual. Veure market-prices.json.
  *   budget column = efectiu (cash); buy/sell al preu actual.
- *   8×15k = 120k > 100k: escassetat intencionada (no pujar pressupost).
+ *   8×10k = 80k < 100k: hi ha marge per completar la plantilla de 8.
  *
  * Regles: plantilla 8, pressupost 100.000 € (mercat multi-equip, 29 entrades).
  */
