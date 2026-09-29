@@ -1,0 +1,33 @@
+{
+  "name": "Supermanager Balaguer",
+  "short_name": "SM Balaguer",
+  "description": "Gestor fantasy dels sèniors del Club Bàsquet Balaguer. Alineació, capità i classificacions.",
+  "start_url": "/jornada",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0b0d10",
+  "theme_color": "#0b0d10",
+  "lang": "ca",
+  "categories": ["sports", "games"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

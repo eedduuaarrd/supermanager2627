@@ -63,8 +63,8 @@ export function MarketSheet({
         aria-label="Tancar mercat"
         onClick={onClose}
       />
-      <div className="market-sheet relative z-10 flex max-h-[min(85dvh,32rem)] w-full flex-col overflow-hidden rounded-t-2xl border border-line border-b-0 bg-ink shadow-[0_-12px_40px_rgba(0,0,0,0.45)]">
-        <div className="flex shrink-0 flex-col items-center px-4 pt-2.5 pb-3">
+      <div className="market-sheet relative z-10 mx-auto flex max-h-[min(85dvh,36rem)] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl border border-line border-b-0 bg-ink shadow-[0_-12px_40px_rgba(0,0,0,0.45)] md:max-w-xl lg:max-w-2xl">
+        <div className="flex shrink-0 flex-col items-center px-4 pt-2.5 pb-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
           <div className="mb-2.5 h-1 w-10 rounded-full bg-white/25" aria-hidden />
           <div className="flex w-full items-start justify-between gap-3">
             <div className="min-w-0">
@@ -77,13 +77,13 @@ export function MarketSheet({
             </div>
             <Button
               type="button"
-              size="icon-sm"
+              size="icon-lg"
               variant="ghost"
               onClick={onClose}
-              className="shrink-0 text-mute hover:bg-white/10 hover:text-bone"
+              className="min-h-11 min-w-11 shrink-0 touch-manipulation text-mute hover:bg-white/10 hover:text-bone"
               aria-label="Tancar"
             >
-              <X className="size-4" />
+              <X className="size-5" />
             </Button>
           </div>
         </div>

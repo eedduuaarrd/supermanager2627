@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 160" role="img" aria-label="Supermanager Balaguer">
+  <defs>
+    <linearGradient id="lg-graphite" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1c222c"/>
+      <stop offset="55%" stop-color="#12151a"/>
+      <stop offset="100%" stop-color="#0b0d10"/>
+    </linearGradient>
+    <linearGradient id="lg-grana" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c23142"/>
+      <stop offset="100%" stop-color="#9b2030"/>
+    </linearGradient>
+    <clipPath id="lg-ball-clip">
+      <circle cx="80" cy="80" r="52"/>
+    </clipPath>
+  </defs>
+
+  <!-- Mark -->
+  <rect x="4" y="4" width="152" height="152" rx="30" fill="url(#lg-graphite)"/>
+  <rect x="10" y="10" width="140" height="140" rx="26" fill="none" stroke="#ece8e1" stroke-opacity="0.12" stroke-width="2"/>
+  <path d="M32 40 A56 56 0 0 1 128 40" fill="none" stroke="url(#lg-grana)" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="80" cy="80" r="52" fill="#161a21" stroke="#ece8e1" stroke-opacity="0.55" stroke-width="3.5"/>
+  <g clip-path="url(#lg-ball-clip)" fill="none" stroke="#ece8e1" stroke-opacity="0.42" stroke-width="2.6" stroke-linecap="round">
+    <path d="M28 80 H132"/>
+    <path d="M80 28 V132"/>
+    <path d="M38 48 C60 66 60 94 38 112"/>
+    <path d="M122 48 C100 66 100 94 122 112"/>
+  </g>
+  <circle cx="80" cy="80" r="34" fill="#0b0d10" fill-opacity="0.55"/>
+  <text
+    x="80"
+    y="92"
+    text-anchor="middle"
+    font-family="Oswald, 'Arial Narrow', Impact, sans-serif"
+    font-size="52"
+    font-weight="700"
+    letter-spacing="-2"
+    fill="#ece8e1"
+  >SM</text>
+  <rect x="56" y="102" width="48" height="3.5" rx="1.75" fill="url(#lg-grana)"/>
+
+  <!-- Wordmark -->
+  <g font-family="Oswald, 'Arial Narrow', Impact, sans-serif" fill="#ece8e1">
+    <text x="184" y="78" font-size="54" font-weight="700" letter-spacing="3">SUPERMANAGER</text>
+    <text x="184" y="124" font-size="36" font-weight="600" letter-spacing="6" fill="#c23142">BALAGUER</text>
+  </g>
+</svg>

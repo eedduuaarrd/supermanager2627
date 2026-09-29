@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -35,10 +36,10 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-full w-full max-w-md flex-1 flex-col justify-center px-5 py-12">
-      <Link href="/" className="mb-8 font-display text-xl text-bone">
-        Supermanager Balaguer
-      </Link>
+    <main className="mx-auto flex min-h-full w-full max-w-md flex-1 flex-col justify-center overflow-x-hidden px-5 py-12 pt-[max(3rem,env(safe-area-inset-top))] pb-[max(3rem,env(safe-area-inset-bottom))]">
+      <div className="mb-8">
+        <BrandLogo href="/" size="md" />
+      </div>
       <h1 className="font-display text-4xl text-bone">Registre</h1>
       <p className="mt-2 text-sm text-mute">
         El primer compte creat al servidor és administrador (pot tancar jornades).
@@ -52,7 +53,7 @@ export default function RegisterPage() {
             required
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="h-11 border-line bg-panel text-bone"
+            className="h-11 min-h-11 border-line bg-panel text-bone"
             placeholder="Ex. Oriol"
           />
         </div>
@@ -64,7 +65,7 @@ export default function RegisterPage() {
             required
             value={teamName}
             onChange={(e) => setTeamName(e.target.value)}
-            className="h-11 border-line bg-panel text-bone"
+            className="h-11 min-h-11 border-line bg-panel text-bone"
             placeholder="Ex. Grana FC"
           />
         </div>
@@ -78,7 +79,7 @@ export default function RegisterPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-11 border-line bg-panel text-bone"
+            className="h-11 min-h-11 border-line bg-panel text-bone"
           />
         </div>
         <div>
@@ -92,7 +93,7 @@ export default function RegisterPage() {
             minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-11 border-line bg-panel text-bone"
+            className="h-11 min-h-11 border-line bg-panel text-bone"
           />
         </div>
         {error && (
@@ -103,7 +104,7 @@ export default function RegisterPage() {
         <Button
           type="submit"
           disabled={pending}
-          className="h-11 w-full bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
+          className="h-11 min-h-11 w-full touch-manipulation bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
         >
           {pending ? "Creant compte…" : "Crear compte"}
         </Button>

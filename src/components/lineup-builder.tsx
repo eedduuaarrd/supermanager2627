@@ -240,12 +240,12 @@ export function LineupBuilder({
             role="dialog"
             aria-modal="true"
             aria-label={`Accions per a ${selectedPlayer.name}`}
-            className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-50 border-t border-line bg-ink/95 px-4 py-3 backdrop-blur-md"
+            className="fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] z-50 border-t border-line bg-ink/95 px-4 py-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] backdrop-blur-md"
           >
-            <div className="mx-auto flex w-full max-w-lg items-center gap-2.5">
+            <div className="mx-auto flex w-full max-w-lg items-center gap-2.5 md:max-w-xl lg:max-w-2xl">
               <Link
                 href={`/jugador/${selectedPlayer.id}`}
-                className="min-w-0 flex-1"
+                className="min-h-11 min-w-0 flex-1 touch-manipulation py-1"
               >
                 <p className="truncate text-sm font-semibold text-bone underline-offset-2 hover:underline">
                   {selectedPlayer.name}
@@ -262,8 +262,8 @@ export function LineupBuilder({
                     onClick={() => setCaptain(selectedPlayer.id)}
                     className={
                       lineup.captainId === selectedPlayer.id
-                        ? "h-11 shrink-0 bg-grana text-bone hover:bg-grana-bright"
-                        : "h-11 shrink-0 border border-line bg-panel-2 text-bone hover:bg-white/10"
+                        ? "h-11 min-h-11 shrink-0 touch-manipulation bg-grana text-bone hover:bg-grana-bright"
+                        : "h-11 min-h-11 shrink-0 touch-manipulation border border-line bg-panel-2 text-bone hover:bg-white/10"
                     }
                   >
                     <Crown className="size-4" /> Capità
@@ -272,7 +272,7 @@ export function LineupBuilder({
                     type="button"
                     size="lg"
                     onClick={() => removePlayer(selectedPlayer.id)}
-                    className="h-11 shrink-0 bg-bone text-ink hover:bg-white"
+                    className="h-11 min-h-11 shrink-0 touch-manipulation bg-bone text-ink hover:bg-white"
                   >
                     <UserMinus className="size-4" /> Treure
                   </Button>

@@ -105,11 +105,21 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+  }
+  /* Prefer 44px+ hit areas on interactive controls in app chrome */
+  a,
+  button {
+    touch-action: manipulation;
   }
 }
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandLogo } from "@/components/brand-logo";
 import { cn } from "@/lib/utils";
 import {
   ClipboardList,
@@ -24,23 +25,31 @@ export function AppShell({ children }: { children: ReactNode }) {
   const isJugador = pathname.startsWith("/jugador/");
 
   return (
-    <div className="flex h-dvh min-h-0 flex-col overflow-hidden">
-      <header className="z-30 shrink-0 border-b border-line bg-ink/90 backdrop-blur-md">
-        <div className="mx-auto flex h-12 max-w-lg items-center px-4">
-          <Link href="/jornada" className="font-display text-lg text-bone">
-            Supermanager
-            <span className="text-grana-bright"> Balaguer</span>
-          </Link>
+    <div className="flex h-dvh min-h-0 flex-col overflow-x-hidden overflow-y-hidden">
+      <header
+        className="z-30 shrink-0 border-b border-line bg-ink/90 pt-[env(safe-area-inset-top)] backdrop-blur-md"
+      >
+        <div
+          className={cn(
+            "mx-auto flex h-12 min-h-12 w-full items-center px-4",
+            "pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]",
+            isEquip
+              ? "max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl"
+              : "max-w-lg md:max-w-xl",
+          )}
+        >
+          <BrandLogo href="/jornada" size="sm" priority />
         </div>
       </header>
 
       <main
         className={cn(
-          "mx-auto flex w-full max-w-lg min-h-0 flex-1 flex-col px-4",
-          "pb-[calc(3.5rem+env(safe-area-inset-bottom))]",
+          "mx-auto flex w-full min-h-0 flex-1 flex-col",
+          "px-4 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]",
+          "pb-[calc(3.75rem+env(safe-area-inset-bottom))]",
           isEquip
-            ? "overflow-y-auto overscroll-contain pt-3"
-            : "overflow-y-auto overscroll-contain pt-2",
+            ? "max-w-lg overflow-y-auto overscroll-contain pt-3 md:max-w-xl lg:max-w-2xl xl:max-w-3xl"
+            : "max-w-lg overflow-y-auto overscroll-contain pt-2 md:max-w-xl",
         )}
       >
         {children}
@@ -50,7 +59,13 @@ export function AppShell({ children }: { children: ReactNode }) {
         className="fixed inset-x-0 bottom-0 z-40 shrink-0 border-t border-line bg-ink/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md"
         aria-label="Navegació principal"
       >
-        <ul className="mx-auto grid h-14 max-w-lg grid-cols-4">
+        <ul
+          className={cn(
+            "mx-auto grid h-[3.75rem] min-h-[3.75rem] grid-cols-4",
+            "max-w-lg md:max-w-xl",
+            isEquip && "lg:max-w-2xl xl:max-w-3xl",
+          )}
+        >
           {NAV.map(({ href, label, icon: Icon }) => {
             const active =
               pathname === href ||
@@ -61,17 +76,18 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link
                   href={href}
                   className={cn(
-                    "flex h-full flex-col items-center justify-center gap-0.5 text-[10px] uppercase tracking-[0.12em] transition-colors",
+                    "flex h-full min-h-11 flex-col items-center justify-center gap-0.5 px-1 text-[10px] uppercase tracking-[0.12em] transition-colors",
+                    "touch-manipulation",
                     active
                       ? "text-grana-bright"
                       : "text-mute hover:text-bone",
                   )}
                 >
                   <Icon
-                    className={cn("size-5", active && "stroke-[2.25]")}
+                    className={cn("size-5 shrink-0", active && "stroke-[2.25]")}
                     aria-hidden
                   />
-                  <span>{label}</span>
+                  <span className="max-w-full truncate">{label}</span>
                 </Link>
               </li>
             );

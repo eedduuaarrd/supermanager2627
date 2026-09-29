@@ -67,8 +67,8 @@ export function CourtBoard({
         className={cn(
           "relative mx-auto",
           fillHeight
-            ? "aspect-[3/4] h-full max-h-full w-auto max-w-full"
-            : "aspect-[3/4] w-full max-w-lg sm:max-w-xl",
+            ? "aspect-[3/4] h-full max-h-full w-auto max-w-full md:max-w-2xl lg:max-w-3xl"
+            : "aspect-[3/4] w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl",
         )}
       >
         <div className="court-board__surface absolute inset-0" aria-hidden />
@@ -246,15 +246,15 @@ function EmptySlot({
       disabled={disabled || !onClick}
       onClick={onClick}
       className={cn(
-        "court-chip court-chip--empty relative flex h-[3.75rem] w-[3.75rem] flex-col items-center justify-center sm:h-[4.25rem] sm:w-[4.25rem]",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grana-bright",
+        "court-chip court-chip--empty relative flex h-[3.75rem] w-[3.75rem] flex-col items-center justify-center sm:h-[4.25rem] sm:w-[4.25rem] md:h-16 md:w-16",
+        "touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grana-bright",
         "disabled:cursor-default",
       )}
       aria-label={`Afegir jugador (slot ${slotIndex + 1})`}
     >
       <div
         className={cn(
-          "flex h-[3.75rem] w-[3.75rem] items-center justify-center rounded-full sm:h-[4.25rem] sm:w-[4.25rem]",
+          "flex h-[3.75rem] w-[3.75rem] items-center justify-center rounded-full sm:h-[4.25rem] sm:w-[4.25rem] md:h-16 md:w-16",
           "border-2 border-dashed border-bone/50",
           "bg-white/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[2px]",
           !disabled && "transition active:scale-95",
@@ -281,7 +281,7 @@ function FilledChip({
   return (
     <div
       className={cn(
-        "court-chip group relative flex h-[3.75rem] w-[3.75rem] flex-col items-center justify-center sm:h-[4.25rem] sm:w-[4.25rem]",
+        "court-chip group relative flex h-[3.75rem] w-[3.75rem] flex-col items-center justify-center sm:h-[4.25rem] sm:w-[4.25rem] md:h-16 md:w-16",
         isCaptain && "court-chip--captain",
         isSelected && "court-chip--selected",
       )}
@@ -294,7 +294,7 @@ function FilledChip({
           onSelect(isSelected ? null : player.id);
         }}
         className={cn(
-          "relative h-[3.75rem] w-[3.75rem] sm:h-[4.25rem] sm:w-[4.25rem]",
+          "relative h-[3.75rem] w-[3.75rem] touch-manipulation sm:h-[4.25rem] sm:w-[4.25rem] md:h-16 md:w-16",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-grana-bright",
           "disabled:cursor-default",
         )}
@@ -310,7 +310,7 @@ function FilledChip({
           photoUrl={player.photoUrl}
           size="lg"
           className={cn(
-            "!h-[3.75rem] !w-[3.75rem] rounded-full ring-2 sm:!h-[4.25rem] sm:!w-[4.25rem]",
+            "!h-[3.75rem] !w-[3.75rem] rounded-full ring-2 sm:!h-[4.25rem] sm:!w-[4.25rem] md:!h-16 md:!w-16",
             isSelected
               ? "ring-grana-bright shadow-[0_0_0_4px_rgba(194,49,66,0.35)]"
               : isCaptain

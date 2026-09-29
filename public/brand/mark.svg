@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Supermanager Balaguer">
+  <defs>
+    <linearGradient id="g-graphite" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1c222c"/>
+      <stop offset="55%" stop-color="#12151a"/>
+      <stop offset="100%" stop-color="#0b0d10"/>
+    </linearGradient>
+    <linearGradient id="g-grana" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c23142"/>
+      <stop offset="100%" stop-color="#9b2030"/>
+    </linearGradient>
+    <clipPath id="ball-clip">
+      <circle cx="256" cy="256" r="168"/>
+    </clipPath>
+  </defs>
+
+  <!-- Outer badge -->
+  <rect width="512" height="512" rx="96" fill="url(#g-graphite)"/>
+  <rect x="18" y="18" width="476" height="476" rx="82" fill="none" stroke="#ece8e1" stroke-opacity="0.12" stroke-width="4"/>
+
+  <!-- Grana accent arc -->
+  <path d="M96 118 A196 196 0 0 1 416 118" fill="none" stroke="url(#g-grana)" stroke-width="18" stroke-linecap="round"/>
+
+  <!-- Basketball -->
+  <circle cx="256" cy="256" r="168" fill="#161a21" stroke="#ece8e1" stroke-opacity="0.55" stroke-width="10"/>
+  <g clip-path="url(#ball-clip)" fill="none" stroke="#ece8e1" stroke-opacity="0.42" stroke-width="8" stroke-linecap="round">
+    <path d="M88 256 H424"/>
+    <path d="M256 88 V424"/>
+    <path d="M118 150 C190 210 190 302 118 362"/>
+    <path d="M394 150 C322 210 322 302 394 362"/>
+  </g>
+
+  <!-- Soft fill behind monogram -->
+  <circle cx="256" cy="256" r="108" fill="#0b0d10" fill-opacity="0.55"/>
+
+  <!-- SM monogram -->
+  <text
+    x="256"
+    y="278"
+    text-anchor="middle"
+    font-family="Oswald, 'Arial Narrow', Impact, sans-serif"
+    font-size="168"
+    font-weight="700"
+    letter-spacing="-6"
+    fill="#ece8e1"
+  >SM</text>
+
+  <!-- Small grana underline under monogram -->
+  <rect x="186" y="318" width="140" height="10" rx="5" fill="url(#g-grana)"/>
+</svg>

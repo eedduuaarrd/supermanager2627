@@ -20,7 +20,7 @@ export function OnboardingClient() {
   }
 
   return (
-    <main className="mx-auto flex min-h-full w-full max-w-md flex-1 flex-col justify-center px-5 py-12">
+    <main className="mx-auto flex min-h-full w-full max-w-md flex-1 flex-col justify-center overflow-x-hidden px-5 py-12 pt-[max(3rem,env(safe-area-inset-top))] pb-[max(3rem,env(safe-area-inset-bottom))]">
       <p className="text-xs uppercase tracking-[0.22em] text-mute">
         Benvingut/da
       </p>
@@ -39,7 +39,7 @@ export function OnboardingClient() {
       <Button
         type="button"
         onClick={dismiss}
-        className="mt-10 h-12 w-full bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
+        className="mt-10 h-12 min-h-12 w-full touch-manipulation bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
       >
         Entès · Anar a l&apos;inici
       </Button>

@@ -48,7 +48,7 @@ export function PlayerRow({
           : undefined
       }
       className={cn(
-        "flex items-center gap-3 border-b border-line px-3 py-3 transition-colors",
+        "flex min-h-14 items-center gap-3 border-b border-line px-3 py-3 transition-colors touch-manipulation",
         selected && "bg-grana/10",
         isCaptain && "bg-white/[0.04]",
         canTapRow && "cursor-pointer active:bg-white/[0.06]",
