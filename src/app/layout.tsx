@@ -14,7 +14,7 @@ const sans = IBM_Plex_Sans({
   variable: "--font-sans",
 });
 
-const siteUrl = "https://supermanager.2.28.127.154.sslip.io";
+const siteUrl = "https://supercbb.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
