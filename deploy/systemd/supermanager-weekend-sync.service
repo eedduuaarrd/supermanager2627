@@ -13,5 +13,10 @@ Environment=PATH=/home/ebernat/.nvm/versions/node/v22.23.3/bin:/usr/local/bin:/u
 Environment=APP_URL=http://127.0.0.1:4317
 Environment=DATA_DIR=/home/ebernat/supermanager/data
 Environment=WEEKEND_SYNC_LOG=/var/log/supermanager-weekend-sync.log
+Environment=HOME=/home/ebernat
+Environment=FCBQ_CHROME_PROFILE=/home/ebernat/.cache/fcbq-chrome
+Environment=FCBQ_CDP_PORT=9335
+Environment=FCBQ_CHROME_LOG=/var/log/supermanager-fcbq-chrome.log
 ExecStart=/home/ebernat/.nvm/versions/node/v22.23.3/bin/node /home/ebernat/supermanager/scripts/weekend-sync.mjs
 Nice=10
+TimeoutStartSec=900

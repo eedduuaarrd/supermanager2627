@@ -1,0 +1,13 @@
+[Unit]
+Description=Timer — refresh FCBQ fixtures (tip-offs) via Chrome daily + before weekend
+
+[Timer]
+# Daily morning before lock-refresh (08:00 Madrid) so tip-offs are fresh.
+OnCalendar=*-*-* 07:30:00 Europe/Madrid
+# Extra pass Friday evening so Saturday tip-offs are current before the weekend.
+OnCalendar=Fri *-*-* 20:00:00 Europe/Madrid
+Persistent=true
+Unit=supermanager-fixtures-refresh.service
+
+[Install]
+WantedBy=timers.target

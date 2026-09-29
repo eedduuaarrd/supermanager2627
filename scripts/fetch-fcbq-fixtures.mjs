@@ -12,6 +12,7 @@
  * msstats games[] often lacks tipOff and upcoming fixtures — prefer calendar.
  *
  * Usage:
+ *   node scripts/fetch-fcbq-fixtures-browser.mjs   # preferred — Chrome CDP, no Edu cookie
  *   node scripts/fetch-fcbq-fixtures.mjs --from-calendar /tmp/fcbq-calendar-rows.json
  *   FCBQ_COOKIE='fcbq_rc=…' node scripts/fetch-fcbq-fixtures.mjs --calendar
  *   FCBQ_COOKIE='…' node scripts/fetch-fcbq-fixtures.mjs --live

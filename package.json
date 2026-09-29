@@ -11,6 +11,7 @@
     "update-prices": "node scripts/update-market-prices.mjs",
     "weekly": "node scripts/weekly-jornada.mjs",
     "fetch-fixtures": "node scripts/fetch-fcbq-fixtures.mjs",
+    "fetch-fixtures-browser": "node scripts/fetch-fcbq-fixtures-browser.mjs",
     "weekend-sync": "node scripts/weekend-sync.mjs"
   },
   "dependencies": {
@@ -23,6 +24,7 @@
     "jose": "^6.2.12",
     "lucide-react": "^1.48.0",
     "next": "16.3.6",
+    "puppeteer-core": "^24.43.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "shadcn": "^4.21.0",

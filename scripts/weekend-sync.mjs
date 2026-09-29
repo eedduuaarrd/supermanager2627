@@ -3,7 +3,8 @@
  * Weekend sync for Supermanager Balaguer (Sat/Sun 23:59 Europe/Madrid).
  *
  * 1) Refresh plantilla stats → player-stats.json (upsert newcomers, recompute VAL)
- * 2) Refresh fixtures.json from msstats (best-effort; needs FCBQ_COOKIE for live)
+ * 2) Refresh fixtures.json from FCBQ calendars via Chrome CDP (no Edu cookie);
+ *    optional FCBQ_COOKIE / --from-api still supported as fallbacks
  * 3) Tag this week's fixtures with current fantasy jornada
  * 4) Assign untagged game rows → current round; score + open next via ADMIN API
  *    (opening next jornada resets transfer snapshots + canvis counters)
@@ -124,17 +125,29 @@ function assignUntaggedGames(round) {
 
 function refreshFixtures(round) {
   const fetchArgs = [];
+  let useBrowser = false;
   if (fromApiIdx >= 0) {
     fetchArgs.push("--from-api", args[fromApiIdx + 1]);
   } else if (args.includes("--from-calendar")) {
     const i = args.indexOf("--from-calendar");
     fetchArgs.push("--from-calendar", args[i + 1]);
-  } else if (process.env.FCBQ_COOKIE || args.includes("--live") || args.includes("--calendar")) {
-    // Prefer FCBQ team calendars (upcoming + tip-off Hora) over msstats games[].
+  } else if (args.includes("--calendar") && process.env.FCBQ_COOKIE) {
+    // Curl calendar with pasted cookie (legacy / emergency).
     fetchArgs.push("--calendar");
+  } else if (args.includes("--live") && process.env.FCBQ_COOKIE) {
+    fetchArgs.push("--live");
+  } else if (!args.includes("--skip-browser")) {
+    // Default: headless Chrome on the VPS scrapes calendars (reCAPTCHA v3).
+    useBrowser = true;
   }
   try {
-    runNode("scripts/fetch-fcbq-fixtures.mjs", fetchArgs);
+    if (useBrowser) {
+      runNode("scripts/fetch-fcbq-fixtures-browser.mjs", []);
+    } else if (fetchArgs.length || process.env.FCBQ_COOKIE) {
+      runNode("scripts/fetch-fcbq-fixtures.mjs", fetchArgs);
+    } else {
+      log("fixtures: no browser/cookie/api source — keeping existing file");
+    }
   } catch (err) {
     log(`fixtures fetch warning: ${err.message} — keeping existing file`);
   }

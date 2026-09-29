@@ -1,0 +1,21 @@
+[Unit]
+Description=Supermanager Balaguer FCBQ fixtures refresh (Chrome calendar scrape)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ebernat
+Group=ebernat
+WorkingDirectory=/home/ebernat/supermanager
+EnvironmentFile=/etc/supermanager.env
+Environment=PATH=/home/ebernat/.nvm/versions/node/v22.23.3/bin:/usr/local/bin:/usr/bin:/bin
+Environment=HOME=/home/ebernat
+Environment=FCBQ_CHROME_PROFILE=/home/ebernat/.cache/fcbq-chrome
+Environment=FCBQ_CDP_PORT=9335
+Environment=FCBQ_CHROME_LOG=/var/log/supermanager-fcbq-chrome.log
+# After scrape, recompute tip-off lock for the open jornada.
+ExecStart=/home/ebernat/.nvm/versions/node/v22.23.3/bin/node /home/ebernat/supermanager/scripts/fetch-fcbq-fixtures-browser.mjs
+ExecStartPost=/usr/bin/curl -sS -X POST http://127.0.0.1:4317/api/admin/weekly -H 'content-type: application/json' -H "x-admin-token: ${ADMIN_TOKEN}" -d '{"action":"lock"}'
+Nice=10
+TimeoutStartSec=600

@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-09-29",
-  "source": "FCBQ calendar dump /tmp/fcbq-calendar-rows.json",
+  "updatedAt": "2026-09-29T17:00:03.177Z",
+  "source": "browser:basquetcatala.cat/partits/calendari_equip_global/402/{legacyId}",
   "timezone": "Europe/Madrid",
   "notes": [
     "tipOff is ISO only when FCBQ publishes a real start time — never invent from date alone.",
@@ -15,6 +15,7 @@
       "teamId": "masc-a",
       "slug": "teixido-a",
       "shortName": "Teixidó A",
+      "fullName": "Teixidó Associats A",
       "legacyTeamId": 92083,
       "fixtures": [
         {
@@ -369,14 +370,14 @@
           "homeTeam": "CN TÀRREGA",
           "awayTeam": "TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A"
         }
-      ],
-      "fullName": "Teixidó Associats A"
+      ]
     },
     {
       "fcbqTeamId": "c057eeae-3aae-4e33-b2ab-54fabb2700ae",
       "teamId": "masc-b",
       "slug": "sifonet-b",
       "shortName": "Lo Sifonet B",
+      "fullName": "Lo Sifonet CB Balaguer B",
       "legacyTeamId": 94248,
       "fixtures": [
         {
@@ -667,14 +668,14 @@
           "homeTeam": "AUTOCARS DEL PLA CB BELLPUIG C",
           "awayTeam": "LO SIFONET CB BALAGUER B"
         }
-      ],
-      "fullName": "Lo Sifonet CB Balaguer B"
+      ]
     },
     {
       "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
       "teamId": "fem-a",
       "slug": "cudos-a",
       "shortName": "Cudos A",
+      "fullName": "Cudos Consultors CB Balaguer A",
       "legacyTeamId": 91097,
       "fixtures": [
         {
@@ -1093,14 +1094,14 @@
           "homeTeam": "CUDOS CONSULTORS CB BALAGUER A",
           "awayTeam": "ODONTOMED JET TERRASSA"
         }
-      ],
-      "fullName": "Cudos Consultors CB Balaguer A"
+      ]
     },
     {
       "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
       "teamId": "fem-b",
       "slug": "farratges-b",
       "shortName": "Farratges B",
+      "fullName": "Farratges La Noguera CB Balaguer B",
       "legacyTeamId": 91098,
       "fixtures": [
         {
@@ -1166,6 +1167,22 @@
           "competition": "C.C. SEGONA CATEGORIA FEMENINA",
           "homeTeam": "SEDIS EFAUSA",
           "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B"
+        },
+        {
+          "date": "2026-10-18",
+          "tipOff": "2026-10-18T18:00:00+02:00",
+          "home": false,
+          "opponent": "SEDIS EFAUSA",
+          "homeTeam": "SEDIS EFAUSA",
+          "awayTeam": "FARRATGES LA NOGUERA CB BALAGUER B",
+          "opponentId": null,
+          "matchCallUuid": null,
+          "matchDayNum": null,
+          "result": null,
+          "teamPoints": null,
+          "opponentPoints": null,
+          "jornada": null,
+          "competition": "C.C. SEGONA CATEGORIA FEMENINA"
         },
         {
           "date": "2026-10-24",
@@ -1519,8 +1536,7 @@
           "homeTeam": "FARRATGES LA NOGUERA CB BALAGUER B",
           "awayTeam": "PUJOL MOLLERUSSA"
         }
-      ],
-      "fullName": "Farratges La Noguera CB Balaguer B"
+      ]
     }
   ]
 }
