@@ -68,7 +68,9 @@ node scripts/update-market-prices.mjs          # un tick si hi ha partits nous
 
 ### Operativa setmanal
 
-Després d’actualitzar l’snapshot FCBQ (`fcbq-rosters.json` o `--from`):
+El snapshot `fcbq-rosters.json` només és honest amb PJ=1. El timer de cap de setmana no el fa servir per puntuar: ingereix el registre per partit i, si falta, no tanca la jornada.
+
+Després d’actualitzar l’snapshot FCBQ a mà (`fcbq-rosters.json` o `--from`):
 
 ```bash
 # Al VPS (app en marxa), amb ADMIN_TOKEN a l’entorn:
@@ -95,14 +97,18 @@ El tancament de jornada a l’app està desactivat: només via timer/scripts o `
 
 ### Weekend sync (systemd)
 
-Dissabte i diumenge **23:59 Europe/Madrid** (`supermanager-weekend-sync.timer`):
+Dissabte i diumenge **23:59 Europe/Madrid** (`supermanager-weekend-sync.timer`). Una jornada fantasy és la **setmana del club** (dl–dg, Europe/Madrid), no un sol dia: el dissabte no tanca si encara queda un partit el diumenge, i una segona passada el mateix cap de setmana **no** avança una jornada buida.
+
+Les estadístiques del timer surten del registre **per partit** (msstats, Chrome com els calendaris). Les mitjanes de plantilla amb PJ>1 no es fan servir per puntuar. Si el scrape falla, el calendari no es refresca, o falta el box score d’un partit ja jugat, el sync **no** puntua ni avança.
 
 ```bash
+npm run test:weekend-sync
+node scripts/weekend-sync.mjs --dry-run   # decisió amb els JSON locals; no fa scrape ni tanca
 ADMIN_TOKEN=… APP_URL=http://127.0.0.1:4317 npm run weekend-sync
 ```
 
-Refresca plantilla → `player-stats.json`, fixtures → `fixtures.json`, puntua via `POST /api/admin/weekly`, actualitza `meta.lineup_lock_at`.
-Unitats a `deploy/systemd/`. Log: `/var/log/supermanager-weekend-sync.log`.
+Al VPS: `systemctl status supermanager-weekend-sync.timer` i `journalctl -u supermanager-weekend-sync.service -n 100 --no-pager`. Dissabte s’espera `week-still-open` si hi ha partit diumenge; diumenge, una sola `action=run`; una segona execució la mateixa setmana, `already-scored-this-week` o `no-club-fixtures`. Log: `/var/log/supermanager-weekend-sync.log`.
+Unitats a `deploy/systemd/`.
 
 ### Backup SQLite (systemd)
 
