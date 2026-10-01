@@ -2,13 +2,21 @@
 /**
  * Weekend sync for Supermanager Balaguer (Sat/Sun 23:59 Europe/Madrid).
  *
- * 1) Refresh plantilla stats → player-stats.json (upsert newcomers, recompute VAL)
+ * A fantasy jornada is one Madrid club week (Mon–Sun), not a single day.
+ * Both timer runs are safe: Saturday does not close while a Sunday fixture
+ * is still ahead, and a second run the same week cannot advance an empty jornada.
+ *
+ * 1) Ingest per-game box scores (msstats via Chrome). Plantilla PJ>1 averages
+ *    are not enough — if ingest fails or a played fixture has no box score,
+ *    do not score or advance (fail-closed).
  * 2) Refresh fixtures.json from FCBQ calendars via Chrome CDP (no Edu cookie);
- *    optional FCBQ_COOKIE / --from-api still supported as fallbacks
- * 3) Tag this week's fixtures with current fantasy jornada
- * 4) Assign untagged game rows → current round; score + open next via ADMIN API
+ *    optional FCBQ_COOKIE / --from-api still supported as fallbacks.
+ *    A fixtures fetch failure also skips score/advance (lock still updates).
+ * 3) Tag this week's fixtures with the current fantasy jornada
+ * 4) Assign this week's untagged game rows; score + open next via ADMIN API
+ *    only when the guard allows it
  *    (opening next jornada resets transfer snapshots + canvis counters)
- * 5) Tick broker market prices (normal tick, anti-retick if no new games)
+ * 5) Tick broker market prices after a successful ingest (anti-retick if no new games)
  * 6) Recompute lineup_lock_at from fixtures tip-offs (null if none published)
  *    Transfer window: Sun 23:59 Madrid → first tip-off; max 3 canvis per team
  *
@@ -16,9 +24,11 @@
  *   ADMIN_TOKEN=… APP_URL=http://127.0.0.1:4317 node scripts/weekend-sync.mjs
  *
  * Flags:
- *   --from path          roster snapshot (default src/data/fcbq-rosters.json)
+ *   --from path          unused by the timer (live box scores). Kept so manual
+ *                        flags from weekly-jornada do not crash this script.
  *   --from-api path      msstats dump for fixtures
- *   --skip-refresh       skip plantilla refresh
+ *   --skip-refresh       skip live box-score ingest (does not score unless
+ *                        you also accept stale stats — the timer never sets this)
  *   --skip-fixtures      skip fixtures fetch
  *   --skip-score         refresh+lock only
  *   --skip-prices        skip market price tick
@@ -34,6 +44,10 @@ import {
   tagJornadaWeek,
   CLUB_TEAMS,
 } from "./fetch-fcbq-fixtures.mjs";
+import {
+  applyAssignments,
+  decideWeekendAdvance,
+} from "./fcbq-weekend-guard.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
@@ -42,10 +56,7 @@ const FIXTURES = join(root, "src/data/fixtures.json");
 const require = createRequire(import.meta.url);
 
 const args = process.argv.slice(2);
-const fromIdx = args.indexOf("--from");
 const fromApiIdx = args.indexOf("--from-api");
-const fromPath =
-  fromIdx >= 0 ? args[fromIdx + 1] : join(root, "src/data/fcbq-rosters.json");
 const skipRefresh = args.includes("--skip-refresh");
 const skipFixtures = args.includes("--skip-fixtures");
 const skipScore = args.includes("--skip-score");
@@ -82,16 +93,48 @@ function openDb() {
   return db;
 }
 
-function currentRound() {
+const SCORED_WEEK_KEY = "weekend_scored_week";
+
+function withDb(fn, fallback) {
   try {
     const db = openDb();
+    try {
+      return fn(db);
+    } finally {
+      db.close();
+    }
+  } catch {
+    return fallback;
+  }
+}
+
+function currentRound() {
+  return withDb((db) => {
     const row = db
       .prepare("SELECT value FROM meta WHERE key = ?")
       .get("current_round");
-    db.close();
     return Number(row?.value ?? 1);
-  } catch {
-    return 1;
+  }, 1);
+}
+
+function scoredWeekKey() {
+  return withDb((db) => {
+    const row = db
+      .prepare("SELECT value FROM meta WHERE key = ?")
+      .get(SCORED_WEEK_KEY);
+    return row?.value ?? null;
+  }, null);
+}
+
+function rememberScoredWeek(key) {
+  const db = openDb();
+  try {
+    db.prepare(
+      `INSERT INTO meta (key, value) VALUES (?, ?)
+       ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+    ).run(SCORED_WEEK_KEY, key);
+  } finally {
+    db.close();
   }
 }
 
@@ -106,26 +149,30 @@ function runNode(script, scriptArgs = [], extraEnv = {}) {
   }
 }
 
-function assignUntaggedGames(round) {
-  const data = JSON.parse(readFileSync(STATS, "utf8"));
-  let assigned = 0;
-  for (const rec of Object.values(data.players ?? {})) {
-    for (const g of rec.games ?? []) {
-      const has =
-        typeof g.round === "number" || typeof g.jornada === "number";
-      if (has) continue;
-      g.round = round;
-      g.jornada = round;
-      assigned += 1;
-    }
-  }
+function loadStats() {
+  return JSON.parse(readFileSync(STATS, "utf8"));
+}
+
+function saveStats(data) {
   writeFileSync(STATS, JSON.stringify(data, null, 2) + "\n");
-  return assigned;
+}
+
+/** True only when this process just wrote a successful box-score ingest. */
+function ingestIsFresh(startedMs) {
+  try {
+    const ingest = loadStats().ingest;
+    if (!ingest?.ok) return false;
+    const at = Date.parse(ingest.at);
+    return Number.isFinite(at) && at >= startedMs - 5000;
+  } catch {
+    return false;
+  }
 }
 
 function refreshFixtures(round) {
   const fetchArgs = [];
   let useBrowser = false;
+  let ok = true;
   if (fromApiIdx >= 0) {
     fetchArgs.push("--from-api", args[fromApiIdx + 1]);
   } else if (args.includes("--from-calendar")) {
@@ -146,10 +193,14 @@ function refreshFixtures(round) {
     } else if (fetchArgs.length || process.env.FCBQ_COOKIE) {
       runNode("scripts/fetch-fcbq-fixtures.mjs", fetchArgs);
     } else {
-      log("fixtures: no browser/cookie/api source — keeping existing file");
+      ok = false;
+      log("fixtures: no browser/cookie/api source — will not score/advance");
     }
   } catch (err) {
-    log(`fixtures fetch warning: ${err.message} — keeping existing file`);
+    ok = false;
+    log(
+      `fixtures fetch FAIL: ${err.message} — keeping existing file, will not score/advance`,
+    );
   }
   if (!existsSync(FIXTURES)) {
     const empty = buildFixturesFile({
@@ -170,7 +221,7 @@ function refreshFixtures(round) {
   const week = tagJornadaWeek(file, round);
   writeFileSync(FIXTURES, JSON.stringify(file, null, 2) + "\n");
   log(`fixtures tagged jornada ${round} for Madrid week ${week.from}→${week.to}`);
-  return file;
+  return { file, ok };
 }
 
 function computeLockAt(file, round) {
@@ -202,29 +253,56 @@ async function postAdmin(action, extra = {}) {
 }
 
 async function main() {
+  const startedMs = Date.now();
   log("weekend-sync start");
   const round = currentRound();
   log(`current fantasy jornada=${round}`);
 
-  if (!skipRefresh) {
-    if (!existsSync(fromPath)) {
-      throw new Error(`Missing roster snapshot: ${fromPath}`);
-    }
-    log(`refresh-fcbq-stats --from ${fromPath}`);
-    if (!dryRun) {
-      // Price tick runs once after scoring (anti-retick); skip during refresh.
-      runNode("scripts/refresh-fcbq-stats.mjs", ["--from", fromPath], {
-        SKIP_MARKET_PRICES: "1",
-      });
+  let ingestOk = false;
+  if (dryRun) {
+    log("dry-run — skip live box-score ingest");
+  } else if (skipRefresh) {
+    log("skip box-score ingest (--skip-refresh) — will not score/advance");
+  } else {
+    log("fetch-fcbq-boxscores-browser");
+    try {
+      runNode("scripts/fetch-fcbq-boxscores-browser.mjs", []);
+      ingestOk = ingestIsFresh(startedMs);
+      if (!ingestOk) {
+        log("stats ingest FAIL: box-score file is not a fresh ok ingest");
+      }
+    } catch (err) {
+      ingestOk = false;
+      log(`stats ingest FAIL: ${err.message} — will not score/advance`);
     }
   }
 
   let fixturesFile = existsSync(FIXTURES)
     ? JSON.parse(readFileSync(FIXTURES, "utf8"))
     : { teams: [] };
-  if (!skipFixtures) {
-    fixturesFile = dryRun ? fixturesFile : refreshFixtures(round);
+  let fixturesOk = skipFixtures;
+  if (!skipFixtures && !dryRun) {
+    const refreshed = refreshFixtures(round);
+    fixturesFile = refreshed.file;
+    fixturesOk = refreshed.ok;
   }
+
+  const stats = existsSync(STATS) ? loadStats() : { players: {} };
+  const decision = decideWeekendAdvance({
+    round,
+    fixturesFile,
+    stats,
+    now: new Date(),
+    scoredWeekKey: scoredWeekKey(),
+    ingestOk: dryRun ? true : ingestOk,
+    fixturesOk: dryRun ? true : fixturesOk,
+  });
+  const missingNote = decision.missing?.length
+    ? ` missing=${decision.missing.map((m) => `${m.teamId}@${m.date}`).join(",")}`
+    : "";
+  log(
+    `score decision: ${decision.reason} advance=${decision.advance} week=${decision.week.from}→${decision.week.to}${missingNote}`,
+  );
 
   const lockAt = computeLockAt(fixturesFile, round);
   log(
@@ -234,31 +312,54 @@ async function main() {
   );
 
   if (dryRun) {
-    log("dry-run — skip assign/score/prices/lock API");
+    log("dry-run — hypothetical decision from files on disk; no scrape, no score");
     return;
   }
 
-  if (!skipScore) {
-    const assigned = assignUntaggedGames(round);
-    log(`assigned ${assigned} untagged game row(s) to jornada ${round}`);
-    if (!ADMIN_TOKEN) {
-      log("WARN: no ADMIN_TOKEN — falling back to weekly-jornada local score");
-      runNode("scripts/weekly-jornada.mjs", [
-        "--skip-refresh",
-        ...(fromIdx >= 0 ? ["--from", fromPath] : []),
-      ]);
-    } else {
-      log(`POST ${APP_URL}/api/admin/weekly action=run`);
-      const result = await postAdmin("run");
-      log(`score OK ${JSON.stringify(result)}`);
-    }
+  let hardFail = !ingestOk || !fixturesOk;
+
+  if (!skipScore && ingestOk) {
+    const assigned = applyAssignments(stats, decision.assignments);
+    if (assigned > 0) saveStats(stats);
+    log(`assigned ${assigned} game row(s) (this club week / already-tagged fixtures only)`);
   }
 
-  // Broker tick after scoring: ±15% when scored game count grew (shouldTickPrice).
+  if (!skipScore && decision.advance) {
+    if (!ADMIN_TOKEN) {
+      hardFail = true;
+      log("FAIL: no ADMIN_TOKEN — not scoring (refusing a blind local advance)");
+    } else {
+      try {
+        log(`POST ${APP_URL}/api/admin/weekly action=run`);
+        const result = await postAdmin("run");
+        log(`score OK ${JSON.stringify(result)}`);
+        try {
+          rememberScoredWeek(decision.week.key);
+          log(`weekend_scored_week=${decision.week.key}`);
+        } catch (err) {
+          log(`WARN: could not store weekend_scored_week (${err.message})`);
+        }
+      } catch (err) {
+        hardFail = true;
+        log(`score FAIL: ${err.message} — did not advance`);
+      }
+    }
+  } else if (!skipScore) {
+    log(`skip score/advance: ${decision.reason}`);
+  }
+
+  // Broker tick when ingest succeeded: ±15% only if scored-game count grew.
   // Writes src/data/market-prices.json; app reads it at runtime (no rebuild).
-  if (!skipPrices) {
-    log("update-market-prices (normal tick, anti-retick)");
-    runNode("scripts/update-market-prices.mjs");
+  if (!skipPrices && ingestOk) {
+    try {
+      log("update-market-prices (normal tick, anti-retick)");
+      runNode("scripts/update-market-prices.mjs");
+    } catch (err) {
+      hardFail = true;
+      log(`prices FAIL: ${err.message}`);
+    }
+  } else if (!skipPrices) {
+    log("skip market prices (stats ingest did not succeed)");
   }
 
   // After score+advance, lock applies to the NEW open jornada from remaining tip-offs.
@@ -275,12 +376,25 @@ async function main() {
     nextRound,
   );
   if (ADMIN_TOKEN) {
-    const lockResult = await postAdmin("lock", { lockAt: nextLock });
-    log(`lock OK ${JSON.stringify(lockResult)}`);
+    try {
+      const lockResult = await postAdmin("lock", { lockAt: nextLock });
+      log(`lock OK ${JSON.stringify(lockResult)}`);
+    } catch (err) {
+      hardFail = true;
+      log(`lock FAIL: ${err.message}`);
+    }
   } else {
     log(`skip API lock (no token); computed lockAt=${nextLock}`);
   }
 
+  if (!skipScore && decision.reason === "missing-box-scores") {
+    hardFail = true;
+  }
+
+  if (hardFail) {
+    log("weekend-sync FAIL — score/advance was not applied");
+    process.exit(1);
+  }
   log("weekend-sync done");
 }
 

@@ -12,7 +12,8 @@
     "weekly": "node scripts/weekly-jornada.mjs",
     "fetch-fixtures": "node scripts/fetch-fcbq-fixtures.mjs",
     "fetch-fixtures-browser": "node scripts/fetch-fcbq-fixtures-browser.mjs",
-    "weekend-sync": "node scripts/weekend-sync.mjs"
+    "weekend-sync": "node scripts/weekend-sync.mjs",
+    "test:weekend-sync": "node --test scripts/weekend-sync.test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

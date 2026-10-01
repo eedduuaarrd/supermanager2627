@@ -2,6 +2,9 @@
 Description=Run Supermanager weekend sync Sat/Sun 23:59 Europe/Madrid
 
 [Timer]
+# Dues passades a propòsit (ds i dg). El script només tanca una vegada
+# per setmana de club (Europe/Madrid) i no avança si la jornada és buida
+# o si falten box scores.
 OnCalendar=Sat *-*-* 23:59:00 Europe/Madrid
 OnCalendar=Sun *-*-* 23:59:00 Europe/Madrid
 Persistent=true

@@ -8,12 +8,17 @@
  * Existing games keep their round/jornada and box scores.
  *
  * Usage: node scripts/refresh-fcbq-stats.mjs [--from path]
+ *
+ * PJ>1 plantilla cells are season averages, not new box scores. Weekend sync
+ * does not score from this file alone — it ingests per-game logs
+ * (scripts/fetch-fcbq-boxscores-browser.mjs) and refuses to advance otherwise.
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { computeVal } from "./compute-val.mjs";
+import { TEAM_MAP, BASE_IDS, normName, fantasyId } from "./fcbq-identity.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
@@ -26,51 +31,8 @@ const TEAM_URLS = [
   "https://www.basquetcatala.cat/estadistica/equip/a5c75f3f-ca35-4553-9eb6-a29780eb2007",
 ];
 
-const TEAM_MAP = {
-  "5f55017e-893e-4323-8b41-b58323ea8f73": { teamId: "masc-a", slug: "teixido-a" },
-  "c057eeae-3aae-4e33-b2ab-54fabb2700ae": { teamId: "masc-b", slug: "sifonet-b" },
-  "839e2243-48dc-4459-aec5-a2dadeb3ad53": { teamId: "fem-a", slug: "cudos-a" },
-  "a5c75f3f-ca35-4553-9eb6-a29780eb2007": { teamId: "fem-b", slug: "farratges-b" },
-};
-
-const BASE_IDS = {
-  "HECTOR LOZANO MARTINEZ": "hector-lozano",
-  "EDUARD BERNAT SUCARRAT": "eduard-bernat",
-  "TONI SALUD GARCIA": "toni-salud",
-  "IVAN FRANCO GUERRERO": "ivan-franco",
-  "GERARD GARCIA ROSAURO": "gerard-garcia",
-  "MARC ESCODA ANGERRI": "marc-escoda",
-  "BABACAR TOURE GASSAMA": "babacar-toure",
-  "GERARD SOLDEVILA CASAS": "gerard-soldevila",
-  "ROGER COMPANYS SOLA": "roger-companys",
-  "ARES BUNOL PERELLO": "ares-bunol",
-  "JULIA PLA PLA": "julia-pla",
-  "ANDREA PERAT GRACIA": "andrea-perat",
-  "NEUS ESCODA ANGERRI": "neus-escoda",
-  "MONICA FONTANET MALLOL": "monica-fontanet",
-  "QUERALT SOLE TORRES": "queralt-sole",
-  "CLARA PANIAGUA MARVA": "clara-paniagua",
-  "MARIAMA MBALLO DIALLO": "mariama-mballo",
-  "MARTINA BENITEZ FARRANDO": "martina-benitez",
-  "ADA DOMENE MORALEDA": "ada-domene",
-  "JANA ROLDAN ARANDILLA": "jana-roldan",
-  "NURIA JIMENEZ ARAN": "nuria-jimenez",
-  "ABRIL GRACIA PALACIN": "abril-gracia",
-  "XENIA ANDREU MONELL": "xenia-andreu",
-  "GINA BETBESE SANCHEZ": "gina-betbese",
-  "GINA TRILLA PINIES": "gina-trilla",
-  "JANA ALARCON SOLANES": "jana-alarcon",
-};
-
-const DUAL_BASES = new Set(["julia-pla", "queralt-sole", "mariama-mballo"]);
-
 function norm(s) {
-  return s.normalize("NFKD").replace(/\p{M}/gu, "").toUpperCase()
-    .replace(/[^A-Z0-9 ]+/g, "").replace(/\s+/g, " ").trim();
-}
-
-function fantasyId(base, teamSlug) {
-  return DUAL_BASES.has(base) ? `${base}__${teamSlug}` : base;
+  return normName(s);
 }
 
 function fingerprint(g) {
@@ -86,7 +48,7 @@ function loadExisting() {
   }
 }
 
-function buildFromRosters(rosters, existing) {
+export function buildFromRosters(rosters, existing) {
   const players = {};
   for (const t of rosters.teams ?? []) {
     const meta = TEAM_MAP[t.id];
@@ -179,7 +141,9 @@ function buildFromRosters(rosters, existing) {
           entry.games.push(candidate);
         }
       } else if (pj > 1) {
-        entry.seasonNote = `FCBQ mostra PJ=${pj} (mitjanes); cal scrape per partit per afegir jornades.`;
+        // Averages only — do not append a fake game. Weekend sync needs the
+        // per-game log and will not close the jornada without it.
+        entry.seasonNote = `FCBQ mostra PJ=${pj} (mitjanes); cal el registre per partit (fetch-fcbq-boxscores-browser.mjs) per afegir jornades.`;
       } else if (pj === 0 && entry.games.length === 0) {
         // No invent — leave empty history.
       }
@@ -210,26 +174,32 @@ function buildFromRosters(rosters, existing) {
   };
 }
 
-const args = process.argv.slice(2);
-const fromIdx = args.indexOf("--from");
-if (args.includes("--live")) throw new Error("Use --from snapshot (reCAPTCHA).");
-const path = fromIdx >= 0 ? args[fromIdx + 1] : join(root, "src/data/fcbq-rosters.json");
-const existing = loadExisting();
-const out = buildFromRosters(JSON.parse(readFileSync(path, "utf8")), existing);
-writeFileSync(OUT, JSON.stringify(out, null, 2) + "\n");
-const withGames = Object.values(out.players).filter((p) => p.games.length > 0);
-console.log(
-  `Wrote ${OUT}: ${Object.keys(out.players).length} players, ${withGames.length} with games, ${withGames.reduce((n, p) => n + p.games.length, 0)} game rows`,
-);
-
-if (!process.env.SKIP_MARKET_PRICES) {
-  console.log("→ update-market-prices.mjs");
-  const priceRun = spawnSync(
-    process.execPath,
-    [join(root, "scripts/update-market-prices.mjs")],
-    { stdio: "inherit", cwd: root },
+function main() {
+  const args = process.argv.slice(2);
+  const fromIdx = args.indexOf("--from");
+  if (args.includes("--live")) throw new Error("Use --from snapshot (reCAPTCHA). Per-game ingest: node scripts/fetch-fcbq-boxscores-browser.mjs");
+  const path = fromIdx >= 0 ? args[fromIdx + 1] : join(root, "src/data/fcbq-rosters.json");
+  const existing = loadExisting();
+  const out = buildFromRosters(JSON.parse(readFileSync(path, "utf8")), existing);
+  writeFileSync(OUT, JSON.stringify(out, null, 2) + "\n");
+  const withGames = Object.values(out.players).filter((p) => p.games.length > 0);
+  console.log(
+    `Wrote ${OUT}: ${Object.keys(out.players).length} players, ${withGames.length} with games, ${withGames.reduce((n, p) => n + p.games.length, 0)} game rows`,
   );
-  if (priceRun.status !== 0) process.exit(priceRun.status ?? 1);
-} else {
-  console.log("→ skip market prices (SKIP_MARKET_PRICES)");
+
+  if (!process.env.SKIP_MARKET_PRICES) {
+    console.log("→ update-market-prices.mjs");
+    const priceRun = spawnSync(
+      process.execPath,
+      [join(root, "scripts/update-market-prices.mjs")],
+      { stdio: "inherit", cwd: root },
+    );
+    if (priceRun.status !== 0) process.exit(priceRun.status ?? 1);
+  } else {
+    console.log("→ skip market prices (SKIP_MARKET_PRICES)");
+  }
 }
+
+const isMain =
+  process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1];
+if (isMain) main();
