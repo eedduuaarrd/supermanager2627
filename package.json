@@ -13,7 +13,8 @@
     "fetch-fixtures": "node scripts/fetch-fcbq-fixtures.mjs",
     "fetch-fixtures-browser": "node scripts/fetch-fcbq-fixtures-browser.mjs",
     "weekend-sync": "node scripts/weekend-sync.mjs",
-    "test:weekend-sync": "node --test scripts/weekend-sync.test.mjs"
+    "test:weekend-sync": "node --test scripts/weekend-sync.test.mjs",
+    "test:ideal-team": "npx --yes tsx scripts/test-ideal-team.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

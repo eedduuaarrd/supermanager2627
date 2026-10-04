@@ -11,12 +11,13 @@ import {
   getRoundStatus,
   setLineupLockAt,
 } from "@/lib/rounds";
+import { refreshStoredIdealTeam } from "@/lib/ideal-team";
 import { closeJornada, openNextJornada } from "@/lib/scoring";
 import { promoteInitialTeamsIfLocked } from "@/lib/teams";
 
 export const runtime = "nodejs";
 
-type WeeklyAction = "refresh" | "close" | "open" | "run" | "lock";
+type WeeklyAction = "refresh" | "close" | "open" | "run" | "lock" | "ideal";
 
 function authorize(req: Request, bodyToken?: string): boolean {
   const adminToken = process.env.ADMIN_TOKEN;
@@ -38,6 +39,8 @@ function authorize(req: Request, bodyToken?: string): boolean {
  * - run: close + advance (score + open next) — typical weekend cron after refresh
  * - lock: recompute/store lineup_lock_at from fixtures.json (or body.lockAt);
  *   if tip-off already passed, promote transfer_phase initial → normal
+ * - ideal: persist the ideal lineup for `round` from fantasy VAL.
+ *   Incomplete scores leave the previous stored lineup in place.
  *
  * Also accepts session cookie for logged-in admin (scripts / curl with session).
  */
@@ -47,6 +50,7 @@ export async function POST(req: Request) {
     action?: WeeklyAction;
     advance?: boolean;
     lockAt?: string | null;
+    round?: number;
   } = {};
   try {
     body = (await req.json()) as typeof body;
@@ -79,7 +83,7 @@ export async function POST(req: Request) {
 
     if (action === "lock") {
       const round = getCurrentRound();
-      let lockAt: string | null =
+      const lockAt: string | null =
         body.lockAt === undefined
           ? computeLineupLockAt(round, loadFixtures())
           : body.lockAt;
@@ -109,6 +113,18 @@ export async function POST(req: Request) {
       });
     }
 
+    if (action === "ideal") {
+      const round = body.round;
+      if (!Number.isInteger(round) || round == null || round < 1) {
+        return NextResponse.json(
+          { error: "Cal una jornada vàlida (round)." },
+          { status: 400 },
+        );
+      }
+      const result = refreshStoredIdealTeam(round);
+      return NextResponse.json({ ok: true, action: "ideal", ...result });
+    }
+
     if (action === "close") {
       const result = closeJornada({ advance: false });
       return NextResponse.json({ ok: true, action, ...result });
@@ -133,6 +149,6 @@ export async function GET() {
     round: getCurrentRound(),
     roundStatus: getRoundStatus(),
     lockAt: getLineupLockAt(),
-    actions: ["refresh", "close", "open", "run", "lock"],
+    actions: ["refresh", "close", "open", "run", "lock", "ideal"],
   });
 }

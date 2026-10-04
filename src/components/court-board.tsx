@@ -68,6 +68,11 @@ interface CourtBoardProps {
   onEmptySlot?: (slot: { slotIndex: number; position: Position }) => void;
   /** Fill remaining flex height without forcing page scroll. */
   fillHeight?: boolean;
+  /**
+   * When set, chip captions show that jornada's fantasy VAL instead of
+   * season average and price. Missing ids render as "VAL —".
+   */
+  jornadaPointsById?: Record<string, number>;
 }
 
 export function CourtBoard({
@@ -77,6 +82,7 @@ export function CourtBoard({
   onSelect,
   onEmptySlot,
   fillHeight,
+  jornadaPointsById,
 }: CourtBoardProps) {
   const filled = assignSlots(players);
   const counts = countByPosition(players);
@@ -236,6 +242,11 @@ export function CourtBoard({
                     isCaptain={isCaptain}
                     isSelected={isSelected}
                     onSelect={onSelect}
+                    jornadaPoints={
+                      jornadaPointsById
+                        ? (jornadaPointsById[player.id] ?? null)
+                        : undefined
+                    }
                   />
                 ) : (
                   <EmptySlot
@@ -299,16 +310,24 @@ function EmptySlot({
   );
 }
 
+function formatJornadaVal(points: number): string {
+  const rounded = Math.round(points * 10) / 10;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+}
+
 function FilledChip({
   player,
   isCaptain,
   isSelected,
   onSelect,
+  jornadaPoints,
 }: {
   player: Player;
   isCaptain: boolean;
   isSelected: boolean;
   onSelect?: (id: string | null) => void;
+  /** undefined keeps the season line; null means the jornada score is missing. */
+  jornadaPoints?: number | null;
 }) {
   const href = `/jugador/${player.id}`;
   return (
@@ -361,6 +380,7 @@ function FilledChip({
         player={player}
         asLink={!isSelected}
         href={href}
+        jornadaPoints={jornadaPoints}
       />
     </div>
   );
@@ -370,10 +390,12 @@ function ChipCaption({
   player,
   asLink,
   href,
+  jornadaPoints,
 }: {
   player: Player;
   asLink: boolean;
   href: string;
+  jornadaPoints?: number | null;
 }) {
   const className =
     "absolute left-1/2 top-[calc(100%+0.4rem)] z-10 w-[5.5rem] -translate-x-1/2 text-center";
@@ -382,16 +404,23 @@ function ChipCaption({
       <p className="truncate text-[10px] font-semibold leading-snug text-bone drop-shadow sm:text-[11px]">
         {displayFirstName(player.name)}
       </p>
-      <p className="mt-0.5 text-[9px] tabular-nums text-bone/65 sm:text-[10px]">
-        VAL {player.avgVal}
-        <span className="mx-0.5 text-white/25">·</span>
-        <PriceLabel
-          price={player.price}
-          prevPrice={player.prevPrice}
-          compact
-          className="text-[9px] sm:text-[10px]"
-        />
-      </p>
+      {jornadaPoints === undefined ? (
+        <p className="mt-0.5 text-[9px] tabular-nums text-bone/65 sm:text-[10px]">
+          VAL {player.avgVal}
+          <span className="mx-0.5 text-white/25">·</span>
+          <PriceLabel
+            price={player.price}
+            prevPrice={player.prevPrice}
+            compact
+            className="text-[9px] sm:text-[10px]"
+          />
+        </p>
+      ) : (
+        <p className="mt-0.5 text-[10px] tabular-nums text-bone/90 drop-shadow sm:text-[11px]">
+          <span className="font-medium text-bone/55">VAL </span>
+          {jornadaPoints == null ? "—" : formatJornadaVal(jornadaPoints)}
+        </p>
+      )}
     </>
   );
   // When selected, action-sheet backdrop covers the court — keep caption as
