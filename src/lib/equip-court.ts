@@ -3,7 +3,7 @@ import { CAPTAIN_MULTIPLIER, resolvePlayerId } from "@/data/roster";
 /**
  * What the Equip court prints under a player.
  * - `price`: quote only (lineup still editable, including the next jornada after Sunday close)
- * - `points`: raw jornada VAL; "-" until that player's match ends; 0 if it ended and they did not play
+ * - `points`: jornada number; captain is raw VAL ×2; "-" until that match ends; 0 if it ended and they did not play
  * - `ideal`: Equip ideal popup — "VAL n" / "VAL —", unchanged
  */
 export type CourtCaptionMode = "price" | "points" | "ideal";
@@ -19,8 +19,9 @@ export type PastCourtView = {
   playerIds: string[];
   captainId: string | null;
   /**
-   * Raw VAL for players who played. 0 means the match is over and they did not
-   * play, or their valuation really was 0. Omitted ids render as "-".
+   * Number under each player. Captain is raw VAL ×2. Everyone else is raw VAL.
+   * 0 means the match is over and they did not play, or the valuation really was 0.
+   * Omitted ids render as "-".
    */
   pointsById: Record<string, number>;
 };
@@ -58,20 +59,23 @@ export function pointsCaptionText(points: number | null | undefined): string {
 }
 
 /**
- * Unmultiplied fantasy VAL for the court.
- * Captain ×2 stays on `points` (team total). This does not change that math:
- * when `val` is missing it still reads the raw figure back out of `points`.
- * A finished DNP is 0. No score row at all is null ("-" until the match ends).
+ * Number printed under a player on the locked court and on a past jornada.
+ * Captain is raw VAL ×2, the same figure already stored on `points` and in the
+ * jornada total. Everyone else is raw VAL. A finished DNP is 0, including the
+ * captain. No score row at all is null ("-" until the match ends).
+ * Legacy rows without `val` use `points`, which is already doubled for the captain.
  */
-export function rawCourtVal(
+export function courtPlayerPoints(
   score: ScoreLike | undefined,
   isCaptain: boolean,
 ): number | null {
   if (!score) return null;
   if (score.dnp) return 0;
-  if (typeof score.val === "number" && Number.isFinite(score.val)) return score.val;
+  if (typeof score.val === "number" && Number.isFinite(score.val)) {
+    if (isCaptain && CAPTAIN_MULTIPLIER > 0) return score.val * CAPTAIN_MULTIPLIER;
+    return score.val;
+  }
   if (typeof score.points !== "number" || !Number.isFinite(score.points)) return null;
-  if (isCaptain && CAPTAIN_MULTIPLIER > 0) return score.points / CAPTAIN_MULTIPLIER;
   return score.points;
 }
 
@@ -148,7 +152,7 @@ export function pointsForInProgressCourt(input: {
   const out: Record<string, number> = {};
   for (const score of input.scores) {
     const id = canon(score.playerId);
-    const raw = rawCourtVal(score, captainId != null && id === captainId);
+    const raw = courtPlayerPoints(score, captainId != null && id === captainId);
     if (raw == null) continue;
     out[id] = raw;
   }
@@ -240,7 +244,7 @@ export function pastCourtFromHistory(row: {
   const pointsById: Record<string, number> = {};
   for (const score of row.scores) {
     const id = canon(score.playerId);
-    const raw = rawCourtVal(score, captainId != null && id === captainId);
+    const raw = courtPlayerPoints(score, captainId != null && id === captainId);
     if (raw == null) continue;
     pointsById[id] = raw;
   }
