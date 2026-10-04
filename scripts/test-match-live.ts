@@ -1,5 +1,6 @@
 /**
- * Match-end push copy, old-game scoring without a push, and partial fantasy scores.
+ * Match-end push copy, jornada 3 result pushes, jornada 1–2 silence,
+ * and partial fantasy scores.
  * Run: npm run test:match-live
  */
 import assert from "node:assert/strict";
@@ -106,7 +107,10 @@ function box(
 async function main() {
   const {
     applyMatchScores,
+    jornadaForMatchPush,
     matchAlreadyScored,
+    matchEndMayPush,
+    MATCH_PUSH_FROM_JORNADA,
     matchNeedsLiveFetch,
     matchPushBody,
     opponentPushName,
@@ -206,12 +210,9 @@ async function main() {
     roundStatus: "open",
   });
   const cappont = ready.find((p) => p.key.endsWith("cappont-1"));
-  assert.equal(cappont?.action, "send");
+  assert.equal(cappont?.action, "score");
   assert.equal(cappont?.round, 2);
-  assert.equal(
-    cappont?.message?.body,
-    "Teixidó 81–65 Cappont.\nDestacat: Hector Lozano (VAL 24).",
-  );
+  assert.equal(cappont?.message, undefined);
   assert.deepEqual(
     cappont?.players.map((p) => p.playerId).sort(),
     ["hector-lozano", "marc-escoda"],
@@ -343,11 +344,17 @@ async function main() {
       return 1;
     },
   });
-  assert.deepEqual(sent, [
-    "Teixidó 81–65 Cappont.\nDestacat: Hector Lozano (VAL 24).",
-  ]);
+  assert.deepEqual(sent, []);
   assert.equal(second.scoredTeams, 1);
-  assert.equal(sent.length, 1);
+  assert.equal(sent.length, 0);
+  assert.equal(
+    (
+      db
+        .prepare(`SELECT outcome FROM match_dispatch WHERE match_key = 'masc-a|cappont-1'`)
+        .get() as { outcome: string }
+    ).outcome,
+    "scored",
+  );
   const row = db
     .prepare(`SELECT points, scores_json FROM round_scores WHERE team_id = 't1' AND round = 2`)
     .get() as { points: number; scores_json: string };
@@ -371,7 +378,7 @@ async function main() {
       return 1;
     },
   });
-  assert.equal(sent.length, 1);
+  assert.equal(sent.length, 0);
   const again = db
     .prepare(`SELECT points FROM round_scores WHERE team_id = 't1' AND round = 2`)
     .get() as { points: number };
@@ -522,7 +529,7 @@ async function main() {
     )
     .get() as { outcome: string };
   assert.equal(startRow.outcome, "skipped");
-  assert.equal(sent.length, 1);
+  assert.equal(sent.length, 0);
 
   await runMatchLivePollTick({
     now: fetchNow,
@@ -547,6 +554,268 @@ async function main() {
     ).outcome,
     "skipped",
   );
+
+  assert.equal(MATCH_PUSH_FROM_JORNADA, 3);
+  const pushBaseline = Date.parse("2026-10-04T10:00:00.000Z");
+  const j3Tip = Date.parse("2026-10-10T16:30:00.000Z");
+  assert.equal(matchEndMayPush(1, j3Tip, pushBaseline), false);
+  assert.equal(matchEndMayPush(2, j3Tip, pushBaseline), false);
+  assert.equal(matchEndMayPush(null, j3Tip, pushBaseline), false);
+  assert.equal(matchEndMayPush(3, pushBaseline - 1, pushBaseline), false);
+  assert.equal(matchEndMayPush(3, j3Tip, pushBaseline), true);
+  assert.equal(matchEndMayPush(4, j3Tip, pushBaseline), true);
+
+  const j3Now = new Date("2026-10-10T19:00:00.000Z");
+  const j3Teixido = {
+    date: "2026-10-10",
+    tipOff: "2026-10-10T16:30:00.000Z",
+    home: true,
+    opponent: "CB CAPPONT",
+    teamPoints: 81,
+    opponentPoints: 65,
+    jornada: 3 as number | null,
+    matchCallUuid: "j3-cappont",
+  };
+  const j3Cudos = {
+    date: "2026-10-10",
+    tipOff: "2026-10-10T17:00:00.000Z",
+    home: false,
+    opponent: "CB ALPICAT",
+    teamPoints: 72,
+    opponentPoints: 68,
+    jornada: 3 as number | null,
+    matchCallUuid: "j3-cudos",
+  };
+  const j3NoVal = {
+    date: "2026-10-10",
+    tipOff: "2026-10-10T18:00:00.000Z",
+    home: true,
+    opponent: "CB TREMP",
+    teamPoints: 60,
+    opponentPoints: 55,
+    jornada: 3,
+    matchCallUuid: "j3-no-val",
+  };
+  const j3Boxes = [
+    box("hector-lozano", "Hector Lozano Martinez", "j3-cappont", {
+      pts: 20,
+      pf: 2,
+      pm: 6,
+    }),
+    {
+      ...box("ares-bunol", "Ares Buñol Perelló", "j3-cudos", {
+        pts: 18,
+        pf: 1,
+        pm: 5,
+      }),
+      teamId: "fem-a" as const,
+    },
+    box("sense-val", "Ningú Inventat", "j3-no-val", {
+      pts: null,
+      pf: null,
+      pm: null,
+    }),
+  ];
+  const j3Plan = planClubMatches({
+    fixtures: {
+      teams: [
+        { ...team, fixtures: [j3Teixido, j3NoVal] },
+        {
+          ...team,
+          teamId: "fem-a",
+          slug: "cudos-a",
+          shortName: "Cudos A",
+          fullName: "Cudos Consultors CB Balaguer A",
+          fixtures: [j3Cudos],
+        },
+      ],
+    },
+    boxes: j3Boxes,
+    baselineMs: pushBaseline,
+    now: j3Now,
+    currentRound: 3,
+    roundStatus: "open",
+  });
+  const j3Cappont = j3Plan.find((p) => p.key.endsWith("j3-cappont"));
+  const j3Side = j3Plan.find((p) => p.key.endsWith("j3-cudos"));
+  const j3Bare = j3Plan.find((p) => p.key.endsWith("j3-no-val"));
+  assert.equal(j3Cappont?.action, "send");
+  assert.equal(j3Cappont?.message?.title, "Supermanager");
+  assert.equal(
+    j3Cappont?.message?.body,
+    "Teixidó 81–65 Cappont.\nDestacat: Hector Lozano (VAL 24).",
+  );
+  assert.equal(j3Side?.action, "send");
+  assert.equal(
+    j3Side?.message?.body,
+    "Cudos 72–68 Alpicat.\nDestacat: Ares Buñol (VAL 22).",
+  );
+  assert.equal(j3Bare?.action, "wait");
+  assert.equal(j3Bare?.message, undefined);
+  assert.equal(
+    j3Plan.some((p) => p.message?.body.includes("Ningú Inventat")),
+    false,
+  );
+
+  const untagged = planClubMatches({
+    fixtures: {
+      teams: [
+        {
+          ...team,
+          fixtures: [{ ...j3Teixido, jornada: null, matchCallUuid: "j3-untagged" }],
+        },
+      ],
+    },
+    boxes: [
+      box("hector-lozano", "Hector Lozano Martinez", "j3-untagged", {
+        pts: 20,
+        pf: 2,
+        pm: 6,
+      }),
+    ],
+    baselineMs: pushBaseline,
+    now: j3Now,
+    currentRound: 3,
+    roundStatus: "open",
+  });
+  assert.equal(untagged[0]?.action, "send");
+  assert.equal(
+    jornadaForMatchPush(
+      { ...j3Teixido, jornada: null, matchCallUuid: "j3-untagged" },
+      3,
+      "open",
+      j3Now,
+    ),
+    3,
+  );
+
+  const tonight = planClubMatches({
+    fixtures: {
+      teams: [
+        {
+          ...team,
+          fixtures: [
+            {
+              date: "2026-10-04",
+              tipOff: "2026-10-04T18:00:00.000Z",
+              home: true,
+              opponent: "CB CAPPONT",
+              teamPoints: 70,
+              opponentPoints: 64,
+              jornada: null,
+              matchCallUuid: "j2-tonight",
+            },
+          ],
+        },
+      ],
+    },
+    boxes: [
+      box(
+        "hector-lozano",
+        "Hector Lozano Martinez",
+        "j2-tonight",
+        { pts: 20, pf: 2, pm: 6 },
+        "2026-10-04",
+      ),
+    ],
+    baselineMs: pushBaseline,
+    now: new Date("2026-10-04T20:00:00.000Z"),
+    currentRound: 2,
+    roundStatus: "open",
+  });
+  assert.equal(tonight[0]?.action, "score");
+  assert.equal(tonight[0]?.message, undefined);
+
+  db.prepare(`UPDATE meta SET value = '3' WHERE key = 'current_round'`).run();
+  db.prepare(
+    `INSERT INTO lineups (team_id, round, player_ids, captain_id, confirmed, budget, snapshot_ids)
+     VALUES ('t1', 3, ?, 'hector-lozano', 0, 20000, '[]')`,
+  ).run(JSON.stringify(["hector-lozano"]));
+  const liveFixtures = {
+    teams: [
+      {
+        ...team,
+        fixtures: [
+          j3Teixido,
+          j3NoVal,
+          {
+            date: "2026-10-04",
+            tipOff: "2026-10-04T18:00:00.000Z",
+            home: true,
+            opponent: "CB CAPPONT",
+            teamPoints: 70,
+            opponentPoints: 64,
+            jornada: 2,
+            matchCallUuid: "j2-still",
+          },
+        ],
+      },
+      {
+        ...team,
+        teamId: "fem-a" as const,
+        slug: "cudos-a",
+        shortName: "Cudos A",
+        fullName: "Cudos Consultors CB Balaguer A",
+        fixtures: [j3Cudos],
+      },
+    ],
+  };
+  const liveBoxes = [
+    ...j3Boxes,
+    box(
+      "hector-lozano",
+      "Hector Lozano Martinez",
+      "j2-still",
+      { pts: 12, pf: 1, pm: 2 },
+      "2026-10-04",
+    ),
+  ];
+  const liveSent: string[] = [];
+  const once = await runMatchLive({
+    now: j3Now,
+    fixtures: liveFixtures,
+    boxes: liveBoxes,
+    send: async (message) => {
+      liveSent.push(message.body);
+      return 1;
+    },
+  });
+  assert.deepEqual(liveSent, [
+    "Teixidó 81–65 Cappont.\nDestacat: Hector Lozano (VAL 24).",
+    "Cudos 72–68 Alpicat.\nDestacat: Ares Buñol (VAL 22).",
+  ]);
+  assert.deepEqual(once.sent, ["masc-a|j3-cappont", "fem-a|j3-cudos"]);
+  assert.equal(
+    (
+      db
+        .prepare(`SELECT outcome FROM match_dispatch WHERE match_key = 'masc-a|j3-no-val'`)
+        .get() as { outcome: string } | undefined
+    ),
+    undefined,
+  );
+  assert.equal(
+    (
+      db
+        .prepare(`SELECT outcome FROM match_dispatch WHERE match_key = 'masc-a|j2-still'`)
+        .get() as { outcome: string } | undefined
+    ),
+    undefined,
+  );
+  const againLive = await runMatchLive({
+    now: new Date("2026-10-10T19:10:00.000Z"),
+    fixtures: liveFixtures,
+    boxes: liveBoxes,
+    send: async (message) => {
+      liveSent.push(message.body);
+      return 1;
+    },
+  });
+  assert.deepEqual(againLive.sent, []);
+  assert.deepEqual(liveSent, [
+    "Teixidó 81–65 Cappont.\nDestacat: Hector Lozano (VAL 24).",
+    "Cudos 72–68 Alpicat.\nDestacat: Ares Buñol (VAL 22).",
+  ]);
+  assert.equal(sent.length, 0);
 
   console.log("OK match-live");
 }
