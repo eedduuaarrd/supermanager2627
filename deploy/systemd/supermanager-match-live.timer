@@ -1,0 +1,15 @@
+[Unit]
+Description=Check finished Balaguer games every minute (Europe/Madrid)
+
+[Timer]
+# Optional. The Next.js process already runs the same check every minute,
+# so this timer does not have to be enabled (the VPS cannot install new
+# units without root). Enable it only if the check should also run as a
+# separate oneshot.
+OnCalendar=*-*-* *:0/1:00 Europe/Madrid
+AccuracySec=15s
+Persistent=true
+Unit=supermanager-match-live.service
+
+[Install]
+WantedBy=timers.target

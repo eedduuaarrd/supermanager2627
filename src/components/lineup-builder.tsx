@@ -35,6 +35,13 @@ interface LineupBuilderProps {
   /** Tip-off / jornada lock — court becomes read-only. */
   readOnly?: boolean;
   lockMessage?: string | null;
+  /** Fantasy VAL from a club game that has already finished. */
+  playedVals?: Record<string, number>;
+}
+
+function formatLiveVal(points: number): string {
+  const rounded = Math.round(points * 10) / 10;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
 }
 
 function softHint(
@@ -79,6 +86,7 @@ export function LineupBuilder({
   error,
   readOnly = false,
   lockMessage = null,
+  playedVals,
 }: LineupBuilderProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pickerSlot, setPickerSlot] = useState<null | {
@@ -223,6 +231,8 @@ export function LineupBuilder({
           onSelect={setSelectedId}
           onEmptySlot={handleEmptySlot}
           fillHeight
+          jornadaPointsById={playedVals}
+          jornadaOnlyKnown
         />
       </section>
 
@@ -289,7 +299,9 @@ export function LineupBuilder({
                   {selectedPlayer.name}
                 </p>
                 <p className="text-xs text-mute">
-                  VAL {selectedPlayer.avgVal} · Veure fitxa
+                  {playedVals && selectedPlayer.id in playedVals
+                    ? `VAL ${formatLiveVal(playedVals[selectedPlayer.id])} · Veure fitxa`
+                    : `VAL ${selectedPlayer.avgVal} · Veure fitxa`}
                 </p>
               </Link>
               {!readOnly && (

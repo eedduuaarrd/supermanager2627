@@ -12,6 +12,7 @@ import {
   setLineupLockAt,
 } from "@/lib/rounds";
 import { refreshStoredIdealTeam } from "@/lib/ideal-team";
+import { runMatchLive } from "@/lib/match-live";
 import { notifyIdealStored, notifyJornadaStart } from "@/lib/push";
 import { closeJornada, openNextJornada } from "@/lib/scoring";
 import { promoteInitialTeamsIfLocked } from "@/lib/teams";
@@ -25,7 +26,8 @@ type WeeklyAction =
   | "run"
   | "lock"
   | "ideal"
-  | "jornada-start";
+  | "jornada-start"
+  | "match-finished";
 
 function authorize(req: Request, bodyToken?: string): boolean {
   const adminToken = process.env.ADMIN_TOKEN;
@@ -53,6 +55,9 @@ function authorize(req: Request, bodyToken?: string): boolean {
  * - jornada-start: if the open jornada's first tip-off of this Madrid week
  *   is within the last 20 minutes, push that it has started (once).
  *   Already started or already finished is recorded as skipped, not sent.
+ * - match-finished: push and score each club game that has a real final
+ *   box score and tipped off after this check first ran. Older games are
+ *   skipped. Does not change ideal or jornada-start.
  *
  * Also accepts session cookie for logged-in admin (scripts / curl with session).
  */
@@ -145,6 +150,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, action: "jornada-start", push });
     }
 
+    if (action === "match-finished") {
+      const live = await runMatchLive();
+      return NextResponse.json({ ok: true, action: "match-finished", ...live });
+    }
+
     if (action === "close") {
       const result = closeJornada({ advance: false });
       return NextResponse.json({ ok: true, action, ...result });
@@ -169,6 +179,6 @@ export async function GET() {
     round: getCurrentRound(),
     roundStatus: getRoundStatus(),
     lockAt: getLineupLockAt(),
-    actions: ["refresh", "close", "open", "run", "lock", "ideal", "jornada-start"],
+    actions: ["refresh", "close", "open", "run", "lock", "ideal", "jornada-start", "match-finished"],
   });
 }

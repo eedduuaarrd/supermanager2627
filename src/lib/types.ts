@@ -46,6 +46,8 @@ export interface RoundScore {
   winBonus: boolean;
   /** VAL when scored from Balaguer formula; omitted for legacy rows. */
   statSource?: "VAL" | "PM";
+  /** Unmultiplied fantasy VAL for this game. Captain ×2 is `points` only. */
+  val?: number;
   dnp?: boolean;
   note?: string;
 }

@@ -374,6 +374,13 @@ export function getDb(): Database.Database {
       created_at TEXT NOT NULL,
       PRIMARY KEY (kind, round)
     );
+
+    -- One row per club match. skipped = already finished before this feature ran.
+    CREATE TABLE IF NOT EXISTS match_dispatch (
+      match_key TEXT PRIMARY KEY,
+      outcome TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
   `);
 
   const current = db

@@ -479,7 +479,7 @@ function scoreLineupFromFcbq(
       // Extended fields consumed by UI via scores_json
       ...(source === "DNP"
         ? { dnp: true, note: "No ha jugat aquesta jornada (0)" }
-        : { statSource: source }),
+        : { statSource: source, val: base }),
     } as RoundScore;
   });
   const teamPoints = scores.reduce((s, x) => s + x.points, 0);
