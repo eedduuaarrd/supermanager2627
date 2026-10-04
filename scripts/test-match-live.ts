@@ -1,5 +1,5 @@
 /**
- * Match-end push copy, no backfill, and partial fantasy scores.
+ * Match-end push copy, old-game scoring without a push, and partial fantasy scores.
  * Run: npm run test:match-live
  */
 import assert from "node:assert/strict";
@@ -29,6 +29,36 @@ const team = {
       matchCallUuid: "old-1",
     },
     {
+      date: "2026-10-02",
+      tipOff: "2026-10-02T18:00:00.000Z",
+      home: true,
+      opponent: "CB VELL",
+      teamPoints: 70,
+      opponentPoints: 60,
+      jornada: 2,
+      matchCallUuid: "old-empty",
+    },
+    {
+      date: "2026-10-03",
+      tipOff: "2026-10-03T16:00:00.000Z",
+      home: false,
+      opponent: "CB ANTIC",
+      teamPoints: 55,
+      opponentPoints: 50,
+      jornada: 2,
+      matchCallUuid: "old-fresh",
+    },
+    {
+      date: "2026-10-01",
+      tipOff: "2026-10-01T18:00:00.000Z",
+      home: true,
+      opponent: "CB SALTAT",
+      teamPoints: 40,
+      opponentPoints: 44,
+      jornada: 2,
+      matchCallUuid: "already-skipped",
+    },
+    {
       date: "2026-10-10",
       tipOff: "2026-10-10T16:30:00.000Z",
       home: true,
@@ -56,12 +86,13 @@ function box(
   name: string,
   uuid: string,
   stats: { pts: number | null; pf: number | null; pm: number | null; tlc?: number; tli?: number },
+  date = "2026-10-10",
 ) {
   return {
     playerId,
     name,
     teamId: "masc-a" as const,
-    date: "2026-10-10",
+    date,
     matchCallUuid: uuid,
     pts: stats.pts,
     pf: stats.pf,
@@ -75,6 +106,8 @@ function box(
 async function main() {
   const {
     applyMatchScores,
+    matchAlreadyScored,
+    matchNeedsLiveFetch,
     matchPushBody,
     opponentPushName,
     pickStandout,
@@ -83,6 +116,7 @@ async function main() {
     runMatchLive,
   } = await import("../src/lib/match-live");
   const { getDb } = await import("../src/lib/db");
+  const { runMatchLivePollTick } = await import("../src/lib/match-live-poll");
 
   assert.equal(opponentPushName("CB CAPPONT"), "Cappont");
   assert.equal(opponentPushName("C.B. TORREFARRERA A"), "Torrefarrera");
@@ -125,6 +159,14 @@ async function main() {
       pf: null,
       pm: null,
     }),
+    box("pol-vell", "Pol Vell Garcia", "old-fresh", { pts: 11, pf: 0, pm: 0 }, "2026-10-03"),
+    box(
+      "nora-salt",
+      "Nora Salt Puig",
+      "already-skipped",
+      { pts: 12, pf: 3, pm: 0 },
+      "2026-10-01",
+    ),
   ];
   const early = planClubMatches({
     fixtures: { teams: [team] },
@@ -134,9 +176,26 @@ async function main() {
     currentRound: 2,
     roundStatus: "open",
   });
-  assert.equal(early.find((p) => p.key.endsWith("old-1"))?.action, "skip-old");
+  assert.equal(early.find((p) => p.key.endsWith("old-1"))?.action, "wait");
+  assert.equal(early.find((p) => p.key.endsWith("old-empty"))?.action, "wait");
+  const oldFreshPlan = early.find((p) => p.key.endsWith("old-fresh"));
+  assert.equal(oldFreshPlan?.action, "score");
+  assert.equal(oldFreshPlan?.round, 2);
+  assert.equal(oldFreshPlan?.message, undefined);
+  assert.equal(early.find((p) => p.key.endsWith("already-skipped"))?.action, "score");
   assert.equal(early.find((p) => p.key.endsWith("cappont-1"))?.action, "wait");
   assert.equal(early.find((p) => p.key.endsWith("tremp-1"))?.action, "wait");
+  assert.equal(
+    planClubMatches({
+      fixtures: { teams: [team] },
+      boxes,
+      baselineMs: Date.parse("2026-10-04T10:00:00.000Z"),
+      now: new Date("2026-10-04T10:00:00.000Z"),
+      currentRound: 2,
+      roundStatus: "closed",
+    }).find((p) => p.key.endsWith("old-fresh"))?.action,
+    "wait",
+  );
 
   const ready = planClubMatches({
     fixtures: { teams: [team] },
@@ -182,7 +241,19 @@ async function main() {
   db.prepare(
     `INSERT INTO lineups (team_id, round, player_ids, captain_id, confirmed, budget, snapshot_ids)
      VALUES ('t1', 2, ?, 'hector-lozano', 0, 20000, '[]')`,
-  ).run(JSON.stringify(["hector-lozano", "marc-escoda", "eduard-bernat"]));
+  ).run(
+    JSON.stringify([
+      "hector-lozano",
+      "marc-escoda",
+      "eduard-bernat",
+      "pol-vell",
+      "nora-salt",
+    ]),
+  );
+  db.prepare(
+    `INSERT INTO match_dispatch (match_key, outcome, created_at)
+     VALUES ('masc-a|already-skipped', 'skipped', '2026-10-03T20:00:00.000Z')`,
+  ).run();
 
   const sent: string[] = [];
   const first = await runMatchLive({
@@ -195,7 +266,73 @@ async function main() {
     },
   });
   assert.equal(sent.length, 0);
-  assert.ok(first.skipped.some((key) => key.endsWith("old-1")));
+  assert.equal(first.scoredTeams, 2);
+  assert.ok(first.waiting.some((key) => key.endsWith("old-empty")));
+  assert.equal(
+    (
+      db
+        .prepare(`SELECT outcome FROM match_dispatch WHERE match_key = 'masc-a|old-empty'`)
+        .get() as { outcome: string } | undefined
+    ),
+    undefined,
+  );
+  assert.equal(
+    (
+      db
+        .prepare(`SELECT outcome FROM match_dispatch WHERE match_key = 'masc-a|old-fresh'`)
+        .get() as { outcome: string }
+    ).outcome,
+    "scored",
+  );
+  assert.equal(
+    (
+      db
+        .prepare(
+          `SELECT outcome FROM match_dispatch WHERE match_key = 'masc-a|already-skipped'`,
+        )
+        .get() as { outcome: string }
+    ).outcome,
+    "scored",
+  );
+  const oldRow = db
+    .prepare(`SELECT points, scores_json FROM round_scores WHERE team_id = 't1' AND round = 2`)
+    .get() as { points: number; scores_json: string };
+  const oldScores = JSON.parse(oldRow.scores_json) as {
+    playerId: string;
+    points: number;
+  }[];
+  assert.equal(oldRow.points, 20);
+  assert.equal(oldScores.find((s) => s.playerId === "pol-vell")?.points, 11);
+  assert.equal(oldScores.find((s) => s.playerId === "nora-salt")?.points, 9);
+
+  const oldAgain = await runMatchLive({
+    now: new Date("2026-10-04T12:00:00.000Z"),
+    fixtures: { teams: [team] },
+    boxes,
+    send: async (message) => {
+      sent.push(message.body);
+      return 1;
+    },
+  });
+  assert.equal(sent.length, 0);
+  assert.equal(oldAgain.scoredTeams, 0);
+  assert.equal(oldAgain.waiting.some((key) => key.endsWith("old-empty")), true);
+  assert.equal(
+    (
+      db
+        .prepare(`SELECT outcome FROM match_dispatch WHERE match_key = 'masc-a|old-empty'`)
+        .get() as { outcome: string } | undefined
+    ),
+    undefined,
+  );
+  assert.equal(
+    (
+      db.prepare(`SELECT points FROM round_scores WHERE team_id = 't1' AND round = 2`).get() as {
+        points: number;
+      }
+    ).points,
+    20,
+  );
 
   const second = await runMatchLive({
     now: new Date("2026-10-10T19:00:00.000Z"),
@@ -210,6 +347,7 @@ async function main() {
     "Teixidó 81–65 Cappont.\nDestacat: Hector Lozano (VAL 24).",
   ]);
   assert.equal(second.scoredTeams, 1);
+  assert.equal(sent.length, 1);
   const row = db
     .prepare(`SELECT points, scores_json FROM round_scores WHERE team_id = 't1' AND round = 2`)
     .get() as { points: number; scores_json: string };
@@ -218,7 +356,7 @@ async function main() {
     points: number;
     val: number;
   }[];
-  assert.equal(row.points, 58);
+  assert.equal(row.points, 78);
   assert.equal(scores.find((s) => s.playerId === "hector-lozano")?.points, 48);
   assert.equal(scores.find((s) => s.playerId === "hector-lozano")?.val, 24);
   assert.equal(scores.find((s) => s.playerId === "marc-escoda")?.points, 10);
@@ -237,7 +375,7 @@ async function main() {
   const again = db
     .prepare(`SELECT points FROM round_scores WHERE team_id = 't1' AND round = 2`)
     .get() as { points: number };
-  assert.equal(again.points, 58);
+  assert.equal(again.points, 78);
 
   const extra = applyMatchScores(2, [
     { playerId: "eduard-bernat", val: 7, minutes: 12 },
@@ -252,6 +390,163 @@ async function main() {
   ) as { playerId: string; val: number }[];
   assert.equal(merged.find((s) => s.playerId === "hector-lozano")?.val, 24);
   assert.equal(merged.find((s) => s.playerId === "eduard-bernat")?.val, 7);
+
+  assert.equal(matchAlreadyScored("sent"), true);
+  assert.equal(matchAlreadyScored("scored"), true);
+  assert.equal(matchAlreadyScored("skipped"), false);
+  assert.equal(matchAlreadyScored(null), false);
+
+  const baselineMs = Date.parse("2026-10-04T10:00:00.000Z");
+  const fetchNow = new Date("2026-10-04T18:00:00.000Z");
+  function oneGame(fixture: {
+    tipOff: string;
+    jornada: number | null;
+    date: string;
+    uuid: string;
+    teamPoints: number | null;
+    opponentPoints: number | null;
+  }) {
+    return {
+      teams: [
+        {
+          ...team,
+          fixtures: [
+            {
+              date: fixture.date,
+              tipOff: fixture.tipOff,
+              home: true,
+              opponent: "CB CAPPONT",
+              teamPoints: fixture.teamPoints,
+              opponentPoints: fixture.opponentPoints,
+              jornada: fixture.jornada,
+              matchCallUuid: fixture.uuid,
+            },
+          ],
+        },
+      ],
+    };
+  }
+  assert.equal(
+    matchNeedsLiveFetch(
+      oneGame({
+        tipOff: "2026-10-02T18:00:00.000Z",
+        jornada: 2,
+        date: "2026-10-02",
+        uuid: "old-open",
+        teamPoints: 70,
+        opponentPoints: 60,
+      }),
+      baselineMs,
+      fetchNow,
+      () => false,
+      2,
+      "open",
+    ),
+    true,
+  );
+  assert.equal(
+    matchNeedsLiveFetch(
+      oneGame({
+        tipOff: "2026-10-02T18:00:00.000Z",
+        jornada: 2,
+        date: "2026-10-02",
+        uuid: "old-open",
+        teamPoints: 70,
+        opponentPoints: 60,
+      }),
+      baselineMs,
+      fetchNow,
+      (key) => key.endsWith("old-open"),
+      2,
+      "open",
+    ),
+    false,
+  );
+  assert.equal(
+    matchNeedsLiveFetch(
+      oneGame({
+        tipOff: "2026-10-10T16:30:00.000Z",
+        jornada: 2,
+        date: "2026-10-10",
+        uuid: "future",
+        teamPoints: null,
+        opponentPoints: null,
+      }),
+      baselineMs,
+      fetchNow,
+      () => false,
+      2,
+      "open",
+    ),
+    false,
+  );
+  assert.equal(
+    matchNeedsLiveFetch(
+      oneGame({
+        tipOff: "2026-09-27T17:00:00.000Z",
+        jornada: 1,
+        date: "2026-09-27",
+        uuid: "other-jornada",
+        teamPoints: null,
+        opponentPoints: null,
+      }),
+      baselineMs,
+      fetchNow,
+      () => false,
+      2,
+      "open",
+    ),
+    false,
+  );
+
+  let refreshed = 0;
+  await runMatchLivePollTick({
+    now: fetchNow,
+    fetchLive: true,
+    fixtures: oneGame({
+      tipOff: "2026-10-03T16:00:00.000Z",
+      jornada: 2,
+      date: "2026-10-03",
+      uuid: "poll-old",
+      teamPoints: null,
+      opponentPoints: null,
+    }),
+    refresh: async () => {
+      refreshed += 1;
+    },
+  });
+  assert.equal(refreshed, 1);
+  const startRow = db
+    .prepare(
+      `SELECT outcome FROM push_dispatch WHERE kind = 'jornada-start' AND round = 2`,
+    )
+    .get() as { outcome: string };
+  assert.equal(startRow.outcome, "skipped");
+  assert.equal(sent.length, 1);
+
+  await runMatchLivePollTick({
+    now: fetchNow,
+    fetchLive: false,
+    fixtures: oneGame({
+      tipOff: "2026-10-03T16:00:00.000Z",
+      jornada: 2,
+      date: "2026-10-03",
+      uuid: "poll-old",
+      teamPoints: null,
+      opponentPoints: null,
+    }),
+  });
+  assert.equal(startRow.outcome, "skipped");
+  assert.equal(
+    (
+      db
+        .prepare(
+          `SELECT outcome FROM push_dispatch WHERE kind = 'jornada-start' AND round = 2`,
+        )
+        .get() as { outcome: string }
+    ).outcome,
+    "skipped",
+  );
 
   console.log("OK match-live");
 }

@@ -1,5 +1,5 @@
 import { getCurrentRound, getDb } from "@/lib/db";
-import { firstWeekendKickoff, loadFixtures } from "@/lib/fixtures";
+import { firstWeekendKickoff, loadFixtures, type FixturesFile } from "@/lib/fixtures";
 import {
   decideIdealPush,
   decideJornadaStartPush,
@@ -264,9 +264,9 @@ export async function notifyIdealStored(round: number, stored: boolean) {
 }
 
 /** Minute checker: first tip-off of the open jornada's current Madrid week. */
-export async function notifyJornadaStart(now = new Date()) {
+export async function notifyJornadaStart(now = new Date(), fixtures?: FixturesFile) {
   const round = getCurrentRound();
-  const kickoff = firstWeekendKickoff(round, loadFixtures(), now);
+  const kickoff = firstWeekendKickoff(round, fixtures ?? loadFixtures(), now);
   if (dispatchRow("jornada-start", round)) {
     return { outcome: "already" as const, delivered: 0, round, kickoff };
   }

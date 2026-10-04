@@ -3,9 +3,15 @@
  * no new root timer is required. A matching systemd unit exists for
  * hosts that prefer a separate oneshot.
  */
-import { loadFixtures } from "@/lib/fixtures";
-import { matchNeedsLiveFetch, runMatchLive } from "@/lib/match-live";
-import { getDb } from "@/lib/db";
+import { getCurrentRound, getDb } from "@/lib/db";
+import { loadFixtures, type FixturesFile } from "@/lib/fixtures";
+import {
+  matchAlreadyScored,
+  matchNeedsLiveFetch,
+  runMatchLive,
+} from "@/lib/match-live";
+import { notifyJornadaStart } from "@/lib/push";
+import { getRoundStatus } from "@/lib/rounds";
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -58,6 +64,45 @@ async function refreshLiveFiles() {
   await runScript("scripts/fetch-fcbq-boxscores-browser.mjs");
 }
 
+/** One minute: refresh a live or still-unscored game, score it, then jornada-start. */
+export async function runMatchLivePollTick(opts?: {
+  now?: Date;
+  fetchLive?: boolean;
+  refresh?: () => Promise<void>;
+  fixtures?: FixturesFile;
+}): Promise<void> {
+  const now = opts?.now ?? new Date();
+  const fetchLive =
+    opts?.fetchLive ??
+    (process.env.NODE_ENV === "production" || process.env.MATCH_LIVE_FETCH === "1");
+  if (fetchLive) {
+    const fixtures = opts?.fixtures ?? loadFixtures();
+    const baseline = getDb()
+      .prepare(`SELECT value FROM meta WHERE key = ?`)
+      .get("match_live_since") as { value: string } | undefined;
+    const baselineMs = baseline ? Date.parse(baseline.value) : now.getTime();
+    const needs = matchNeedsLiveFetch(
+      fixtures,
+      Number.isFinite(baselineMs) ? baselineMs : now.getTime(),
+      now,
+      (key) => {
+        const row = getDb()
+          .prepare(`SELECT outcome FROM match_dispatch WHERE match_key = ?`)
+          .get(key) as { outcome: string } | undefined;
+        return matchAlreadyScored(row?.outcome);
+      },
+      getCurrentRound(),
+      getRoundStatus(),
+    );
+    if (needs) await (opts?.refresh ?? refreshLiveFiles)();
+  }
+  await runMatchLive({
+    now,
+    ...(opts?.fixtures ? { fixtures: opts.fixtures } : {}),
+  });
+  await notifyJornadaStart(now, opts?.fixtures);
+}
+
 export function startMatchLivePoll() {
   if (started) return;
   if (process.env.MATCH_LIVE_POLL === "0") return;
@@ -68,31 +113,7 @@ export function startMatchLivePoll() {
   const tick = () => {
     if (running) return;
     running = true;
-    void withLock(async () => {
-      const fetchLive =
-        process.env.NODE_ENV === "production" || process.env.MATCH_LIVE_FETCH === "1";
-      if (fetchLive) {
-        const baseline = getDb()
-          .prepare(`SELECT value FROM meta WHERE key = ?`)
-          .get("match_live_since") as { value: string } | undefined;
-        const baselineMs = baseline ? Date.parse(baseline.value) : Date.now();
-        const needs = matchNeedsLiveFetch(
-          loadFixtures(),
-          Number.isFinite(baselineMs) ? baselineMs : Date.now(),
-          new Date(),
-          (key) => {
-            const row = getDb()
-              .prepare(
-                `SELECT outcome FROM match_dispatch WHERE match_key = ?`,
-              )
-              .get(key) as { outcome: string } | undefined;
-            return row?.outcome === "sent" || row?.outcome === "skipped";
-          },
-        );
-        if (needs) await refreshLiveFiles();
-      }
-      await runMatchLive();
-    }).finally(() => {
+    void withLock(() => runMatchLivePollTick()).finally(() => {
       running = false;
     });
   };

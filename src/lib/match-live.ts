@@ -1,8 +1,13 @@
 /**
- * When one Balaguer club game finishes: push every subscriber and score
- * only the fantasy players who have a real box score for that game.
- * Games whose tip-off is before the first run are recorded as skipped
- * and never sent. Ideal-team and jornada-start pushes are untouched.
+ * When one Balaguer club game finishes, score the fantasy players who
+ * have a real box score for that game.
+ * Tip-off after match_live_since: score and push once.
+ * Tip-off before that clock: if the jornada is open and both scores plus
+ * at least one real VAL exist, score once and do not push. If the data
+ * is not ready, wait and retry — do not store a skip that blocks scoring.
+ * A row already marked skipped is scored once when the box exists, still
+ * without a push. Ideal-team pushes are untouched. The minute poll also
+ * runs the jornada-start notifier.
  */
 import { CAPTAIN_MULTIPLIER, getPlayer } from "@/data/roster";
 import { getCurrentRound, getDb } from "@/lib/db";
@@ -50,7 +55,8 @@ export type MatchBox = {
 
 export type PlannedMatch = {
   key: string;
-  action: "skip-old" | "wait" | "send";
+  /** `score` stores fantasy points and does not push. */
+  action: "score" | "wait" | "send";
   tipOffMs: number | null;
   message?: PushMessage;
   round: number | null;
@@ -165,11 +171,34 @@ function sameGame(box: MatchBox, teamId: string, fixture: ClubFixture): boolean 
   return Boolean(day && boxDay && day === boxDay);
 }
 
+/** Open jornada this fixture counts toward, or null when it must not be scored. */
+function openRoundForFixture(
+  fixture: ClubFixture,
+  currentRound: number,
+  roundStatus: "open" | "closed",
+  now: Date,
+): number | null {
+  if (roundStatus !== "open") return null;
+  const week = madridWeekBounds(now);
+  const day = fixture.date?.slice(0, 10) ?? "";
+  if (fixture.jornada === currentRound) return currentRound;
+  if (
+    (fixture.jornada == null || fixture.jornada === undefined) &&
+    day &&
+    day >= week.from &&
+    day <= week.to
+  ) {
+    return currentRound;
+  }
+  return null;
+}
+
 /**
  * Decide what to do with each club fixture.
  * No score numbers and no player VAL are invented: missing data waits.
- * A tip-off before `baselineMs` is skipped forever (already under way
- * before this check existed).
+ * A tip-off before `baselineMs` is scored without a push when the open
+ * jornada already has both scores and a real VAL. It is never stored as
+ * a skip. A later tip-off is scored and pushed.
  */
 export function planClubMatches(input: {
   fixtures: FixturesFile;
@@ -179,7 +208,6 @@ export function planClubMatches(input: {
   currentRound: number;
   roundStatus: "open" | "closed";
 }): PlannedMatch[] {
-  const week = madridWeekBounds(input.now);
   const plans: PlannedMatch[] = [];
   for (const team of input.fixtures.teams ?? []) {
     for (const fixture of team.fixtures ?? []) {
@@ -187,10 +215,6 @@ export function planClubMatches(input: {
         typeof fixture.tipOff === "string" ? Date.parse(fixture.tipOff) : NaN;
       if (!Number.isFinite(tipOffMs)) continue;
       const key = matchKey(team.teamId, fixture);
-      if (tipOffMs < input.baselineMs) {
-        plans.push({ key, action: "skip-old", tipOffMs, round: null, players: [] });
-        continue;
-      }
       if (tipOffMs > input.now.getTime()) {
         plans.push({ key, action: "wait", tipOffMs, round: null, players: [] });
         continue;
@@ -198,10 +222,6 @@ export function planClubMatches(input: {
       const sideScore = finiteScore(fixture.teamPoints);
       const opponentScore = finiteScore(fixture.opponentPoints);
       const opponentRaw = fixture.opponent?.trim() ?? "";
-      if (sideScore == null || opponentScore == null || !opponentRaw) {
-        plans.push({ key, action: "wait", tipOffMs, round: null, players: [] });
-        continue;
-      }
       const played = [];
       for (const box of input.boxes) {
         if (!sameGame(box, team.teamId, fixture)) continue;
@@ -214,34 +234,40 @@ export function planClubMatches(input: {
           minutes: stat.minutes,
         });
       }
-      const standout = pickStandout(played);
-      if (!standout) {
+      const round = openRoundForFixture(
+        fixture,
+        input.currentRound,
+        input.roundStatus,
+        input.now,
+      );
+      if (sideScore == null || opponentScore == null || played.length === 0) {
         plans.push({ key, action: "wait", tipOffMs, round: null, players: [] });
         continue;
       }
-      let round: number | null = null;
-      if (input.roundStatus === "open") {
-        const day = fixture.date?.slice(0, 10) ?? "";
-        if (fixture.jornada === input.currentRound) round = input.currentRound;
-        else if (
-          fixture.jornada == null &&
-          day &&
-          day >= week.from &&
-          day <= week.to
-        ) {
-          round = input.currentRound;
+      const players = played.map((p) => ({
+        playerId: p.playerId,
+        val: p.val,
+        minutes: p.minutes,
+      }));
+      if (tipOffMs < input.baselineMs) {
+        if (round == null) {
+          plans.push({ key, action: "wait", tipOffMs, round: null, players: [] });
+          continue;
         }
+        plans.push({ key, action: "score", tipOffMs, round, players });
+        continue;
+      }
+      const standout = pickStandout(played);
+      if (!standout || !opponentRaw) {
+        plans.push({ key, action: "wait", tipOffMs, round: null, players: [] });
+        continue;
       }
       plans.push({
         key,
         action: "send",
         tipOffMs,
         round,
-        players: played.map((p) => ({
-          playerId: p.playerId,
-          val: p.val,
-          minutes: p.minutes,
-        })),
+        players,
         message: {
           title: PUSH_TITLE,
           body: matchPushBody({
@@ -506,8 +532,9 @@ export type MatchLiveResult = {
 };
 
 /**
- * Seal the first-run clock, skip matches already under way, and send
- * only matches that finish afterwards. Injectable `send` avoids the network.
+ * Seal the first-run clock. Score a finished open-jornada game once.
+ * Push only when the tip-off is at or after that clock. Injectable `send`
+ * avoids the network.
  */
 export async function runMatchLive(opts?: {
   now?: Date;
@@ -535,14 +562,29 @@ export async function runMatchLive(opts?: {
   let scoredTeams = 0;
   for (const plan of plans) {
     const existing = dispatchOutcome(plan.key);
-    if (existing === "sent" || existing === "skipped") {
-      if (existing === "skipped") skipped.push(plan.key);
+    if (existing === "sent" || existing === "scored") continue;
+    const readyToScore =
+      (plan.action === "score" || plan.action === "send") &&
+      plan.round != null &&
+      plan.players.length > 0;
+    // A legacy skip is not final. Score once when the box exists; never push.
+    if (existing === "skipped") {
+      if (!readyToScore) {
+        waiting.push(plan.key);
+        continue;
+      }
+      scoredTeams += applyMatchScores(plan.round!, plan.players);
+      setOutcome(plan.key, "scored");
       continue;
     }
-    if (plan.action === "skip-old") {
-      if (existing == null) claim(plan.key, "skipped");
-      else setOutcome(plan.key, "skipped");
-      skipped.push(plan.key);
+    if (plan.action === "score") {
+      if (!readyToScore) {
+        waiting.push(plan.key);
+        continue;
+      }
+      if (existing == null && !claim(plan.key, "pending")) continue;
+      scoredTeams += applyMatchScores(plan.round!, plan.players);
+      setOutcome(plan.key, "scored");
       continue;
     }
     if (plan.action !== "send" || !plan.message) {
@@ -577,22 +619,37 @@ export async function runMatchLive(opts?: {
   };
 }
 
-/** True when a not-yet-recorded match has tipped off and may still be finishing. */
+/** Sent or scored matches are done. A legacy skip still needs a box and a score. */
+export function matchAlreadyScored(outcome: string | null | undefined): boolean {
+  return outcome === "sent" || outcome === "scored";
+}
+
+/**
+ * True when the poll should refresh fixtures and box scores.
+ * A current-jornada game that has tipped off and is not yet scored is
+ * fetched even when the tip-off is before the baseline or outside the
+ * short live window. Other games keep that window.
+ */
 export function matchNeedsLiveFetch(
   fixtures: FixturesFile,
   baselineMs: number,
   now: Date,
   already: (key: string) => boolean,
+  currentRound: number,
+  roundStatus: "open" | "closed",
 ): boolean {
   const horizon = 5 * 60 * 60 * 1000;
   for (const team of fixtures.teams ?? []) {
     for (const fixture of team.fixtures ?? []) {
       if (typeof fixture.tipOff !== "string") continue;
       const tip = Date.parse(fixture.tipOff);
-      if (!Number.isFinite(tip) || tip < baselineMs) continue;
-      if (now.getTime() < tip || now.getTime() - tip > horizon) continue;
+      if (!Number.isFinite(tip) || now.getTime() < tip) continue;
       const key = matchKey(team.teamId, fixture);
       if (already(key)) continue;
+      if (openRoundForFixture(fixture, currentRound, roundStatus, now) != null) {
+        return true;
+      }
+      if (tip < baselineMs || now.getTime() - tip > horizon) continue;
       const side = finiteScore(fixture.teamPoints);
       const opp = finiteScore(fixture.opponentPoints);
       if (side == null || opp == null) return true;

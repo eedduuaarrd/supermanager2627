@@ -375,7 +375,10 @@ export function getDb(): Database.Database {
       PRIMARY KEY (kind, round)
     );
 
-    -- One row per club match. skipped = already finished before this feature ran.
+    -- One row per club match.
+    -- sent = pushed (and scored when the jornada was open).
+    -- scored = fantasy points stored without a push.
+    -- skipped = legacy row; not final — score once when the box exists, still without a push.
     CREATE TABLE IF NOT EXISTS match_dispatch (
       match_key TEXT PRIMARY KEY,
       outcome TEXT NOT NULL,
