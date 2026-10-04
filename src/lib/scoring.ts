@@ -62,6 +62,8 @@ export type TeamRoundHistoryRow = {
   captainId: string | null;
   playedAt: string;
   scores: RoundScore[];
+  /** Squad that played (lineups row). Falls back to whoever is in the score list. */
+  playerIds: string[];
 };
 
 /** Scored jornadas for one fantasy team, oldest → newest, with cumulative + rank. */
@@ -87,6 +89,17 @@ export function getTeamRoundHistory(teamId: string): TeamRoundHistoryRow[] {
 
   const rounds = rows.map((r) => r.round);
   const placeholders = rounds.map(() => "?").join(",");
+  const lineupRows = db
+    .prepare(
+      `SELECT round, player_ids FROM lineups
+       WHERE team_id = ? AND round IN (${placeholders})`,
+    )
+    .all(teamId, ...rounds) as { round: number; player_ids: string }[];
+  const lineupIds = new Map<number, string[]>();
+  for (const lineup of lineupRows) {
+    const ids = parsePlayerIds(lineup.player_ids);
+    if (ids.length > 0) lineupIds.set(lineup.round, ids);
+  }
   const peerScores = db
     .prepare(
       `SELECT team_id, round, points FROM round_scores WHERE round IN (${placeholders})`,
@@ -113,6 +126,10 @@ export function getTeamRoundHistory(teamId: string): TeamRoundHistoryRow[] {
     } catch {
       scores = [];
     }
+    const fromScores = scores.map((score) => {
+      const resolved = resolvePlayerId(score.playerId);
+      return resolved ?? score.playerId;
+    });
     return {
       round: row.round,
       points: row.points,
@@ -122,6 +139,7 @@ export function getTeamRoundHistory(teamId: string): TeamRoundHistoryRow[] {
       captainId: row.captain_id,
       playedAt: row.played_at,
       scores,
+      playerIds: lineupIds.get(row.round) ?? fromScores,
     };
   });
 }

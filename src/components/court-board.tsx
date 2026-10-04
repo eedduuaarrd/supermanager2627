@@ -8,6 +8,12 @@ import {
   LINEUP_SLOTS,
   POSITION_LABEL,
 } from "@/data/roster";
+import {
+  courtChipCaption,
+  formatCourtPoints,
+  type CourtCaptionMode,
+  type CourtChipCaption,
+} from "@/lib/equip-court";
 import type { Player, Position } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Crown, Plus } from "lucide-react";
@@ -69,12 +75,18 @@ interface CourtBoardProps {
   /** Fill remaining flex height without forcing page scroll. */
   fillHeight?: boolean;
   /**
-   * When set, chip captions show that jornada's fantasy VAL instead of
-   * season average and price. Missing ids render as "VAL —", unless
-   * `jornadaOnlyKnown` is set — then only listed players change.
+   * Caption under each player.
+   * Equip uses `price` or `points`. The ideal popup uses `ideal` ("VAL n").
+   * When omitted, a points map selects `ideal` so the popup stays as it is.
+   */
+  caption?: CourtCaptionMode;
+  /**
+   * Jornada numbers for `points` and `ideal`.
+   * `points`: missing ids render as "-".
+   * `ideal`: missing ids render as "VAL —", unless `jornadaOnlyKnown`.
    */
   jornadaPointsById?: Record<string, number>;
-  /** Players without a finished-game VAL keep the season average. */
+  /** Ideal popup only: players without a finished-game VAL keep the season line. */
   jornadaOnlyKnown?: boolean;
 }
 
@@ -85,9 +97,12 @@ export function CourtBoard({
   onSelect,
   onEmptySlot,
   fillHeight,
+  caption,
   jornadaPointsById,
   jornadaOnlyKnown = false,
 }: CourtBoardProps) {
+  const captionMode: CourtCaptionMode =
+    caption ?? (jornadaPointsById ? "ideal" : "price");
   const filled = assignSlots(players);
   const counts = countByPosition(players);
 
@@ -227,6 +242,14 @@ export function CourtBoard({
             const isCaptain = player != null && captainId === player.id;
             const isSelected = player != null && selectedId === player.id;
             const posFull = counts[slot.position] >= LINEUP_SLOTS[slot.position];
+            const chip = player
+              ? courtChipCaption({
+                  mode: captionMode,
+                  playerId: player.id,
+                  pointsById: jornadaPointsById,
+                  idealOnlyKnown: jornadaOnlyKnown,
+                })
+              : null;
             return (
               <div
                 key={slot.key}
@@ -246,15 +269,7 @@ export function CourtBoard({
                     isCaptain={isCaptain}
                     isSelected={isSelected}
                     onSelect={onSelect}
-                    jornadaPoints={
-                      jornadaPointsById
-                        ? player.id in jornadaPointsById
-                          ? jornadaPointsById[player.id]
-                          : jornadaOnlyKnown
-                            ? undefined
-                            : null
-                        : undefined
-                    }
+                    chip={chip!}
                   />
                 ) : (
                   <EmptySlot
@@ -318,24 +333,18 @@ function EmptySlot({
   );
 }
 
-function formatJornadaVal(points: number): string {
-  const rounded = Math.round(points * 10) / 10;
-  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
-}
-
 function FilledChip({
   player,
   isCaptain,
   isSelected,
   onSelect,
-  jornadaPoints,
+  chip,
 }: {
   player: Player;
   isCaptain: boolean;
   isSelected: boolean;
   onSelect?: (id: string | null) => void;
-  /** undefined keeps the season line; null means the jornada score is missing. */
-  jornadaPoints?: number | null;
+  chip: CourtChipCaption;
 }) {
   const href = `/jugador/${player.id}`;
   return (
@@ -388,7 +397,7 @@ function FilledChip({
         player={player}
         asLink={!isSelected}
         href={href}
-        jornadaPoints={jornadaPoints}
+        chip={chip}
       />
     </div>
   );
@@ -398,22 +407,28 @@ function ChipCaption({
   player,
   asLink,
   href,
-  jornadaPoints,
+  chip,
 }: {
   player: Player;
   asLink: boolean;
   href: string;
-  jornadaPoints?: number | null;
+  chip: CourtChipCaption;
 }) {
   const className =
     "absolute left-1/2 top-[calc(100%+0.4rem)] z-10 w-[5.5rem] -translate-x-1/2 text-center";
+  const statClass =
+    "mt-0.5 text-[10px] tabular-nums text-bone/90 drop-shadow sm:text-[11px]";
   const body = (
     <>
       <p className="truncate text-[10px] font-semibold leading-snug text-bone drop-shadow sm:text-[11px]">
         {displayFirstName(player.name)}
       </p>
-      {jornadaPoints === undefined ? (
-        <p className="mt-0.5 text-[9px] tabular-nums text-bone/65 sm:text-[10px]">
+      {chip.kind === "season" ? (
+        <p
+          data-court-caption="season"
+          data-player-id={player.id}
+          className="mt-0.5 text-[9px] tabular-nums text-bone/65 sm:text-[10px]"
+        >
           VAL {player.avgVal}
           <span className="mx-0.5 text-white/25">·</span>
           <PriceLabel
@@ -423,10 +438,36 @@ function ChipCaption({
             className="text-[9px] sm:text-[10px]"
           />
         </p>
+      ) : chip.kind === "price" ? (
+        <p
+          data-court-caption="price"
+          data-player-id={player.id}
+          className="mt-0.5 text-[9px] tabular-nums text-bone/65 sm:text-[10px]"
+        >
+          <PriceLabel
+            price={player.price}
+            prevPrice={player.prevPrice}
+            compact
+            showArrow={false}
+            className="text-[9px] sm:text-[10px]"
+          />
+        </p>
+      ) : chip.kind === "points" ? (
+        <p
+          data-court-caption="points"
+          data-player-id={player.id}
+          className={statClass}
+        >
+          {chip.text}
+        </p>
       ) : (
-        <p className="mt-0.5 text-[10px] tabular-nums text-bone/90 drop-shadow sm:text-[11px]">
+        <p
+          data-court-caption="ideal"
+          data-player-id={player.id}
+          className={statClass}
+        >
           <span className="font-medium text-bone/55">VAL </span>
-          {jornadaPoints == null ? "—" : formatJornadaVal(jornadaPoints)}
+          {chip.value == null ? "—" : formatCourtPoints(chip.value)}
         </p>
       )}
     </>

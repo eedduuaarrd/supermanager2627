@@ -113,6 +113,7 @@ export function IdealTeamSheet({
                 captainId={null}
                 selectedId={selectedId}
                 onSelect={setSelectedId}
+                caption="ideal"
                 jornadaPointsById={pointsById}
                 fillHeight
               />
