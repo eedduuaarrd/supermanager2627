@@ -55,9 +55,11 @@ function authorize(req: Request, bodyToken?: string): boolean {
  * - jornada-start: if the open jornada's first tip-off of this Madrid week
  *   is within the last 20 minutes, push that it has started (once).
  *   Already started or already finished is recorded as skipped, not sent.
- * - match-finished: push and score each club game that has a real final
- *   box score and tipped off after this check first ran. Older games are
- *   skipped. Does not change ideal or jornada-start.
+ * - match-finished: score each club game that has both final scores and a
+ *   real VAL. Games that tipped off after this check first ran are also
+ *   pushed. Earlier games are scored once and not pushed; if the box is
+ *   not ready they wait instead of being skipped. Does not change ideal
+ *   or jornada-start.
  *
  * Also accepts session cookie for logged-in admin (scripts / curl with session).
  */

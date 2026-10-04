@@ -15,7 +15,6 @@ import { formatCourtPoints } from "@/lib/equip-court";
 import {
   countByPosition,
   issueMessage,
-  projectedPoints,
   remainingBudget,
   validateLineup,
 } from "@/lib/game";
@@ -127,7 +126,6 @@ export function LineupBuilder({
   );
   const counts = countByPosition(lineup.playerIds);
   const validation = validateLineup(lineup, budget, committedIds, priceOf);
-  const projected = projectedPoints(lineup);
   const filled = lineup.playerIds.length;
   const overBudget = remaining < 0;
   const showHarshValidation =
@@ -218,12 +216,9 @@ export function LineupBuilder({
             </>
           ) : null}
         </p>
-        <p className="shrink-0 tabular-nums text-mute/70">
-          {projected > 0 ? (
-            <span title="Punts projectats (capità ×2)">≈{projected}</span>
-          ) : null}
+        <p className="shrink-0 tabular-nums">
           {feedback ? (
-            <span className={`ml-2 ${feedback.tone}`} aria-live="polite">
+            <span className={feedback.tone} aria-live="polite">
               {feedback.text}
             </span>
           ) : null}

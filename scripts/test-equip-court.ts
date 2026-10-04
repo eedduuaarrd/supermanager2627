@@ -511,6 +511,14 @@ async function main() {
   assert.equal(builderSrc.includes("Alineació bloquejada"), false);
   assert.equal(builderSrc.includes("Finestra de transferències tancada"), false);
   console.log("OK lock sentence is gone from the court");
+
+  assert.equal(builderSrc.includes("projectedPoints"), false);
+  assert.equal(builderSrc.includes("Punts projectats"), false);
+  assert.equal(builderSrc.includes("≈"), false);
+  assert.equal(builderSrc.includes('aria-label="Pressupost i places"'), true);
+  assert.equal(builderSrc.includes("{filled}/{LINEUP_SIZE}"), true);
+  assert.equal(builderSrc.includes("formatPrice(remaining)"), true);
+  console.log("OK Equip does not render the projected-points figure");
 }
 
 main().catch((err) => {
