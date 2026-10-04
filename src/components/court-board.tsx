@@ -70,9 +70,12 @@ interface CourtBoardProps {
   fillHeight?: boolean;
   /**
    * When set, chip captions show that jornada's fantasy VAL instead of
-   * season average and price. Missing ids render as "VAL —".
+   * season average and price. Missing ids render as "VAL —", unless
+   * `jornadaOnlyKnown` is set — then only listed players change.
    */
   jornadaPointsById?: Record<string, number>;
+  /** Players without a finished-game VAL keep the season average. */
+  jornadaOnlyKnown?: boolean;
 }
 
 export function CourtBoard({
@@ -83,6 +86,7 @@ export function CourtBoard({
   onEmptySlot,
   fillHeight,
   jornadaPointsById,
+  jornadaOnlyKnown = false,
 }: CourtBoardProps) {
   const filled = assignSlots(players);
   const counts = countByPosition(players);
@@ -244,7 +248,11 @@ export function CourtBoard({
                     onSelect={onSelect}
                     jornadaPoints={
                       jornadaPointsById
-                        ? (jornadaPointsById[player.id] ?? null)
+                        ? player.id in jornadaPointsById
+                          ? jornadaPointsById[player.id]
+                          : jornadaOnlyKnown
+                            ? undefined
+                            : null
                         : undefined
                     }
                   />

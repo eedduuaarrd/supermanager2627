@@ -161,7 +161,7 @@ export function computeLineupLockAt(
 }
 
 /** Monday–Sunday dates in Europe/Madrid for `now`. */
-function madridWeekBounds(now: Date): { from: string; to: string } {
+export function madridWeekBounds(now: Date): { from: string; to: string } {
   const anchorDay = madridToday(now);
   const [y, m, d] = anchorDay.split("-").map(Number);
   const utcApprox = new Date(Date.UTC(y, m - 1, d, 12));

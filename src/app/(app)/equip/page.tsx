@@ -5,6 +5,7 @@ import { JornadaPointsHistory } from "@/components/jornada-points-history";
 import { LineupBuilder } from "@/components/lineup-builder";
 import { useManager } from "@/components/manager-provider";
 import { TeamSwitcher } from "@/components/team-switcher";
+import { useEffect, useState } from "react";
 
 function EquipContent() {
   const {
@@ -20,7 +21,29 @@ function EquipContent() {
     lineupLocked,
     lockMessage,
     transfer,
+    activeTeamId,
   } = useManager();
+  const [playedVals, setPlayedVals] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    let cancel = false;
+    async function load() {
+      try {
+        const res = await fetch("/api/lineup", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = (await res.json()) as { playedVals?: Record<string, number> };
+        if (!cancel) setPlayedVals(data.playedVals ?? {});
+      } catch {
+        /* keep the last scores */
+      }
+    }
+    void load();
+    const timer = window.setInterval(() => void load(), 60_000);
+    return () => {
+      cancel = true;
+      window.clearInterval(timer);
+    };
+  }, [activeTeamId]);
 
   const readOnly = lineupLocked || transfer?.windowOpen === false;
 
@@ -45,6 +68,7 @@ function EquipContent() {
           error={actionError}
           readOnly={readOnly}
           lockMessage={lockMessage ?? transfer?.message}
+          playedVals={playedVals}
         />
       </div>
     </div>

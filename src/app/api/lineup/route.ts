@@ -6,6 +6,7 @@ import {
   isLineupLocked,
 } from "@/lib/fixtures";
 import { getLineupLockAt, getRoundStatus } from "@/lib/rounds";
+import { playedValsForTeam } from "@/lib/match-live";
 import { ensureLineupRow, saveLineup } from "@/lib/scoring";
 import {
   ensureActiveTeamId,
@@ -116,6 +117,7 @@ export async function GET() {
     budget: row.budget ?? INITIAL_BUDGET,
     teamId,
     lineup: lineupPayload(row),
+    playedVals: playedValsForTeam(teamId, round),
   });
 }
 

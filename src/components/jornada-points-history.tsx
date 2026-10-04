@@ -20,32 +20,50 @@ type HistoryRow = {
 
 export function JornadaPointsHistory() {
   const { activeTeamId } = useManager();
-  const [history, setHistory] = useState<HistoryRow[] | null>(null);
-  const [selected, setSelected] = useState<number | null>(null);
+  const [history, setHistory] = useState<{
+    teamId: string | null;
+    rows: HistoryRow[] | null;
+  }>({ teamId: null, rows: null });
+  const [selected, setSelected] = useState<{
+    teamId: string | null;
+    round: number | null;
+  }>({ teamId: null, round: null });
+  const rows = history.teamId === activeTeamId ? history.rows : null;
+  const selectedRound = selected.teamId === activeTeamId ? selected.round : null;
 
   useEffect(() => {
     let cancelled = false;
-    setHistory(null);
-    setSelected(null);
-    (async () => {
+    const teamId = activeTeamId;
+    async function load() {
       try {
         const res = await fetch("/api/teams/scores", { cache: "no-store" });
         if (!res.ok) {
-          if (!cancelled) setHistory([]);
+          if (!cancelled) {
+            setHistory((cur) =>
+              cur.teamId === teamId && cur.rows != null ? cur : { teamId, rows: [] },
+            );
+          }
           return;
         }
         const data = (await res.json()) as { history?: HistoryRow[] };
-        if (!cancelled) setHistory(data.history ?? []);
+        if (!cancelled) setHistory({ teamId, rows: data.history ?? [] });
       } catch {
-        if (!cancelled) setHistory([]);
+        if (!cancelled) {
+          setHistory((cur) =>
+            cur.teamId === teamId && cur.rows != null ? cur : { teamId, rows: [] },
+          );
+        }
       }
-    })();
+    }
+    void load();
+    const timer = window.setInterval(() => void load(), 60_000);
     return () => {
       cancelled = true;
+      window.clearInterval(timer);
     };
   }, [activeTeamId]);
 
-  if (history == null) {
+  if (rows == null) {
     return (
       <p className="shrink-0 px-0.5 text-[10px] uppercase tracking-[0.14em] text-mute/70">
         Punts de jornada…
@@ -53,7 +71,7 @@ export function JornadaPointsHistory() {
     );
   }
 
-  if (history.length === 0) {
+  if (rows.length === 0) {
     return (
       <p className="shrink-0 px-0.5 text-[10px] text-mute/70">
         <span className="uppercase tracking-[0.14em]">Punts de jornada</span>
@@ -63,8 +81,8 @@ export function JornadaPointsHistory() {
     );
   }
 
-  const detail = selected != null ? history.find((h) => h.round === selected) : null;
-  const seasonTotal = history[history.length - 1]?.cumulative ?? 0;
+  const detail = selectedRound != null ? rows.find((h) => h.round === selectedRound) : null;
+  const seasonTotal = rows[rows.length - 1]?.cumulative ?? 0;
 
   return (
     <div className="shrink-0 space-y-1.5 px-0.5">
@@ -82,15 +100,19 @@ export function JornadaPointsHistory() {
         role="list"
         aria-label="Historial de punts per jornada"
       >
-        {history.map((row) => {
-          const active = selected === row.round;
+        {rows.map((row) => {
+          const active = selectedRound === row.round;
           return (
             <button
               key={row.round}
               type="button"
               role="listitem"
               onClick={() =>
-                setSelected((cur) => (cur === row.round ? null : row.round))
+                setSelected((cur) =>
+                  cur.teamId === activeTeamId && cur.round === row.round
+                    ? { teamId: activeTeamId, round: null }
+                    : { teamId: activeTeamId, round: row.round },
+                )
               }
               className={cn(
                 "group relative flex min-w-[4.75rem] shrink-0 flex-col items-stretch overflow-hidden rounded-sm px-2.5 py-1.5 text-left transition-[background-color,box-shadow,border-color] duration-200",
@@ -137,7 +159,7 @@ export function JornadaPointsHistory() {
             <button
               type="button"
               className="text-[10px] uppercase tracking-[0.12em] text-mute hover:text-bone"
-              onClick={() => setSelected(null)}
+              onClick={() => setSelected({ teamId: activeTeamId, round: null })}
             >
               Tancar
             </button>
