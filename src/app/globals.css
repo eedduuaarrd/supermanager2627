@@ -129,6 +129,20 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
+
+  .h-app {
+    height: var(--app-height, 100dvh);
+    max-height: var(--app-height, 100dvh);
+  }
+}
+
+body.h-app {
+  position: fixed;
+  top: var(--app-top, 0px);
+  right: 0;
+  left: 0;
+  width: 100%;
+  contain: paint;
 }
 
 .arena-bg {
@@ -152,7 +166,6 @@
       rgb(255 255 255 / 2%) 72px,
       rgb(255 255 255 / 2%) 73px
     );
-  background-attachment: fixed;
 }
 
 /* ── Inici hub ── */
@@ -287,6 +300,35 @@
 
 .court-chip--selected {
   z-index: 2;
+}
+
+.court-stat-bar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 3.35rem;
+  max-width: 5.5rem;
+  height: 1.2rem;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background: rgb(11 13 16 / 92%);
+  color: var(--bone);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 45%),
+    inset 0 0 0 1px rgb(255 255 255 / 16%);
+}
+
+.court-stat-bar > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--bone);
 }
 
 .court-chip--empty:not(:disabled):active .rounded-full {

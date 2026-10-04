@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans, Oswald } from "next/font/google";
+import { AppViewportLock } from "@/components/app-viewport-lock";
 import { PwaRegister } from "@/components/pwa-register";
 import "./globals.css";
 
@@ -89,12 +90,47 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="ca"
-      className={`${display.variable} ${sans.variable} h-dvh antialiased`}
+      className={`${display.variable} ${sans.variable} h-app antialiased`}
+      suppressHydrationWarning
     >
-      <body className="arena-bg flex h-dvh min-h-0 flex-col overflow-x-hidden overflow-y-hidden font-sans text-bone">
+      <body className="arena-bg flex h-app min-h-0 flex-col overflow-x-hidden overflow-y-hidden font-sans text-bone">
+        <script
+          id="app-viewport"
+          dangerouslySetInnerHTML={{ __html: APP_VIEWPORT_SCRIPT }}
+        />
         {children}
+        <AppViewportLock />
         <PwaRegister />
       </body>
     </html>
   );
 }
+
+const APP_VIEWPORT_SCRIPT = `(function(){
+  if (window.__appViewportBound) return;
+  window.__appViewportBound = true;
+  function apply(){
+    var vv = window.visualViewport;
+    var height = vv && vv.height > 0 ? vv.height : window.innerHeight;
+    var top = vv && vv.offsetTop > 0 ? vv.offsetTop : 0;
+    if (!(height > 0)) return;
+    var root = document.documentElement;
+    root.style.setProperty("--app-height", height + "px");
+    root.style.setProperty("--app-top", top + "px");
+  }
+  apply();
+  requestAnimationFrame(function(){
+    apply();
+    var main = document.querySelector("main");
+    if (main) main.scrollTop = 0;
+    requestAnimationFrame(apply);
+  });
+  var vv = window.visualViewport;
+  if (vv) {
+    vv.addEventListener("resize", apply);
+    vv.addEventListener("scroll", apply);
+  }
+  window.addEventListener("resize", apply);
+  window.addEventListener("orientationchange", apply);
+  window.addEventListener("pageshow", apply);
+})();`;

@@ -203,7 +203,6 @@ function JornadaContent() {
     hasCaptain,
     status: meta.status,
   });
-  const open = meta.status === "open";
 
   function onCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -225,12 +224,6 @@ function JornadaContent() {
       <header className="hub-fade space-y-2">
         <p className="font-display text-3xl tracking-wide text-bone sm:text-4xl">
           {meta.label.toUpperCase()}
-          <span className="mx-2 text-mute" aria-hidden>
-            ·
-          </span>
-          <span className={open ? "text-emerald-400" : "text-mute"}>
-            {open ? "OBERTA" : "TANCADA"}
-          </span>
         </p>
         <p className="text-sm text-mute">Partits nous cada setmana.</p>
       </header>
