@@ -220,13 +220,19 @@ export type JornadaChipPoints = {
   points: number;
   cumulative: number;
   rank: number | null;
+  /**
+   * False only on the placeholder for the open jornada before a score row exists.
+   * Omitted or true means the points are the stored jornada total.
+   */
+  scored?: boolean;
 };
 
 /**
  * Pills for the Equip strip.
  * Scored jornadas stay as stored. While the round is open, the current jornada
- * is still a pill before any score row exists: 0 points, no rank, and the
- * season total already on the books. That 0 is not written as a score.
+ * is still a pill before any score row exists: no rank, season total unchanged.
+ * The placeholder points stay 0 and are not written as a score. The pill prints
+ * "-" until the first match starts.
  */
 export function withCurrentJornadaChip<T extends JornadaChipPoints>(
   rows: readonly T[],
@@ -244,8 +250,28 @@ export function withCurrentJornadaChip<T extends JornadaChipPoints>(
     points: 0,
     cumulative: last?.cumulative ?? 0,
     rank: null,
+    scored: false,
   } as T;
   return [...ordered, chip].sort((a, b) => a.round - b.round);
+}
+
+/**
+ * Figure on a jornada pill.
+ * The open jornada shows "-" until its first match starts. After tip-off, the
+ * number is the stored total, or 0 when nobody has scored yet. Past jornadas
+ * keep their stored points. The dash is not a score.
+ */
+export function jornadaPillFigure(input: {
+  points: number;
+  isCurrent: boolean;
+  scored: boolean;
+  /** Earliest tip-off of this jornada has been reached, or the jornada is closed. */
+  matchStarted: boolean;
+  historyLoaded: boolean;
+}): string {
+  if (input.isCurrent && !input.scored && !input.matchStarted) return "-";
+  if (input.isCurrent && !input.scored && !input.historyLoaded) return "…";
+  return String(input.points);
 }
 
 /**

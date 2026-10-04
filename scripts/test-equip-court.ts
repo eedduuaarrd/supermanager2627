@@ -60,6 +60,7 @@ async function main() {
     formatCourtPoints,
     currentJornadaPinned,
     historyChipActive,
+    jornadaPillFigure,
     nextHistorySelection,
     withCurrentJornadaChip,
     pastCourtFromHistory,
@@ -295,6 +296,7 @@ async function main() {
   assert.match(historySrc, /row\.rank/);
   assert.match(historySrc, /currentJornadaPinned/);
   assert.match(historySrc, /withCurrentJornadaChip/);
+  assert.match(historySrc, /jornadaPillFigure/);
   assert.match(historySrc, /pinCurrent/);
   assert.doesNotMatch(historySrc, /detail\.opponent/);
   console.log("OK history chips stay and the text list is gone");
@@ -441,15 +443,66 @@ async function main() {
     [1, 2, 3],
   );
   assert.equal(openChips[2].points, 0);
+  assert.equal(openChips[2].scored, false);
   assert.equal(openChips[2].rank, null);
   assert.equal(openChips[2].cumulative, 62);
+  assert.equal(
+    jornadaPillFigure({
+      points: openChips[2].points,
+      isCurrent: true,
+      scored: false,
+      matchStarted: false,
+      historyLoaded: true,
+    }),
+    "-",
+  );
+  assert.equal(
+    jornadaPillFigure({
+      points: 0,
+      isCurrent: true,
+      scored: false,
+      matchStarted: true,
+      historyLoaded: true,
+    }),
+    "0",
+  );
+  assert.equal(
+    jornadaPillFigure({
+      points: 0,
+      isCurrent: true,
+      scored: true,
+      matchStarted: true,
+      historyLoaded: true,
+    }),
+    "0",
+  );
+  assert.equal(
+    jornadaPillFigure({
+      points: openChips[0].points,
+      isCurrent: false,
+      scored: true,
+      matchStarted: false,
+      historyLoaded: true,
+    }),
+    "40",
+  );
+  assert.equal(
+    jornadaPillFigure({
+      points: 22,
+      isCurrent: false,
+      scored: true,
+      matchStarted: false,
+      historyLoaded: true,
+    }),
+    "22",
+  );
   assert.equal(
     scored.reduce((sum, chip) => sum + chip.points, 0),
     62,
   );
   const onlyCurrent = withCurrentJornadaChip([], 3, true);
   assert.deepEqual(onlyCurrent, [
-    { round: 3, points: 0, cumulative: 0, rank: null },
+    { round: 3, points: 0, cumulative: 0, rank: null, scored: false },
   ]);
   const alreadyScored = withCurrentJornadaChip(
     [{ round: 3, points: 11, cumulative: 73, rank: 4 }],
@@ -549,7 +602,9 @@ async function main() {
   );
   assert.match(openHtml, /data-jornada-chip="3"/);
   assert.match(openHtml, /data-highlighted="true"/);
+  assert.match(openHtml, /data-jornada-figure="-"/);
   assert.match(openHtml, />J3</);
+  assert.match(openHtml, />-</);
   assert.equal(openHtml.includes("Encara no"), false);
   console.log("OK open window paints the selected J3 pill before history loads");
 

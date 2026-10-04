@@ -4,6 +4,7 @@ import { useManager } from "@/components/manager-provider";
 import {
   currentJornadaPinned,
   historyChipActive,
+  jornadaPillFigure,
   nextHistorySelection,
   pastCourtFromHistory,
   withCurrentJornadaChip,
@@ -31,8 +32,9 @@ export function JornadaPointsHistory({
   /** Selected past jornada, or null when the court should show the current view. */
   onPastCourt?: (court: PastCourtView | null) => void;
 }) {
-  const { activeTeamId, round, roundStatus } = useManager();
+  const { activeTeamId, round, roundStatus, lineupLocked } = useManager();
   const pinCurrent = currentJornadaPinned(roundStatus);
+  const matchStarted = lineupLocked;
   const [history, setHistory] = useState<{
     teamId: string | null;
     rows: HistoryRow[] | null;
@@ -53,6 +55,7 @@ export function JornadaPointsHistory({
       points: row.points,
       cumulative: row.cumulative,
       rank: row.rank,
+      scored: true,
     })),
     round,
     pinCurrent,
@@ -146,12 +149,20 @@ export function JornadaPointsHistory({
             currentRound: round,
             pinCurrent,
           });
+          const figure = jornadaPillFigure({
+            points: row.points,
+            isCurrent: row.round === round,
+            scored: row.scored !== false,
+            matchStarted,
+            historyLoaded: rows != null,
+          });
           return (
             <button
               key={row.round}
               type="button"
               role="listitem"
               data-jornada-chip={row.round}
+              data-jornada-figure={figure}
               data-highlighted={active ? "true" : "false"}
               onClick={() =>
                 setSelected((cur) => ({
@@ -181,7 +192,7 @@ export function JornadaPointsHistory({
                 J{row.round}
               </span>
               <span className="font-display text-[1.35rem] leading-none tabular-nums tracking-wide text-bone">
-                {rows == null && row.round === round ? "…" : row.points}
+                {figure}
               </span>
               {row.rank != null ? (
                 <span
