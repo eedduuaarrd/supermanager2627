@@ -50,7 +50,9 @@ function authorize(req: Request, bodyToken?: string): boolean {
  * - lock: recompute/store lineup_lock_at from fixtures.json (or body.lockAt);
  *   if tip-off already passed, promote transfer_phase initial → normal
  * - ideal: persist the ideal lineup for `round` from fantasy VAL.
- *   Incomplete scores leave the previous stored lineup in place.
+ *   Caps are 2 bases, 3 alers and 3 pivots. A short line is stored as the
+ *   players who scored and replaces the previous jornada. No real scores
+ *   leave the previous lineup in place.
  *   A successful store pushes "equip ideal" to subscribed users (once).
  * - jornada-start: if the open jornada's first tip-off of this Madrid week
  *   is within the last 20 minutes, push that it has started (once).

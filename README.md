@@ -110,7 +110,7 @@ ADMIN_TOKEN=… APP_URL=http://127.0.0.1:4317 npm run weekend-sync
 Al VPS: `systemctl status supermanager-weekend-sync.timer` i `journalctl -u supermanager-weekend-sync.service -n 100 --no-pager`. Dissabte s’espera `week-still-open` si hi ha partit diumenge; diumenge, una sola `action=run`; una segona execució la mateixa setmana, `already-scored-this-week` o `no-club-fixtures`. Log: `/var/log/supermanager-weekend-sync.log`.
 Unitats a `deploy/systemd/`.
 
-**Equip ideal** (diumenge 23:59 Europe/Madrid, dins el mateix sync): desa l’alineació dels millors VAL reals de la jornada que aquell run acaba de tancar (3 pivots, 3 alers, 2 bases). El botó d’Inici mostra aquesta jornada desada — amb la jornada 2 oberta, J1 — i no es mou fins al diumenge següent. Només entren jugadors amb un box real; si falta algun slot, es manté l’últim equip vàlid. Dissabte no el canvia.
+**Equip ideal** (diumenge 23:59 Europe/Madrid, dins el mateix sync): desa l’alineació dels millors VAL reals de la jornada que aquell run acaba de tancar (2 bases, 3 alers, 3 pivots). El botó d’Inici mostra aquesta jornada desada — amb la jornada 2 oberta, J1 — i no es mou fins al diumenge següent. Només entren jugadors amb un box real. Si una línia en té menys, es desen els que han jugat i se substitueix l’equip de la jornada anterior; no s’inventa ningú per omplir el slot. Sense cap VAL real, es manté l’últim equip. Dissabte no el canvia.
 
 ```bash
 npm run test:ideal-team

@@ -1,4 +1,3 @@
-import { LINEUP_SLOTS } from "@/data/roster";
 import { getDb, getCurrentRound } from "@/lib/db";
 import { getLiveRoster } from "@/lib/live-roster";
 import {
@@ -27,6 +26,16 @@ export type ScoredIdealPlayer = {
 };
 
 /**
+ * Caps for the locked ideal team: 2 bases, 3 alers, 3 pivots.
+ * These are maximums. A line with fewer real scorers stays short.
+ */
+export const IDEAL_TEAM_SLOTS = {
+  B: 2,
+  A: 3,
+  P: 3,
+} as const;
+
+/**
  * Last jornada whose results are already in (not the one still open).
  * Open jornada 2 → 1. Closed jornada 2 (scored, not advanced yet) → 2.
  * Nothing completed while jornada 1 is still open.
@@ -42,9 +51,10 @@ export function lastCompletedRound(
 }
 
 /**
- * One best player per court slot (3P, 3A, 2B), ordered like the lineup.
- * Uses the points already computed with fantasy VAL. Returns null when any
- * slot cannot be filled — callers must not invent players.
+ * Best real scorers for the ideal court, ordered like the lineup (P→A→B).
+ * Takes at most 3 pivots, 3 alers and 2 bases. A shorter line is kept as the
+ * players who actually scored — never padded with an invented player.
+ * Returns null only when nobody has a usable score.
  */
 export function pickIdealLineup(
   scored: ScoredIdealPlayer[],
@@ -66,14 +76,14 @@ export function pickIdealLineup(
     pools[pos].sort(
       (a, b) => b.points - a.points || a.playerId.localeCompare(b.playerId),
     );
-    if (pools[pos].length < LINEUP_SLOTS[pos]) return null;
   }
 
   const picked = [
-    ...pools.P.slice(0, LINEUP_SLOTS.P),
-    ...pools.A.slice(0, LINEUP_SLOTS.A),
-    ...pools.B.slice(0, LINEUP_SLOTS.B),
+    ...pools.P.slice(0, IDEAL_TEAM_SLOTS.P),
+    ...pools.A.slice(0, IDEAL_TEAM_SLOTS.A),
+    ...pools.B.slice(0, IDEAL_TEAM_SLOTS.B),
   ];
+  if (picked.length === 0) return null;
   return {
     playerIds: picked.map((p) => p.playerId),
     scores: picked.map((p) => ({ playerId: p.playerId, points: p.points })),
@@ -154,21 +164,24 @@ export type RefreshIdealResult =
   | { stored: true; round: number; playerIds: string[]; scores: IdealScore[] }
   | {
       stored: false;
-      reason: "no-scores" | "incomplete";
+      reason: "no-scores";
       round: number;
       keptRound: number | null;
     };
 
 /**
  * Recompute the ideal lineup for `round` from box scores and persist it.
- * If the jornada cannot fill every slot, the previous row is left untouched.
+ * A line that is short of real scorers is stored as the players who played.
+ * That partial lineup still replaces the previous jornada. The previous row
+ * stays only when this jornada has no usable scores at all.
+ * `scored` defaults to the real VAL rows for `round`.
  */
 export function refreshStoredIdealTeam(
   round: number,
   db = getDb(),
+  scored: ScoredIdealPlayer[] = collectScoredPlayers(round),
 ): RefreshIdealResult {
   const kept = readStoredIdealTeam(db);
-  const scored = collectScoredPlayers(round);
   if (scored.length === 0) {
     return {
       stored: false,
@@ -181,7 +194,7 @@ export function refreshStoredIdealTeam(
   if (!picked) {
     return {
       stored: false,
-      reason: "incomplete",
+      reason: "no-scores",
       round,
       keptRound: kept?.round ?? null,
     };
@@ -209,8 +222,9 @@ export type IdealTeamView = {
   round: number | null;
   team: StoredIdealTeam | null;
   /**
-   * A newer jornada has finished in the DB, but its scores were not complete
-   * enough to replace the stored lineup. Null when the label matches.
+   * A newer jornada is the last completed one, but it is not the stored
+   * lineup (the Sunday job has not written it, or it had no real scores).
+   * Null when the label matches the stored team.
    */
   pendingRound: number | null;
 };

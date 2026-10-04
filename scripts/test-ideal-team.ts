@@ -18,6 +18,7 @@ async function main() {
     collectScoredPlayers,
     ensureStoredIdealTeam,
     lastCompletedRound,
+    IDEAL_TEAM_SLOTS,
     pickIdealLineup,
     readStoredIdealTeam,
     refreshStoredIdealTeam,
@@ -28,21 +29,47 @@ async function main() {
   );
   const { getDb } = await import("../src/lib/db");
   const { openRound } = await import("../src/lib/rounds");
-  const { LINEUP_SLOTS } = await import("../src/data/roster");
+  assert.deepEqual(IDEAL_TEAM_SLOTS, { B: 2, A: 3, P: 3 });
 
   assert.equal(lastCompletedRound(2, "open"), 1);
   assert.equal(lastCompletedRound(1, "open"), null);
   assert.equal(lastCompletedRound(2, "closed"), 2);
   assert.equal(lastCompletedRound(3, "open"), 2);
 
-  assert.equal(
-    pickIdealLineup([
-      { playerId: "p1", position: "P", points: 1 },
-      { playerId: "p2", position: "P", points: 2 },
-    ]),
-    null,
-    "do not invent players when a position is short",
+  const shortLine = pickIdealLineup([
+    { playerId: "p1", position: "P", points: 1 },
+    { playerId: "p2", position: "P", points: 2 },
+  ]);
+  assert.ok(shortLine);
+  assert.deepEqual(
+    shortLine.playerIds,
+    ["p2", "p1"],
+    "a short line keeps the players who scored and invents nobody",
   );
+
+  const threeBases = pickIdealLineup([
+    { playerId: "b-low", position: "B", points: 1 },
+    { playerId: "b-mid", position: "B", points: 4 },
+    { playerId: "b-high", position: "B", points: 9 },
+    { playerId: "a-1", position: "A", points: 3 },
+    { playerId: "a-2", position: "A", points: 2 },
+    { playerId: "a-3", position: "A", points: 1 },
+    { playerId: "p-1", position: "P", points: 6 },
+    { playerId: "p-2", position: "P", points: 5 },
+    { playerId: "p-3", position: "P", points: 4 },
+  ]);
+  assert.ok(threeBases);
+  assert.deepEqual(threeBases.playerIds, [
+    "p-1",
+    "p-2",
+    "p-3",
+    "a-1",
+    "a-2",
+    "a-3",
+    "b-high",
+    "b-mid",
+  ]);
+  assert.equal(threeBases.playerIds.includes("b-low"), false);
 
   const tied = pickIdealLineup([
     { playerId: "p-b", position: "P", points: 5 },
@@ -93,9 +120,12 @@ async function main() {
       );
     }
   }
-  assert.equal(counts.P, LINEUP_SLOTS.P);
-  assert.equal(counts.A, LINEUP_SLOTS.A);
-  assert.equal(counts.B, LINEUP_SLOTS.B);
+  assert.equal(counts.P, IDEAL_TEAM_SLOTS.P);
+  assert.equal(counts.A, IDEAL_TEAM_SLOTS.A);
+  assert.equal(counts.B, IDEAL_TEAM_SLOTS.B);
+  assert.equal(counts.B, 2);
+  assert.equal(counts.A, 3);
+  assert.equal(counts.P, 3);
 
   assert.equal(pickIdealLineup(collectScoredPlayers(99)), null);
 
@@ -108,6 +138,44 @@ async function main() {
   if (!skipped.stored) assert.equal(skipped.reason, "no-scores");
   assert.equal(readStoredIdealTeam()?.round, 1);
   assert.deepEqual(readStoredIdealTeam()?.playerIds, before?.playerIds);
+
+  const jornada2 = [
+    { playerId: "base-1", position: "B" as const, points: 11 },
+    { playerId: "base-2", position: "B" as const, points: 4 },
+    { playerId: "aler-1", position: "A" as const, points: 9 },
+    { playerId: "aler-2", position: "A" as const, points: 6 },
+    { playerId: "aler-3", position: "A" as const, points: 2 },
+    { playerId: "pivot-1", position: "P" as const, points: 8 },
+    { playerId: "pivot-2", position: "P" as const, points: 3 },
+  ];
+  const replaced = refreshStoredIdealTeam(2, getDb(), jornada2);
+  assert.equal(replaced.stored, true);
+  if (replaced.stored) {
+    assert.deepEqual(replaced.playerIds, [
+      "pivot-1",
+      "pivot-2",
+      "aler-1",
+      "aler-2",
+      "aler-3",
+      "base-1",
+      "base-2",
+    ]);
+  }
+  assert.equal(readStoredIdealTeam()?.round, 2);
+  assert.equal(readStoredIdealTeam()?.playerIds.length, 7);
+  assert.equal(
+    readStoredIdealTeam()?.playerIds.includes("base-3"),
+    false,
+    "do not invent a third base",
+  );
+
+  const onlyBases = refreshStoredIdealTeam(2, getDb(), [
+    { playerId: "base-1", position: "B", points: 11 },
+    { playerId: "base-2", position: "B", points: 4 },
+  ]);
+  assert.equal(onlyBases.stored, true);
+  assert.deepEqual(readStoredIdealTeam()?.playerIds, ["base-1", "base-2"]);
+  assert.equal(readStoredIdealTeam()?.round, 2);
 
   openRound(2);
   getDb().prepare("DELETE FROM ideal_lineup").run();
