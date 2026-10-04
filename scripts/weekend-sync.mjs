@@ -13,7 +13,9 @@
  *    Saturday does not close while a later game in the week is still ahead.
  * 2) Refresh fixtures.json from FCBQ calendars via Chrome CDP (no Edu cookie);
  *    optional FCBQ_COOKIE / --from-api still supported as fallbacks.
- *    A fixtures fetch failure also skips score/advance (lock still updates).
+ *    The browser fetch gives up after CALENDAR_FETCH_TIMEOUT_MS (and sooner
+ *    on "Verificació de seguretat"). Sunday still scores from the file on
+ *    disk. Saturday does not advance when that refresh fails.
  * 3) Tag this week's fixtures with the current fantasy jornada
  * 4) Assign this week's untagged game rows; score + open next via ADMIN API
  *    only when the guard allows it
@@ -49,6 +51,7 @@ import {
   buildFixturesFile,
   tagJornadaWeek,
   CLUB_TEAMS,
+  CALENDAR_FETCH_TIMEOUT_MS,
 } from "./fetch-fcbq-fixtures.mjs";
 import {
   applyAssignments,
@@ -56,6 +59,7 @@ import {
   idealRoundToLock,
   isMadridSunday,
   shouldUpdateMarketPrices,
+  weekendSyncShouldFail,
 } from "./fcbq-weekend-guard.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -76,6 +80,8 @@ const APP_URL = (process.env.APP_URL || "http://127.0.0.1:4317").replace(
   /\/$/,
   "",
 );
+/** Box ingest already throws when the JWT is missing. This caps a hung Chrome. */
+const BOX_INGEST_TIMEOUT_MS = 180_000;
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "";
 const LOG =
   process.env.WEEKEND_SYNC_LOG ||
@@ -147,14 +153,24 @@ function rememberScoredWeek(key) {
   }
 }
 
-function runNode(script, scriptArgs = [], extraEnv = {}) {
+function runNode(script, scriptArgs = [], extraEnv = {}, options = {}) {
+  const timeoutMs = options.timeoutMs;
   const r = spawnSync(process.execPath, [join(root, script), ...scriptArgs], {
     stdio: "inherit",
     cwd: root,
     env: { ...process.env, ...extraEnv },
+    ...(timeoutMs ? { timeout: timeoutMs, killSignal: "SIGKILL" } : {}),
   });
+  if (r.error) {
+    if (r.error.code === "ETIMEDOUT") {
+      throw new Error(`${script} timed out after ${timeoutMs}ms`);
+    }
+    throw new Error(`${script} failed: ${r.error.message}`);
+  }
   if (r.status !== 0) {
-    throw new Error(`${script} exited ${r.status}`);
+    throw new Error(
+      `${script} exited ${r.status}${r.signal ? ` signal=${r.signal}` : ""}`,
+    );
   }
 }
 
@@ -196,19 +212,20 @@ function refreshFixtures(round) {
     // Default: headless Chrome on the VPS scrapes calendars (reCAPTCHA v3).
     useBrowser = true;
   }
+  const fetchTimeout = { timeoutMs: CALENDAR_FETCH_TIMEOUT_MS };
   try {
     if (useBrowser) {
-      runNode("scripts/fetch-fcbq-fixtures-browser.mjs", []);
+      runNode("scripts/fetch-fcbq-fixtures-browser.mjs", [], {}, fetchTimeout);
     } else if (fetchArgs.length || process.env.FCBQ_COOKIE) {
-      runNode("scripts/fetch-fcbq-fixtures.mjs", fetchArgs);
+      runNode("scripts/fetch-fcbq-fixtures.mjs", fetchArgs, {}, fetchTimeout);
     } else {
       ok = false;
-      log("fixtures: no browser/cookie/api source — will not score/advance");
+      log("fixtures: no browser/cookie/api source — keeping existing fixtures");
     }
   } catch (err) {
     ok = false;
     log(
-      `fixtures fetch FAIL: ${err.message} — keeping existing file, will not score/advance`,
+      `fixtures fetch FAIL: ${err.message} — keeping existing fixtures`,
     );
   }
   if (!existsSync(FIXTURES)) {
@@ -275,7 +292,12 @@ async function main() {
   } else {
     log("fetch-fcbq-boxscores-browser");
     try {
-      runNode("scripts/fetch-fcbq-boxscores-browser.mjs", []);
+      runNode(
+        "scripts/fetch-fcbq-boxscores-browser.mjs",
+        [],
+        {},
+        { timeoutMs: BOX_INGEST_TIMEOUT_MS },
+      );
       ingestOk = ingestIsFresh(startedMs);
       if (!ingestOk) {
         log("stats ingest FAIL: box-score file is not a fresh ok ingest");
@@ -337,9 +359,15 @@ async function main() {
     return;
   }
 
-  // A failed box ingest must not block Sunday's close. It still fails the
-  // run when this pass does not score (Saturday, or Sunday with the week open).
-  let hardFail = !fixturesOk || (!ingestOk && !decision.advance);
+  // JWT miss, a failed box ingest, or a calendar security/timeout must not
+  // fail Sunday once this pass scores. They still fail the run when it does
+  // not score (Saturday, or Sunday while a later game is still ahead).
+  let hardFail = weekendSyncShouldFail({
+    fixturesOk,
+    ingestOk,
+    advance: decision.advance,
+    reason: decision.reason,
+  });
   let scoreApplied = false;
 
   if (!skipScore && (ingestOk || decision.advance)) {

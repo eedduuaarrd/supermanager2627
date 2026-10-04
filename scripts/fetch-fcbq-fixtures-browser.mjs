@@ -23,6 +23,10 @@ import {
   CLUB_TEAMS,
   parseCalendarHtml,
   buildFixturesFile,
+  CALENDAR_FETCH_TIMEOUT_MS,
+  CALENDAR_SECURITY_TIMEOUT_MS,
+  calendarWaitDecision,
+  isFederationSecurityPage,
 } from "./fetch-fcbq-fixtures.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -64,98 +68,103 @@ function loadExistingSync() {
   }
 }
 
-async function waitForCalendar(page, timeoutMs = 90000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    const st = await page.evaluate(() => {
+async function readCalendarState(page) {
+  try {
+    return await page.evaluate(() => {
       const body = document.body?.innerText || "";
       const title = document.title || "";
       return {
         title,
+        body: body.slice(0, 800),
         hasHora: /Hora/i.test(body) && /\d{2}\/\d{2}\/\d{4}/.test(body),
-        captcha:
-          /Verificaci/i.test(title) || /CONFIRMA QUE ETS UNA PERSONA/i.test(body),
-        blocked: /activitat inusual/i.test(body),
       };
     });
-    if (st.hasHora) return "ok";
-    if (st.captcha || st.blocked) {
-      for (const frame of page.frames()) {
-        try {
-          const box = await frame.$(
-            "#recaptcha-anchor, .recaptcha-checkbox-border",
-          );
-          if (box) await box.click({ delay: 40 });
-        } catch {
-          /* frame may have navigated */
-        }
-      }
-      try {
-        await page.evaluate(() => {
-          window.fcbq?.recaptcha?.autoVerify?.();
-        });
-      } catch {
-        /* ignore */
-      }
+  } catch {
+    return { title: "", body: "", hasHora: false };
+  }
+}
+
+async function nudgeSecurityCheck(page) {
+  for (const frame of page.frames()) {
+    try {
+      const box = await frame.$(
+        "#recaptcha-anchor, .recaptcha-checkbox-border",
+      );
+      if (box) await box.click({ delay: 40 });
+    } catch {
+      /* frame may have navigated */
     }
-    await sleep(1200);
+  }
+  try {
+    await page.evaluate(() => {
+      window.fcbq?.recaptcha?.autoVerify?.();
+    });
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * Poll until the calendar table is there. A security interstitial gives up
+ * after CALENDAR_SECURITY_TIMEOUT_MS. Anything else gives up at the page
+ * timeout, and never past `deadlineMs`.
+ */
+async function waitForCalendar(page, deadlineMs) {
+  const start = Date.now();
+  while (Date.now() < deadlineMs) {
+    const st = await readCalendarState(page);
+    const decision = calendarWaitDecision({
+      elapsedMs: Date.now() - start,
+      title: st.title,
+      body: st.body,
+      hasHora: st.hasHora,
+    });
+    if (decision !== "wait") return decision;
+    if (isFederationSecurityPage(st)) await nudgeSecurityCheck(page);
+    await sleep(1000);
   }
   return "timeout";
 }
 
-async function warmUp(page) {
+async function warmUp(page, deadlineMs) {
   // Seed reCAPTCHA v3 / fcbq_rc on a light page before calendar scrapes.
+  // The security interstitial gets the same short bound as a calendar page.
+  const start = Date.now();
   try {
     await page.goto("https://www.basquetcatala.cat/", {
       waitUntil: "domcontentloaded",
-      timeout: 45000,
+      timeout: 20_000,
     });
-    for (let i = 0; i < 20; i++) {
-      const st = await page.evaluate(() => {
-        const title = document.title || "";
-        const body = document.body?.innerText || "";
-        return {
-          captcha:
-            /Verificaci/i.test(title) ||
-            /CONFIRMA QUE ETS UNA PERSONA/i.test(body),
-          ready: /Federaci/i.test(title) || /Bàsquet Català/i.test(title),
-        };
-      });
-      if (!st.captcha && st.ready) break;
-      if (st.captcha) {
-        for (const frame of page.frames()) {
-          try {
-            const box = await frame.$("#recaptcha-anchor");
-            if (box) await box.click({ delay: 40 });
-          } catch {
-            /* ignore */
-          }
-        }
-        try {
-          await page.evaluate(() => window.fcbq?.recaptcha?.autoVerify?.());
-        } catch {
-          /* ignore */
-        }
-      }
-      await sleep(1200);
+    while (Date.now() - start < CALENDAR_SECURITY_TIMEOUT_MS && Date.now() < deadlineMs) {
+      const st = await readCalendarState(page);
+      const title = st.title || "";
+      const ready = /Federaci/i.test(title) || /Bàsquet Català/i.test(title);
+      if (!isFederationSecurityPage(st) && ready) break;
+      if (isFederationSecurityPage(st)) await nudgeSecurityCheck(page);
+      await sleep(1000);
     }
-    await sleep(1500);
   } catch (err) {
     console.warn("warm-up:", err.message);
   }
 }
 
-async function scrapeTeam(page, team) {
+async function scrapeTeam(page, team, deadlineMs) {
   const url = `${CAL_BASE}/${team.legacyTeamId}`;
   const resp = await page.goto(url, {
     waitUntil: "domcontentloaded",
-    timeout: 60000,
+    timeout: 20_000,
   });
   const status = resp?.status() ?? 0;
-  const ready = await waitForCalendar(page);
+  const ready = await waitForCalendar(page, deadlineMs);
   if (ready !== "ok") {
+    let title = "";
+    try {
+      title = await page.title();
+    } catch {
+      title = "";
+    }
     throw new Error(
-      `calendar ${team.legacyTeamId} ${ready} (HTTP ${status}, title=${await page.title()})`,
+      `calendar ${team.legacyTeamId} ${ready} (HTTP ${status}, title=${title})`,
     );
   }
   const html = await page.content();
@@ -184,31 +193,50 @@ async function main() {
   const browser = await puppeteer.connect({
     browserURL: `http://127.0.0.1:${PORT}`,
     defaultViewport: null,
-    protocolTimeout: 180000,
+    protocolTimeout: 20_000,
   });
 
   const page = await browser.newPage();
-  page.setDefaultTimeout(90000);
+  page.setDefaultTimeout(20_000);
+  const deadline = Date.now() + CALENDAR_FETCH_TIMEOUT_MS;
 
   const payloadsByTeam = {};
   const gaps = [];
 
   try {
-    await warmUp(page);
+    await warmUp(page, deadline);
     const pending = [...CLUB_TEAMS];
-    // Two passes: first visit + one retry for teams that hit the challenge page.
+    // One retry only for a short non-security failure. The security page and
+    // a timeout are terminal: retrying them is what sat on "Verificació de
+    // seguretat" until the Sunday close never ran.
     for (let pass = 1; pass <= 2 && pending.length; pass++) {
+      if (Date.now() >= deadline) {
+        console.warn(
+          `calendar fetch gave up after ${CALENDAR_FETCH_TIMEOUT_MS}ms`,
+        );
+        for (const team of pending) {
+          gaps.push(`${team.shortName}: timeout`);
+        }
+        pending.length = 0;
+        break;
+      }
       const batch = pending.splice(0, pending.length);
       for (const team of batch) {
+        if (Date.now() >= deadline) {
+          gaps.push(`${team.shortName}: timeout`);
+          console.warn("FAIL", team.shortName, "timeout");
+          continue;
+        }
         try {
-          const games = await scrapeTeam(page, team);
+          const games = await scrapeTeam(page, team, deadline);
           payloadsByTeam[team.fcbqTeamId] = { games };
           const withTip = games.filter((g) => g.tipOff).length;
           console.log(
             `OK ${team.shortName}: ${games.length} fixtures (${withTip} tip-offs)`,
           );
         } catch (err) {
-          if (pass === 1) {
+          const terminal = /security|timeout/i.test(err.message);
+          if (pass === 1 && !terminal && Date.now() < deadline) {
             console.warn("retry later", team.shortName, err.message);
             pending.push(team);
           } else {
@@ -218,9 +246,9 @@ async function main() {
         }
         await sleep(1000);
       }
-      if (pending.length) {
+      if (pending.length && Date.now() < deadline) {
         console.log(`pass ${pass} incomplete — re-warming (${pending.length} left)`);
-        await warmUp(page);
+        await warmUp(page, deadline);
       }
     }
   } finally {

@@ -27,6 +27,50 @@ const root = join(__dirname, "..");
 const OUT = join(root, "src/data/fixtures.json");
 const CLUB_ID = 402;
 
+/**
+ * Once "Verificació de seguretat" is on screen, stop that page. Do not sit
+ * through the old 90s captcha loop, and do not retry the same wall.
+ */
+export const CALENDAR_SECURITY_TIMEOUT_MS = 15_000;
+
+/** A calendar that is not the security wall and never renders Hora. */
+export const CALENDAR_PAGE_TIMEOUT_MS = 25_000;
+
+/**
+ * Whole browser calendar refresh. weekend-sync kills the child here and
+ * continues the Sunday close from fixtures already on disk.
+ */
+export const CALENDAR_FETCH_TIMEOUT_MS = 90_000;
+
+/** Federation interstitial (reCAPTCHA / "confirma que ets una persona"). */
+export function isFederationSecurityPage({ title = "", body = "" } = {}) {
+  if (/Verificaci[oó]/i.test(title)) return true;
+  return /Verificaci[oó] de seguretat|CONFIRMA QUE ETS UNA PERSONA|activitat inusual/i.test(
+    body,
+  );
+}
+
+/**
+ * @returns {"ok"|"security"|"timeout"|"wait"}
+ * "security" and "timeout" mean give up on this page and continue.
+ */
+export function calendarWaitDecision({
+  elapsedMs,
+  title = "",
+  body = "",
+  hasHora = false,
+  securityTimeoutMs = CALENDAR_SECURITY_TIMEOUT_MS,
+  pageTimeoutMs = CALENDAR_PAGE_TIMEOUT_MS,
+} = {}) {
+  if (hasHora) return "ok";
+  if (isFederationSecurityPage({ title, body })) {
+    if (elapsedMs >= securityTimeoutMs) return "security";
+    return "wait";
+  }
+  if (elapsedMs >= pageTimeoutMs) return "timeout";
+  return "wait";
+}
+
 export const CLUB_TEAMS = [
   {
     fcbqTeamId: "5f55017e-893e-4323-8b41-b58323ea8f73",
@@ -326,8 +370,8 @@ async function fetchCalendarHtml(legacyTeamId, cookie) {
   });
   if (!res.ok) throw new Error(`calendar ${legacyTeamId} HTTP ${res.status}`);
   const html = await res.text();
-  if (/Verificació de seguretat|CONFIRMA QUE ETS UNA PERSONA/i.test(html)) {
-    throw new Error(`calendar ${legacyTeamId} blocked by reCAPTCHA`);
+  if (isFederationSecurityPage({ body: html })) {
+    throw new Error(`calendar ${legacyTeamId} security`);
   }
   return html;
 }
