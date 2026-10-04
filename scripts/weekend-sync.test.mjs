@@ -5,6 +5,8 @@ import { mergeTeamLogs, coverageGaps } from "./fcbq-boxscores.mjs";
 import {
   applyAssignments,
   decideWeekendAdvance,
+  idealRoundToLock,
+  isMadridSunday,
   madridDay,
   madridWeek,
 } from "./fcbq-weekend-guard.mjs";
@@ -62,6 +64,77 @@ function game(partial) {
     ...partial,
   };
 }
+
+test("Sunday lock-in picks the jornada that just finished", () => {
+  assert.equal(isMadridSunday(SAT), false);
+  assert.equal(isMadridSunday(SUN), true);
+  // This run closes the open jornada.
+  assert.equal(
+    idealRoundToLock({
+      isSunday: true,
+      currentRound: 2,
+      advance: true,
+      reason: "ok",
+    }),
+    2,
+  );
+  // Saturday already advanced; Sunday still locks the finished jornada.
+  assert.equal(
+    idealRoundToLock({
+      isSunday: true,
+      currentRound: 3,
+      advance: false,
+      reason: "already-scored-this-week",
+    }),
+    2,
+  );
+  assert.equal(
+    idealRoundToLock({
+      isSunday: true,
+      currentRound: 2,
+      advance: false,
+      reason: "week-still-open",
+    }),
+    null,
+  );
+  assert.equal(
+    idealRoundToLock({
+      isSunday: true,
+      currentRound: 2,
+      advance: false,
+      reason: "missing-box-scores",
+    }),
+    null,
+  );
+  assert.equal(
+    idealRoundToLock({
+      isSunday: true,
+      currentRound: 2,
+      advance: false,
+      reason: "no-box-scores",
+    }),
+    null,
+  );
+  // Saturday must not move the stored ideal team.
+  assert.equal(
+    idealRoundToLock({
+      isSunday: false,
+      currentRound: 2,
+      advance: true,
+      reason: "ok",
+    }),
+    null,
+  );
+  assert.equal(
+    idealRoundToLock({
+      isSunday: true,
+      currentRound: 1,
+      advance: false,
+      reason: "already-scored-this-week",
+    }),
+    null,
+  );
+});
 
 test("Madrid Sat and Sun share one club week", () => {
   assert.equal(madridDay(SAT), "2026-10-03");

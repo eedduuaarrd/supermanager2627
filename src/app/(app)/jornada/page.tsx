@@ -1,6 +1,11 @@
 "use client";
 
 import { BootGate } from "@/components/boot-gate";
+import {
+  IdealTeamButton,
+  IdealTeamSheet,
+  type IdealLineup,
+} from "@/components/ideal-team-sheet";
 import { InstallReopenLink } from "@/components/install-app-modal";
 import { useManager } from "@/components/manager-provider";
 import { TeamChips } from "@/components/team-chips";
@@ -89,7 +94,7 @@ function primaryCta(opts: {
 }
 
 function JornadaContent() {
-  const { teams, lineup, activeTeamId, maxTeams, createTeam, round } =
+  const { teams, lineup, activeTeamId, maxTeams, createTeam, round, roster } =
     useManager();
   const filled = lineup.playerIds.length;
   const hasCaptain = Boolean(lineup.captainId);
@@ -110,6 +115,12 @@ function JornadaContent() {
   const [newName, setNewName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const [idealOpen, setIdealOpen] = useState(false);
+  const [ideal, setIdeal] = useState<{
+    round: number | null;
+    team: IdealLineup | null;
+    pendingRound: number | null;
+  }>({ round: null, team: null, pendingRound: null });
 
   useEffect(() => {
     let cancelled = false;
@@ -159,6 +170,33 @@ function JornadaContent() {
     };
   }, [activeTeamId]);
 
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/ideal-team", { cache: "no-store" });
+        if (!res.ok || cancelled) return;
+        const data = (await res.json()) as {
+          round?: number | null;
+          team?: IdealLineup | null;
+          pendingRound?: number | null;
+        };
+        if (cancelled) return;
+        setIdeal({
+          round: typeof data.round === "number" ? data.round : null,
+          team: data.team ?? null,
+          pendingRound:
+            typeof data.pendingRound === "number" ? data.pendingRound : null,
+        });
+      } catch {
+        /* hub still works without the ideal team */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const cta = primaryCta({
     hasTeams,
     filled,
@@ -203,14 +241,27 @@ function JornadaContent() {
           Equip actiu
         </p>
 
-        {hasTeams && (
-          <TeamChips
-            createOpen={createOpen}
-            onCreateOpen={() => {
-              setCreateOpen(true);
-              setError(null);
-            }}
-          />
+        {(hasTeams || ideal.round != null) && (
+          <div className="flex items-center">
+            {hasTeams ? (
+              <TeamChips
+                className="min-w-0 flex-1"
+                createOpen={createOpen}
+                onCreateOpen={() => {
+                  setCreateOpen(true);
+                  setError(null);
+                }}
+              />
+            ) : (
+              <span className="min-w-0 flex-1" />
+            )}
+            {ideal.round != null && (
+              <IdealTeamButton
+                round={ideal.round}
+                onClick={() => setIdealOpen(true)}
+              />
+            )}
+          </div>
         )}
 
         {(!hasTeams || createOpen) && (
@@ -326,6 +377,17 @@ function JornadaContent() {
         <div className="hub-fade-late border-t border-line/50 pt-3">
           <InstallReopenLink />
         </div>
+      )}
+
+      {ideal.round != null && (
+        <IdealTeamSheet
+          open={idealOpen}
+          onOpenChange={setIdealOpen}
+          round={ideal.round}
+          team={ideal.team}
+          pendingRound={ideal.pendingRound}
+          roster={roster}
+        />
       )}
     </div>
   );

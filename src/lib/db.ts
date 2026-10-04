@@ -347,6 +347,15 @@ export function getDb(): Database.Database {
       opened_at TEXT,
       scored_at TEXT
     );
+
+    -- Singleton (id = 1): ideal lineup locked by the Sunday 23:59 Madrid job.
+    CREATE TABLE IF NOT EXISTS ideal_lineup (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      round INTEGER NOT NULL,
+      player_ids TEXT NOT NULL,
+      scores_json TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
   `);
 
   const current = db

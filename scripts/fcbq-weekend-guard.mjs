@@ -249,3 +249,36 @@ export function decideWeekendAdvance({
   }
   return { advance: true, reason: "ok", ...base, missing };
 }
+
+/** True on Sunday in Europe/Madrid (the ideal-team lock-in), not Saturday. */
+export function isMadridSunday(date = new Date()) {
+  const weekday = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Europe/Madrid",
+    weekday: "short",
+  }).format(date);
+  return weekday === "Sun";
+}
+
+/**
+ * Jornada the Sunday 23:59 Madrid run should store as the ideal team.
+ * Returns null when that jornada is not ready — caller keeps the last lineup.
+ *
+ * - `advance`: this run is closing `currentRound` (the jornada that just finished).
+ * - `already-scored-this-week`: an earlier pass already closed it and opened the
+ *   next, so the finished jornada is `currentRound - 1`.
+ * Saturday never locks a new ideal team (`isSunday` false).
+ */
+export function idealRoundToLock({
+  isSunday,
+  currentRound,
+  advance,
+  reason,
+}) {
+  if (!isSunday) return null;
+  if (!Number.isInteger(currentRound) || currentRound < 1) return null;
+  if (advance) return currentRound;
+  if (reason === "already-scored-this-week" && currentRound > 1) {
+    return currentRound - 1;
+  }
+  return null;
+}

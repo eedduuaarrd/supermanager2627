@@ -19,6 +19,8 @@
  * 5) Tick broker market prices after a successful ingest (anti-retick if no new games)
  * 6) Recompute lineup_lock_at from fixtures tip-offs (null if none published)
  *    Transfer window: Sun 23:59 Madrid → first tip-off; max 3 canvis per team
+ * 7) Sunday only: persist the ideal lineup for the jornada this run locks in.
+ *    Saturday does not move it. Missing scores keep the previous stored team.
  *
  * Usage (VPS, app running):
  *   ADMIN_TOKEN=… APP_URL=http://127.0.0.1:4317 node scripts/weekend-sync.mjs
@@ -47,6 +49,8 @@ import {
 import {
   applyAssignments,
   decideWeekendAdvance,
+  idealRoundToLock,
+  isMadridSunday,
 } from "./fcbq-weekend-guard.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -311,12 +315,25 @@ async function main() {
       : "lineup_lock_at=null (no published tip-offs — lineup stays open)",
   );
 
+  const sunday = isMadridSunday(new Date());
   if (dryRun) {
+    const previewTarget = idealRoundToLock({
+      isSunday: sunday,
+      currentRound: round,
+      advance: decision.advance,
+      reason: decision.reason,
+    });
+    log(
+      previewTarget == null
+        ? "ideal team: unchanged (not a Sunday lock-in)"
+        : `ideal team: would lock J${previewTarget}`,
+    );
     log("dry-run — hypothetical decision from files on disk; no scrape, no score");
     return;
   }
 
   let hardFail = !ingestOk || !fixturesOk;
+  let scoreApplied = false;
 
   if (!skipScore && ingestOk) {
     const assigned = applyAssignments(stats, decision.assignments);
@@ -333,6 +350,7 @@ async function main() {
         log(`POST ${APP_URL}/api/admin/weekly action=run`);
         const result = await postAdmin("run");
         log(`score OK ${JSON.stringify(result)}`);
+        scoreApplied = true;
         try {
           rememberScoredWeek(decision.week.key);
           log(`weekend_scored_week=${decision.week.key}`);
@@ -346,6 +364,37 @@ async function main() {
     }
   } else if (!skipScore) {
     log(`skip score/advance: ${decision.reason}`);
+  }
+
+  // Sunday 23:59 Madrid: store the ideal team for the jornada just locked in.
+  // A failed score this run must not pretend the open jornada is finished.
+  const idealTarget = idealRoundToLock({
+    isSunday: sunday,
+    currentRound: round,
+    advance: scoreApplied,
+    reason: decision.reason,
+  });
+  if (!sunday) {
+    log("ideal team: skip (not Sunday Europe/Madrid)");
+  } else if (idealTarget == null) {
+    log("ideal team: unchanged (jornada not ready — keeping last stored lineup)");
+  } else if (!ADMIN_TOKEN) {
+    log(`ideal team: skip J${idealTarget} (no ADMIN_TOKEN)`);
+  } else {
+    try {
+      log(`POST ${APP_URL}/api/admin/weekly action=ideal round=${idealTarget}`);
+      const ideal = await postAdmin("ideal", { round: idealTarget });
+      if (ideal.stored) {
+        log(`ideal team J${idealTarget} stored`);
+      } else {
+        log(
+          `ideal team unchanged: ${ideal.reason} for J${idealTarget} (keeping J${ideal.keptRound ?? "none"})`,
+        );
+      }
+    } catch (err) {
+      hardFail = true;
+      log(`ideal team FAIL: ${err.message}`);
+    }
   }
 
   // Broker tick when ingest succeeded: ±15% only if scored-game count grew.
