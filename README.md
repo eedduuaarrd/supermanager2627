@@ -123,7 +123,7 @@ Web Push (VAPID) cap als navegadors que s’hi subscriuen. No hi ha un altre pro
 - **Equip ideal:** el mateix diumenge 23:59 Europe/Madrid, només si el sync desa la jornada que acaba de tancar. Títol `Supermanager`, cos `Ja pots consultar l'equip ideal de la jornada X.`
 - **Inici de jornada:** cada minut (`supermanager-push-jornada.timer`) comprova el primer tip-off real d’aquesta setmana de Madrid. En el moment del xiulet: `La jornada X ja ha començat.` Si el tip-off ja ha passat de 20 minuts, o la jornada ja està tancada, no s’envia.
 
-Cada avís surt una sola vegada per jornada, a totes les subscripcions desades. Cal que l’usuari hagi iniciat sessió i hagi tocat **Activa les notificacions** a Compte. A l’iPhone, a més, l’app ha d’estar a la pantalla d’inici (iOS 16.4+) — Safari en una pestanya no rep Web Push.
+Cada avís surt una sola vegada per jornada, a totes les subscripcions desades. Cal que l’usuari hagi iniciat sessió. En obrir l’app, si aquest dispositiu encara no hi està subscrit, es demana el permís del navegador (el mateix que **Activa les notificacions** a Compte). Si es tanca amb «Ara no», no es torna a demanar en aquella sessió. Si el permís queda bloquejat, no es torna a obrir el diàleg del navegador. A l’iPhone, a més, l’app ha d’estar a la pantalla d’inici (iOS 16.4+) — Safari en una pestanya no rep Web Push, i el diàleg ho diu.
 
 Claus: `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` a l’entorn, o bé el servidor les crea a `DATA_DIR/vapid.json` el primer cop. No es fa un enviament de jornades ja començades o ja tancades.
 

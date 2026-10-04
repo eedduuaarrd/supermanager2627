@@ -2,6 +2,7 @@
 
 import { BrandLogo } from "@/components/brand-logo";
 import { InstallAppModal } from "@/components/install-app-modal";
+import { PushPrompt } from "@/components/push-prompt";
 import { cn } from "@/lib/utils";
 import {
   ClipboardList,
@@ -57,6 +58,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </main>
 
       <InstallAppModal />
+      <PushPrompt />
 
       <nav
         className="fixed inset-x-0 bottom-0 z-40 shrink-0 border-t border-line bg-ink/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md"

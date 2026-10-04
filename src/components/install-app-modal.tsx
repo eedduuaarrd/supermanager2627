@@ -27,7 +27,7 @@ const SESSION_KEY = "sm_install_modal_session_dismiss";
 const AUTO_SHOW_DELAY_MS = 1500;
 export const OPEN_INSTALL_MODAL_EVENT = "sm:open-install-modal";
 
-function isStandaloneDisplay(): boolean {
+export function isStandaloneDisplay(): boolean {
   if (typeof window === "undefined") return false;
   const mq = window.matchMedia("(display-mode: standalone)").matches;
   const ios =
@@ -36,7 +36,7 @@ function isStandaloneDisplay(): boolean {
   return mq || ios;
 }
 
-function shouldAutoShow(): boolean {
+export function shouldAutoShowInstall(): boolean {
   try {
     if (isStandaloneDisplay()) return false;
     if (localStorage.getItem(DONT_SHOW_KEY) === "1") return false;
@@ -45,6 +45,26 @@ function shouldAutoShow(): boolean {
   } catch {
     return !isStandaloneDisplay();
   }
+}
+
+let installModalOpen = false;
+const installOpenListeners = new Set<() => void>();
+
+function setInstallModalOpen(next: boolean) {
+  if (installModalOpen === next) return;
+  installModalOpen = next;
+  for (const listener of installOpenListeners) listener();
+}
+
+export function subscribeInstallModalOpen(onStoreChange: () => void) {
+  installOpenListeners.add(onStoreChange);
+  return () => {
+    installOpenListeners.delete(onStoreChange);
+  };
+}
+
+export function getInstallModalOpen(): boolean {
+  return installModalOpen;
 }
 
 function subscribeNoop() {
@@ -268,7 +288,7 @@ export function InstallAppModal() {
   const onOnboarding = pathname === "/onboarding" || pathname.startsWith("/onboarding/");
   const autoShowEligible = useSyncExternalStore(
     subscribeNoop,
-    shouldAutoShow,
+    shouldAutoShowInstall,
     () => false,
   );
   const deferredPrompt = useSyncExternalStore(
@@ -291,6 +311,11 @@ export function InstallAppModal() {
   const autoShow =
     autoShowEligible && !onOnboarding && delayPassed && !dismissed;
   const open = manualOpen || autoShow;
+
+  useEffect(() => {
+    setInstallModalOpen(open);
+    return () => setInstallModalOpen(false);
+  }, [open]);
 
   useEffect(() => {
     if (!autoShowEligible || onOnboarding) {
