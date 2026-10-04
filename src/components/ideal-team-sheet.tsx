@@ -87,8 +87,8 @@ export function IdealTeamSheet({
             </p>
             {pendingRound != null && team && (
               <p className="mt-1 text-[11px] leading-snug text-[#c4b396]">
-                J{pendingRound} encara no té resultats complets. Es manté
-                l&apos;equip ideal de J{team.round}.
+                L&apos;equip ideal de J{pendingRound} encara no està desat. Es
+                mostra el de J{team.round}.
               </p>
             )}
             <DialogPrimitive.Close

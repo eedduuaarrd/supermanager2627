@@ -25,8 +25,10 @@
  *    missing box does not freeze everyone else. Saturday still waits for ingest.
  * 6) Recompute lineup_lock_at from fixtures tip-offs (null if none published)
  *    Transfer window: Sun 23:59 Madrid → first tip-off; max 3 canvis per team
- * 7) Sunday only: persist the ideal lineup for the jornada this run locks in.
- *    Saturday does not move it. Missing scores keep the previous stored team.
+ * 7) Sunday only: persist the ideal lineup for the jornada this run locks in
+ *    (2 bases, 3 alers, 3 pivots). A short line is stored as the players who
+ *    scored and replaces the previous team. Saturday does not move it.
+ *    No real scores keep the previous stored team.
  *
  * Usage (VPS, app running):
  *   ADMIN_TOKEN=… APP_URL=http://127.0.0.1:4317 node scripts/weekend-sync.mjs
