@@ -207,27 +207,95 @@ export function toggleHistoryRound(
 }
 
 /**
- * While the jornada is locked and still open, its chip is highlighted with no tap.
- * A tapped past chip is the only other highlight. Tapping the current chip
- * returns to that live court instead of opening a second copy.
+ * The current jornada pill stays selected while that round is open.
+ * That is the lineup window (changes allowed) and the locked live jornada.
+ * A closed round does not pin itself.
+ */
+export function currentJornadaPinned(roundStatus: "open" | "closed"): boolean {
+  return roundStatus === "open";
+}
+
+export type JornadaChipPoints = {
+  round: number;
+  points: number;
+  cumulative: number;
+  rank: number | null;
+  /**
+   * False only on the placeholder for the open jornada before a score row exists.
+   * Omitted or true means the points are the stored jornada total.
+   */
+  scored?: boolean;
+};
+
+/**
+ * Pills for the Equip strip.
+ * Scored jornadas stay as stored. While the round is open, the current jornada
+ * is still a pill before any score row exists: no rank, season total unchanged.
+ * The placeholder points stay 0 and are not written as a score. The pill prints
+ * "-" until the first match starts.
+ */
+export function withCurrentJornadaChip<T extends JornadaChipPoints>(
+  rows: readonly T[],
+  currentRound: number,
+  pinCurrent: boolean,
+): T[] {
+  const ordered = [...rows].sort((a, b) => a.round - b.round);
+  if (!pinCurrent || !Number.isInteger(currentRound) || currentRound < 1) {
+    return ordered;
+  }
+  if (ordered.some((row) => row.round === currentRound)) return ordered;
+  const last = ordered[ordered.length - 1];
+  const chip = {
+    round: currentRound,
+    points: 0,
+    cumulative: last?.cumulative ?? 0,
+    rank: null,
+    scored: false,
+  } as T;
+  return [...ordered, chip].sort((a, b) => a.round - b.round);
+}
+
+/**
+ * Figure on a jornada pill.
+ * The open jornada shows "-" until its first match starts. After tip-off, the
+ * number is the stored total, or 0 when nobody has scored yet. Past jornadas
+ * keep their stored points. The dash is not a score.
+ */
+export function jornadaPillFigure(input: {
+  points: number;
+  isCurrent: boolean;
+  scored: boolean;
+  /** Earliest tip-off of this jornada has been reached, or the jornada is closed. */
+  matchStarted: boolean;
+  historyLoaded: boolean;
+}): string {
+  if (input.isCurrent && !input.scored && !input.matchStarted) return "-";
+  if (input.isCurrent && !input.scored && !input.historyLoaded) return "…";
+  return String(input.points);
+}
+
+/**
+ * While the jornada is open — lineup window or locked — its pill is selected
+ * with no tap. A tapped past pill is the only other selection. Tapping the
+ * current pill returns to that court. Edits stay on the open window.
  */
 export function historyChipActive(input: {
   round: number;
   selectedRound: number | null;
   currentRound: number;
-  inProgress: boolean;
+  pinCurrent: boolean;
 }): boolean {
   if (input.selectedRound != null) return input.selectedRound === input.round;
-  return input.inProgress && input.round === input.currentRound;
+  return input.pinCurrent && input.round === input.currentRound;
 }
 
 export function nextHistorySelection(input: {
   selectedRound: number | null;
   tappedRound: number;
   currentRound: number;
-  inProgress: boolean;
+  pinCurrent: boolean;
 }): number | null {
-  if (input.inProgress && input.tappedRound === input.currentRound) return null;
+  if (input.pinCurrent && input.tappedRound === input.currentRound) return null;
   return toggleHistoryRound(input.selectedRound, input.tappedRound);
 }
 

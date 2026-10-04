@@ -58,8 +58,11 @@ async function main() {
     buildCourtMatchSheets,
     courtChipCaption,
     formatCourtPoints,
+    currentJornadaPinned,
     historyChipActive,
+    jornadaPillFigure,
     nextHistorySelection,
+    withCurrentJornadaChip,
     pastCourtFromHistory,
     courtPlayerPoints,
     pointsCaptionText,
@@ -291,6 +294,10 @@ async function main() {
   assert.equal(historySrc.includes("Tancar"), false);
   assert.match(historySrc, /row\.points/);
   assert.match(historySrc, /row\.rank/);
+  assert.match(historySrc, /currentJornadaPinned/);
+  assert.match(historySrc, /withCurrentJornadaChip/);
+  assert.match(historySrc, /jornadaPillFigure/);
+  assert.match(historySrc, /pinCurrent/);
   assert.doesNotMatch(historySrc, /detail\.opponent/);
   console.log("OK history chips stay and the text list is gone");
 
@@ -339,12 +346,14 @@ async function main() {
   assert.ok(fromDb.playerIds.includes("eduard-bernat"));
   console.log("OK jornada chip equals the court sum, captain doubled, season keeps it");
 
+  assert.equal(currentJornadaPinned("open"), true);
+  assert.equal(currentJornadaPinned("closed"), false);
   assert.equal(
     historyChipActive({
       round: 2,
       selectedRound: null,
       currentRound: 2,
-      inProgress: true,
+      pinCurrent: true,
     }),
     true,
   );
@@ -353,7 +362,7 @@ async function main() {
       round: 1,
       selectedRound: null,
       currentRound: 2,
-      inProgress: true,
+      pinCurrent: true,
     }),
     false,
   );
@@ -362,7 +371,7 @@ async function main() {
       round: 1,
       selectedRound: 1,
       currentRound: 2,
-      inProgress: true,
+      pinCurrent: true,
     }),
     true,
   );
@@ -371,7 +380,7 @@ async function main() {
       round: 2,
       selectedRound: 1,
       currentRound: 2,
-      inProgress: true,
+      pinCurrent: true,
     }),
     false,
   );
@@ -380,7 +389,7 @@ async function main() {
       round: 2,
       selectedRound: null,
       currentRound: 2,
-      inProgress: false,
+      pinCurrent: false,
     }),
     false,
   );
@@ -389,7 +398,7 @@ async function main() {
       selectedRound: null,
       tappedRound: 2,
       currentRound: 2,
-      inProgress: true,
+      pinCurrent: true,
     }),
     null,
   );
@@ -398,7 +407,7 @@ async function main() {
       selectedRound: 1,
       tappedRound: 2,
       currentRound: 2,
-      inProgress: true,
+      pinCurrent: true,
     }),
     null,
   );
@@ -407,7 +416,7 @@ async function main() {
       selectedRound: null,
       tappedRound: 1,
       currentRound: 2,
-      inProgress: true,
+      pinCurrent: true,
     }),
     1,
   );
@@ -416,11 +425,188 @@ async function main() {
       selectedRound: 1,
       tappedRound: 1,
       currentRound: 2,
-      inProgress: true,
+      pinCurrent: true,
     }),
     null,
   );
   console.log("OK current jornada chip highlights itself until a past chip is tapped");
+
+  // Open window: J3 is already a pill and selected. Past jornadas stay tappable.
+  // Selecting J3 again keeps the editable court (price, current players).
+  const scored = [
+    { round: 1, points: 40, cumulative: 40, rank: 2 },
+    { round: 2, points: 22, cumulative: 62, rank: 1 },
+  ];
+  const openChips = withCurrentJornadaChip(scored, 3, currentJornadaPinned("open"));
+  assert.deepEqual(
+    openChips.map((chip) => chip.round),
+    [1, 2, 3],
+  );
+  assert.equal(openChips[2].points, 0);
+  assert.equal(openChips[2].scored, false);
+  assert.equal(openChips[2].rank, null);
+  assert.equal(openChips[2].cumulative, 62);
+  assert.equal(
+    jornadaPillFigure({
+      points: openChips[2].points,
+      isCurrent: true,
+      scored: false,
+      matchStarted: false,
+      historyLoaded: true,
+    }),
+    "-",
+  );
+  assert.equal(
+    jornadaPillFigure({
+      points: 0,
+      isCurrent: true,
+      scored: false,
+      matchStarted: true,
+      historyLoaded: true,
+    }),
+    "0",
+  );
+  assert.equal(
+    jornadaPillFigure({
+      points: 0,
+      isCurrent: true,
+      scored: true,
+      matchStarted: true,
+      historyLoaded: true,
+    }),
+    "0",
+  );
+  assert.equal(
+    jornadaPillFigure({
+      points: openChips[0].points,
+      isCurrent: false,
+      scored: true,
+      matchStarted: false,
+      historyLoaded: true,
+    }),
+    "40",
+  );
+  assert.equal(
+    jornadaPillFigure({
+      points: 22,
+      isCurrent: false,
+      scored: true,
+      matchStarted: false,
+      historyLoaded: true,
+    }),
+    "22",
+  );
+  assert.equal(
+    scored.reduce((sum, chip) => sum + chip.points, 0),
+    62,
+  );
+  const onlyCurrent = withCurrentJornadaChip([], 3, true);
+  assert.deepEqual(onlyCurrent, [
+    { round: 3, points: 0, cumulative: 0, rank: null, scored: false },
+  ]);
+  const alreadyScored = withCurrentJornadaChip(
+    [{ round: 3, points: 11, cumulative: 73, rank: 4 }],
+    3,
+    true,
+  );
+  assert.equal(alreadyScored.length, 1);
+  assert.equal(alreadyScored[0].points, 11);
+  assert.deepEqual(withCurrentJornadaChip(scored, 3, currentJornadaPinned("closed")), scored);
+
+  assert.equal(
+    historyChipActive({
+      round: 3,
+      selectedRound: null,
+      currentRound: 3,
+      pinCurrent: currentJornadaPinned("open"),
+    }),
+    true,
+  );
+  assert.equal(
+    historyChipActive({
+      round: 2,
+      selectedRound: null,
+      currentRound: 3,
+      pinCurrent: true,
+    }),
+    false,
+  );
+  const viewingPast = nextHistorySelection({
+    selectedRound: null,
+    tappedRound: 2,
+    currentRound: 3,
+    pinCurrent: true,
+  });
+  assert.equal(viewingPast, 2);
+  assert.equal(
+    historyChipActive({
+      round: 3,
+      selectedRound: viewingPast,
+      currentRound: 3,
+      pinCurrent: true,
+    }),
+    false,
+  );
+  assert.equal(
+    historyChipActive({
+      round: 2,
+      selectedRound: viewingPast,
+      currentRound: 3,
+      pinCurrent: true,
+    }),
+    true,
+  );
+  const backToEdit = nextHistorySelection({
+    selectedRound: viewingPast,
+    tappedRound: 3,
+    currentRound: 3,
+    pinCurrent: true,
+  });
+  assert.equal(backToEdit, null);
+  const editing = resolveEquipCourt({
+    lineupLocked: false,
+    roundStatus: "open",
+    current: {
+      playerIds: ["next-a", "next-b"],
+      captainId: "next-a",
+      pointsById: { "next-a": 30 },
+    },
+    past: backToEdit == null ? null : past,
+  });
+  assert.equal(editing.source, "current");
+  assert.equal(editing.caption, "price");
+  assert.deepEqual(editing.playerIds, ["next-a", "next-b"]);
+  assert.deepEqual(editing.pointsById, {});
+  console.log("OK open window shows J3 selected and keeps edits on that pill");
+
+  const { ManagerProvider } = await import("../src/components/manager-provider");
+  const { JornadaPointsHistory } = await import(
+    "../src/components/jornada-points-history"
+  );
+  const openHtml = renderToStaticMarkup(
+    createElement(
+      ManagerProvider,
+      {
+        user: {
+          id: "u1",
+          email: "court@example.com",
+          displayName: "Edu",
+          teamName: "Tollagrossa",
+          activeTeamId: "t1",
+          isAdmin: false,
+        },
+        initialRound: 3,
+        children: createElement(JornadaPointsHistory),
+      },
+    ),
+  );
+  assert.match(openHtml, /data-jornada-chip="3"/);
+  assert.match(openHtml, /data-highlighted="true"/);
+  assert.match(openHtml, /data-jornada-figure="-"/);
+  assert.match(openHtml, />J3</);
+  assert.match(openHtml, />-</);
+  assert.equal(openHtml.includes("Encara no"), false);
+  console.log("OK open window paints the selected J3 pill before history loads");
 
   const sheets = buildCourtMatchSheets({
     round: 2,
