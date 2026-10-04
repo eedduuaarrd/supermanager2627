@@ -20,7 +20,6 @@ function EquipContent() {
     actionError,
     user,
     lineupLocked,
-    lockMessage,
     transfer,
     activeTeamId,
     round,
@@ -95,7 +94,6 @@ function EquipContent() {
           saveStatus={saveStatus}
           error={actionError}
           readOnly={readOnly}
-          lockMessage={lockMessage ?? transfer?.message}
           caption={court.caption}
           playedVals={court.pointsById}
           courtPlayerIds={past ? court.playerIds : undefined}

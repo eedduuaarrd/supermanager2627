@@ -36,7 +36,6 @@ interface LineupBuilderProps {
   error?: string | null;
   /** Tip-off / jornada lock — court becomes read-only. */
   readOnly?: boolean;
-  lockMessage?: string | null;
   /**
    * `points`: raw jornada number, or "-" when that player has no score.
    * `price`: quote only (editable window, and the next jornada after Sunday close).
@@ -93,7 +92,6 @@ export function LineupBuilder({
   saveStatus,
   error,
   readOnly = false,
-  lockMessage = null,
   caption = "price",
   playedVals,
   courtPlayerIds,
@@ -204,12 +202,6 @@ export function LineupBuilder({
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-2">
-      {readOnly && !historyView ? (
-        <div className="shrink-0 px-0.5 py-1 text-sm text-amber-100/90">
-          {lockMessage ??
-            "Finestra de transferències tancada. Només lectura fins diumenge 23:59 (Madrid)."}
-        </div>
-      ) : null}
       <div className="flex shrink-0 items-baseline justify-between gap-2 px-0.5 text-xs text-mute">
         <p className="min-w-0 tabular-nums" aria-label="Pressupost i places">
           <span className={filled === LINEUP_SIZE ? "text-bone/80" : undefined}>

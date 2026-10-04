@@ -55,10 +55,14 @@ function statText(html: string, id: string): string {
 
 async function main() {
   const {
+    buildCourtMatchSheets,
     courtChipCaption,
     formatCourtPoints,
+    historyChipActive,
+    nextHistorySelection,
     pastCourtFromHistory,
     pointsCaptionText,
+    pointsForInProgressCourt,
     rawCourtVal,
     resolveEquipCourt,
     toggleHistoryRound,
@@ -120,8 +124,8 @@ async function main() {
   assert.equal(rawCourtVal({ playerId: "cap", val: 9, points: 18 }, true), 9);
   assert.equal(rawCourtVal({ playerId: "cap", points: 18 }, true), 9);
   assert.equal(rawCourtVal({ playerId: "mate", val: 4, points: 4 }, false), 4);
-  assert.equal(rawCourtVal({ playerId: "sit", dnp: true, points: 0 }, false), null);
-  assert.equal(rawCourtVal({ playerId: "sit", dnp: true, points: 0 }, true), null);
+  assert.equal(rawCourtVal({ playerId: "sit", dnp: true, points: 0 }, false), 0);
+  assert.equal(rawCourtVal({ playerId: "sit", dnp: true, points: 0 }, true), 0);
   assert.equal(rawCourtVal({ playerId: "zero", val: 0, points: 0 }, false), 0);
   assert.equal(pointsCaptionText(0), "0");
   assert.equal(formatCourtPoints(12.34), "12.3");
@@ -193,8 +197,7 @@ async function main() {
   });
   assert.deepEqual(past.playerIds, ["cap", "wait", "zero"]);
   assert.equal(past.captainId, "cap");
-  assert.deepEqual(past.pointsById, { cap: 9, zero: 0 });
-  assert.equal(Object.hasOwn(past.pointsById, "wait"), false);
+  assert.deepEqual(past.pointsById, { cap: 9, zero: 0, wait: 0 });
 
   const replaced = resolveEquipCourt({
     lineupLocked: false,
@@ -210,14 +213,14 @@ async function main() {
   assert.equal(replaced.caption, "points");
   assert.deepEqual(replaced.playerIds, ["cap", "wait", "zero"]);
   assert.equal(replaced.captainId, "cap");
-  assert.deepEqual(replaced.pointsById, { cap: 9, zero: 0 });
+  assert.deepEqual(replaced.pointsById, { cap: 9, zero: 0, wait: 0 });
   const pastHtml = render({
     caption: replaced.caption,
     points: replaced.pointsById,
     captainId: replaced.captainId,
   });
   assert.equal(statText(pastHtml, "cap"), "9");
-  assert.equal(statText(pastHtml, "wait"), "-");
+  assert.equal(statText(pastHtml, "wait"), "0");
   assert.equal(statText(pastHtml, "zero"), "0");
   assert.equal(pastHtml.includes("VAL"), false);
 
@@ -322,9 +325,182 @@ async function main() {
   assert.equal(fromDb.captainId, "hector-lozano");
   assert.equal(fromDb.pointsById["hector-lozano"], 9);
   assert.equal(fromDb.pointsById["marc-escoda"], 4);
-  assert.equal(fromDb.pointsById["eduard-bernat"], undefined);
+  assert.equal(fromDb.pointsById["eduard-bernat"], 0);
   assert.ok(fromDb.playerIds.includes("eduard-bernat"));
   console.log("OK stored jornada keeps team total ×2 and raw per-player VAL");
+
+  assert.equal(
+    historyChipActive({
+      round: 2,
+      selectedRound: null,
+      currentRound: 2,
+      inProgress: true,
+    }),
+    true,
+  );
+  assert.equal(
+    historyChipActive({
+      round: 1,
+      selectedRound: null,
+      currentRound: 2,
+      inProgress: true,
+    }),
+    false,
+  );
+  assert.equal(
+    historyChipActive({
+      round: 1,
+      selectedRound: 1,
+      currentRound: 2,
+      inProgress: true,
+    }),
+    true,
+  );
+  assert.equal(
+    historyChipActive({
+      round: 2,
+      selectedRound: 1,
+      currentRound: 2,
+      inProgress: true,
+    }),
+    false,
+  );
+  assert.equal(
+    historyChipActive({
+      round: 2,
+      selectedRound: null,
+      currentRound: 2,
+      inProgress: false,
+    }),
+    false,
+  );
+  assert.equal(
+    nextHistorySelection({
+      selectedRound: null,
+      tappedRound: 2,
+      currentRound: 2,
+      inProgress: true,
+    }),
+    null,
+  );
+  assert.equal(
+    nextHistorySelection({
+      selectedRound: 1,
+      tappedRound: 2,
+      currentRound: 2,
+      inProgress: true,
+    }),
+    null,
+  );
+  assert.equal(
+    nextHistorySelection({
+      selectedRound: null,
+      tappedRound: 1,
+      currentRound: 2,
+      inProgress: true,
+    }),
+    1,
+  );
+  assert.equal(
+    nextHistorySelection({
+      selectedRound: 1,
+      tappedRound: 1,
+      currentRound: 2,
+      inProgress: true,
+    }),
+    null,
+  );
+  console.log("OK current jornada chip highlights itself until a past chip is tapped");
+
+  const sheets = buildCourtMatchSheets({
+    round: 2,
+    teams: [
+      {
+        teamId: "masc-a",
+        fixtures: [
+          {
+            jornada: 2,
+            teamPoints: 81,
+            opponentPoints: 65,
+            matchCallUuid: "done",
+            date: "2026-10-04",
+          },
+          {
+            jornada: 2,
+            teamPoints: null,
+            opponentPoints: null,
+            matchCallUuid: "later",
+            date: "2026-10-05",
+          },
+        ],
+      },
+      {
+        teamId: "masc-b",
+        fixtures: [
+          {
+            jornada: 2,
+            teamPoints: null,
+            opponentPoints: null,
+            matchCallUuid: "later",
+            date: "2026-10-05",
+          },
+        ],
+      },
+      {
+        teamId: "fem-a",
+        fixtures: [
+          {
+            jornada: 2,
+            teamPoints: 70,
+            opponentPoints: 60,
+            matchCallUuid: "fem-done",
+            date: "2026-10-04",
+          },
+        ],
+      },
+    ],
+    boxes: [
+      { playerId: "played", teamId: "masc-a", matchCallUuid: "done", date: "2026-10-04" },
+      { playerId: "zero-val", teamId: "masc-a", matchCallUuid: "done", date: "2026-10-04" },
+      { playerId: "fem-played", teamId: "fem-a", matchCallUuid: "fem-done", date: "2026-10-04" },
+    ],
+  });
+  const livePoints = pointsForInProgressCourt({
+    round: 2,
+    playerIds: ["played", "zero-val", "sat", "waiting", "other-team"],
+    captainId: "played",
+    scores: [
+      { playerId: "played", val: 11, points: 22 },
+      { playerId: "zero-val", val: 0, points: 0 },
+    ],
+    teamOf: (id) =>
+      id === "other-team" ? "fem-a" : id === "waiting" ? "masc-b" : "masc-a",
+    matches: sheets,
+  });
+  assert.equal(livePoints.played, 11);
+  assert.equal(livePoints["zero-val"], 0);
+  assert.equal(livePoints.sat, 0);
+  assert.equal(Object.hasOwn(livePoints, "waiting"), false);
+  assert.equal(livePoints["other-team"], 0);
+  const noSheet = pointsForInProgressCourt({
+    round: 2,
+    playerIds: ["sat"],
+    scores: [],
+    teamOf: () => "masc-a",
+    matches: [
+      { teamId: "masc-a", jornada: 2, finished: true, boxPlayerIds: [] },
+    ],
+  });
+  assert.equal(Object.hasOwn(noSheet, "sat"), false);
+  console.log("OK '-' until the match ends, then 0 if they did not play");
+
+  const builderSrc = fs.readFileSync(
+    path.join(root, "src/components/lineup-builder.tsx"),
+    "utf8",
+  );
+  assert.equal(builderSrc.includes("Alineació bloquejada"), false);
+  assert.equal(builderSrc.includes("Finestra de transferències tancada"), false);
+  console.log("OK lock sentence is gone from the court");
 }
 
 main().catch((err) => {

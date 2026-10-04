@@ -2,8 +2,9 @@
 
 import { useManager } from "@/components/manager-provider";
 import {
+  historyChipActive,
+  nextHistorySelection,
   pastCourtFromHistory,
-  toggleHistoryRound,
   type PastCourtView,
 } from "@/lib/equip-court";
 import type { RoundScore } from "@/lib/types";
@@ -28,7 +29,8 @@ export function JornadaPointsHistory({
   /** Selected past jornada, or null when the court should show the current view. */
   onPastCourt?: (court: PastCourtView | null) => void;
 }) {
-  const { activeTeamId } = useManager();
+  const { activeTeamId, round, lineupLocked, roundStatus } = useManager();
+  const inProgress = lineupLocked && roundStatus === "open";
   const [history, setHistory] = useState<{
     teamId: string | null;
     rows: HistoryRow[] | null;
@@ -124,19 +126,28 @@ export function JornadaPointsHistory({
         aria-label="Historial de punts per jornada"
       >
         {rows.map((row) => {
-          const active = selectedRound === row.round;
+          const active = historyChipActive({
+            round: row.round,
+            selectedRound,
+            currentRound: round,
+            inProgress,
+          });
           return (
             <button
               key={row.round}
               type="button"
               role="listitem"
+              data-jornada-chip={row.round}
+              data-highlighted={active ? "true" : "false"}
               onClick={() =>
                 setSelected((cur) => ({
                   teamId: activeTeamId,
-                  round: toggleHistoryRound(
-                    cur.teamId === activeTeamId ? cur.round : null,
-                    row.round,
-                  ),
+                  round: nextHistorySelection({
+                    selectedRound: cur.teamId === activeTeamId ? cur.round : null,
+                    tappedRound: row.round,
+                    currentRound: round,
+                    inProgress,
+                  }),
                 }))
               }
               className={cn(

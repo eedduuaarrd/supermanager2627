@@ -12,6 +12,10 @@ import {
   type ClubFixture,
   type FixturesFile,
 } from "@/lib/fixtures";
+import {
+  buildCourtMatchSheets,
+  pointsForInProgressCourt,
+} from "@/lib/equip-court";
 import { fantasyStatFromGame, type PlayerGameStat } from "@/lib/player-stats";
 import { PUSH_TITLE } from "@/lib/push-policy";
 import { deliverToAll, ensureVapid, type PushMessage } from "@/lib/push";
@@ -390,31 +394,68 @@ export function applyMatchScores(
   return teams;
 }
 
+function readRoundScoreRow(
+  teamId: string,
+  round: number,
+): { scores: RoundScore[]; captainId: string | null } {
+  const row = getDb()
+    .prepare(
+      `SELECT scores_json, captain_id FROM round_scores WHERE team_id = ? AND round = ?`,
+    )
+    .get(teamId, round) as
+    | { scores_json: string; captain_id: string | null }
+    | undefined;
+  if (!row) return { scores: [], captainId: null };
+  try {
+    const parsed = JSON.parse(row.scores_json) as unknown;
+    return {
+      scores: Array.isArray(parsed) ? (parsed as RoundScore[]) : [],
+      captainId: row.captain_id,
+    };
+  } catch {
+    return { scores: [], captainId: row.captain_id };
+  }
+}
+
 export function playedValsForTeam(
   teamId: string,
   round: number,
 ): Record<string, number> {
-  const row = getDb()
-    .prepare(
-      `SELECT scores_json FROM round_scores WHERE team_id = ? AND round = ?`,
-    )
-    .get(teamId, round) as { scores_json: string } | undefined;
-  if (!row) return {};
-  let scores: RoundScore[] = [];
-  try {
-    const parsed = JSON.parse(row.scores_json) as unknown;
-    if (Array.isArray(parsed)) scores = parsed as RoundScore[];
-  } catch {
-    return {};
-  }
   const out: Record<string, number> = {};
-  for (const score of scores) {
+  for (const score of readRoundScoreRow(teamId, round).scores) {
     if (score.dnp) continue;
     if (typeof score.val === "number" && Number.isFinite(score.val)) {
       out[score.playerId] = score.val;
     }
   }
   return out;
+}
+
+/**
+ * Court numbers for the open locked jornada. Does not rewrite scores or totals.
+ * Players still waiting stay out of the map. A finished match with a box sheet
+ * contributes 0 for lineup players who are not on it.
+ */
+export function inProgressCourtPointsForTeam(
+  teamId: string,
+  round: number,
+  playerIds: string[],
+): Record<string, number> {
+  const stored = readRoundScoreRow(teamId, round);
+  const fixtures = loadFixtures();
+  const boxes = loadMatchBoxes();
+  return pointsForInProgressCourt({
+    round,
+    playerIds,
+    scores: stored.scores,
+    captainId: stored.captainId,
+    teamOf: (playerId) => getPlayer(playerId)?.teamId ?? null,
+    matches: buildCourtMatchSheets({
+      round,
+      teams: fixtures.teams ?? [],
+      boxes,
+    }),
+  });
 }
 
 export function loadMatchBoxes(): MatchBox[] {
