@@ -1,6 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  enablePushOnThisDevice,
+  readPushPermission,
+  subscribeThisDevice,
+} from "@/lib/push-client";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 type UiState =
@@ -12,47 +17,12 @@ type UiState =
   | "busy"
   | "error";
 
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const raw = atob(base64);
-  const out = new Uint8Array(raw.length);
-  for (let i = 0; i < raw.length; i += 1) out[i] = raw.charCodeAt(i);
-  return out;
-}
-
-async function subscribeThisDevice(): Promise<void> {
-  const reg = await navigator.serviceWorker.ready;
-  const keyRes = await fetch("/api/push/public-key", { cache: "no-store" });
-  if (!keyRes.ok) throw new Error("no-key");
-  const { publicKey } = (await keyRes.json()) as { publicKey?: string };
-  if (!publicKey) throw new Error("no-key");
-  const existing = await reg.pushManager.getSubscription();
-  const sub =
-    existing ??
-    (await reg.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(publicKey) as BufferSource,
-    }));
-  const json = sub.toJSON();
-  const res = await fetch("/api/push/subscribe", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(json),
-  });
-  if (!res.ok) throw new Error("save");
-}
-
 function detectedState(): UiState {
-  if (
-    !("Notification" in window) ||
-    !("serviceWorker" in navigator) ||
-    !("PushManager" in window)
-  ) {
-    return "unsupported";
-  }
-  if (Notification.permission === "denied") return "denied";
-  if (Notification.permission === "granted") return "busy";
+  const permission = readPushPermission();
+  if (permission === "unsupported") return "unsupported";
+  if (permission === "denied") return "denied";
+  if (permission === "granted") return "busy";
+  if (permission === "unknown") return "unknown";
   return "default";
 }
 
@@ -87,17 +57,12 @@ export function PushOptIn() {
 
   async function enable() {
     setOverride("busy");
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission !== "granted") {
-        setOverride(permission === "denied" ? "denied" : "default");
-        return;
-      }
-      await subscribeThisDevice();
-      setOverride("on");
-    } catch {
-      setOverride("error");
-    }
+    const result = await enablePushOnThisDevice();
+    if (result === "on") setOverride("on");
+    else if (result === "denied") setOverride("denied");
+    else if (result === "unsupported") setOverride("unsupported");
+    else if (result === "error") setOverride("error");
+    else setOverride("default");
   }
 
   return (

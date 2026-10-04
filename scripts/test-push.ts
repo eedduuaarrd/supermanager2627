@@ -22,6 +22,7 @@ async function main() {
     PUSH_TITLE,
   } = await import("../src/lib/push-policy");
   const { dispatchLoggedPush } = await import("../src/lib/push");
+  const { decidePushPrompt } = await import("../src/lib/push-prompt");
 
 assert.equal(PUSH_TITLE, "Supermanager");
 assert.equal(
@@ -194,6 +195,37 @@ const again = await dispatchLoggedPush({
 });
 assert.equal(again.outcome, "already");
 assert.equal(sent.length, 1);
+
+const basePrompt = {
+  dismissedThisSession: false,
+  permission: "default" as const,
+  hasSubscription: false as boolean | null,
+  iosWithoutHomeScreen: false,
+  blockedByInstall: false,
+};
+assert.equal(decidePushPrompt(basePrompt), "ask");
+assert.equal(decidePushPrompt({ ...basePrompt, dismissedThisSession: true }), "hidden");
+assert.equal(decidePushPrompt({ ...basePrompt, hasSubscription: true }), "hidden");
+assert.equal(decidePushPrompt({ ...basePrompt, hasSubscription: null }), "hidden");
+assert.equal(decidePushPrompt({ ...basePrompt, permission: "denied" }), "hidden");
+assert.equal(decidePushPrompt({ ...basePrompt, permission: "granted" }), "hidden");
+assert.equal(decidePushPrompt({ ...basePrompt, blockedByInstall: true }), "hidden");
+assert.equal(
+  decidePushPrompt({ ...basePrompt, iosWithoutHomeScreen: true }),
+  "ios-home-screen",
+);
+assert.equal(
+  decidePushPrompt({
+    ...basePrompt,
+    iosWithoutHomeScreen: true,
+    permission: "denied",
+  }),
+  "hidden",
+);
+assert.equal(
+  decidePushPrompt({ ...basePrompt, permission: "unsupported" }),
+  "hidden",
+);
 
   console.log("OK push");
 }
