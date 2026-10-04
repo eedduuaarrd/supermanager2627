@@ -109,27 +109,49 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 const APP_VIEWPORT_SCRIPT = `(function(){
   if (window.__appViewportBound) return;
   window.__appViewportBound = true;
+  function px(el, prop){
+    return parseFloat(getComputedStyle(el).getPropertyValue(prop)) || 0;
+  }
+  function probe(style, read){
+    var el = document.createElement("div");
+    el.style.cssText = style;
+    document.documentElement.appendChild(el);
+    var value = read(el);
+    el.remove();
+    return value;
+  }
   function apply(){
     var vv = window.visualViewport;
-    var height = vv && vv.height > 0 ? vv.height : window.innerHeight;
-    var top = vv && vv.offsetTop > 0 ? vv.offsetTop : 0;
-    if (!(height > 0)) return;
-    var root = document.documentElement;
-    root.style.setProperty("--app-height", height + "px");
-    root.style.setProperty("--app-top", top + "px");
+    var visible = vv && vv.height > 0 ? vv.height : window.innerHeight;
+    if (!(visible > 0)) return;
+    var dynamic = probe(
+      "position:fixed;left:0;top:0;height:100dvh;width:0;visibility:hidden;pointer-events:none;",
+      function(el){ return el.getBoundingClientRect().height; }
+    );
+    var safeTop = probe(
+      "position:fixed;visibility:hidden;padding-top:env(safe-area-inset-top);",
+      function(el){ return px(el, "padding-top"); }
+    );
+    // iOS standalone: the first visualViewport is short by the status bar
+    // (safe-area-inset-top, ~47–59px), then it grows into 100dvh. 100dvh is
+    // already the full screen on that first frame. The Safari toolbar gap is
+    // larger (~70px+); adopting it would make the shell taller than the
+    // visible page and clip Equip again. A keyboard shrink is larger still.
+    var limit = safeTop > 0 ? safeTop + 2 : 62;
+    var height = visible;
+    if (dynamic > visible && dynamic - visible <= limit) height = dynamic;
+    document.documentElement.style.setProperty("--app-height", height + "px");
+    document.documentElement.style.setProperty("--app-top", "0px");
   }
+  window.__applyAppViewport = apply;
   apply();
   requestAnimationFrame(function(){
     apply();
     var main = document.querySelector("main");
     if (main) main.scrollTop = 0;
-    requestAnimationFrame(apply);
   });
   var vv = window.visualViewport;
-  if (vv) {
-    vv.addEventListener("resize", apply);
-    vv.addEventListener("scroll", apply);
-  }
+  if (vv) vv.addEventListener("resize", apply);
   window.addEventListener("resize", apply);
   window.addEventListener("orientationchange", apply);
   window.addEventListener("pageshow", apply);
