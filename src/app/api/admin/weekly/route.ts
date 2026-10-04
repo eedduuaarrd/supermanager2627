@@ -12,12 +12,20 @@ import {
   setLineupLockAt,
 } from "@/lib/rounds";
 import { refreshStoredIdealTeam } from "@/lib/ideal-team";
+import { notifyIdealStored, notifyJornadaStart } from "@/lib/push";
 import { closeJornada, openNextJornada } from "@/lib/scoring";
 import { promoteInitialTeamsIfLocked } from "@/lib/teams";
 
 export const runtime = "nodejs";
 
-type WeeklyAction = "refresh" | "close" | "open" | "run" | "lock" | "ideal";
+type WeeklyAction =
+  | "refresh"
+  | "close"
+  | "open"
+  | "run"
+  | "lock"
+  | "ideal"
+  | "jornada-start";
 
 function authorize(req: Request, bodyToken?: string): boolean {
   const adminToken = process.env.ADMIN_TOKEN;
@@ -41,6 +49,10 @@ function authorize(req: Request, bodyToken?: string): boolean {
  *   if tip-off already passed, promote transfer_phase initial → normal
  * - ideal: persist the ideal lineup for `round` from fantasy VAL.
  *   Incomplete scores leave the previous stored lineup in place.
+ *   A successful store pushes "equip ideal" to subscribed users (once).
+ * - jornada-start: if the open jornada's first tip-off of this Madrid week
+ *   is within the last 20 minutes, push that it has started (once).
+ *   Already started or already finished is recorded as skipped, not sent.
  *
  * Also accepts session cookie for logged-in admin (scripts / curl with session).
  */
@@ -122,7 +134,15 @@ export async function POST(req: Request) {
         );
       }
       const result = refreshStoredIdealTeam(round);
-      return NextResponse.json({ ok: true, action: "ideal", ...result });
+      const push = result.stored
+        ? await notifyIdealStored(round, true)
+        : { outcome: "wait" as const, delivered: 0 };
+      return NextResponse.json({ ok: true, action: "ideal", ...result, push });
+    }
+
+    if (action === "jornada-start") {
+      const push = await notifyJornadaStart();
+      return NextResponse.json({ ok: true, action: "jornada-start", push });
     }
 
     if (action === "close") {
@@ -149,6 +169,6 @@ export async function GET() {
     round: getCurrentRound(),
     roundStatus: getRoundStatus(),
     lockAt: getLineupLockAt(),
-    actions: ["refresh", "close", "open", "run", "lock", "ideal"],
+    actions: ["refresh", "close", "open", "run", "lock", "ideal", "jornada-start"],
   });
 }

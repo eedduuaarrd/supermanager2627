@@ -356,6 +356,24 @@ export function getDb(): Database.Database {
       scores_json TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS push_subscriptions (
+      endpoint TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      p256dh TEXT NOT NULL,
+      auth TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+
+    -- One row per kind+jornada. outcome sent | skipped | pending.
+    -- Stops a later run from notifying a jornada that already started or finished.
+    CREATE TABLE IF NOT EXISTS push_dispatch (
+      kind TEXT NOT NULL,
+      round INTEGER NOT NULL,
+      outcome TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      PRIMARY KEY (kind, round)
+    );
   `);
 
   const current = db

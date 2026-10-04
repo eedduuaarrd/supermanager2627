@@ -1,5 +1,5 @@
 /* Supermanager Balaguer — minimal offline shell cache */
-const CACHE = "sm-balaguer-v1";
+const CACHE = "sm-balaguer-v2";
 const PRECACHE = [
   "/",
   "/manifest.webmanifest",
@@ -21,6 +21,45 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((keys) =>
       Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))),
     ).then(() => self.clients.claim()),
+  );
+});
+
+self.addEventListener("push", (event) => {
+  let payload = { title: "Supermanager", body: "", url: "/jornada" };
+  try {
+    if (event.data) {
+      const parsed = event.data.json();
+      if (parsed && typeof parsed === "object") {
+        payload = { ...payload, ...parsed };
+      }
+    }
+  } catch {
+    /* keep defaults */
+  }
+  event.waitUntil(
+    self.registration.showNotification(payload.title || "Supermanager", {
+      body: payload.body || "",
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      lang: "ca",
+      data: { url: payload.url || "/jornada" },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = event.notification.data?.url || "/jornada";
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+      for (const client of list) {
+        if (client.url.includes(self.location.origin) && "focus" in client) {
+          return client.focus();
+        }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(target);
+      return undefined;
+    }),
   );
 });
 

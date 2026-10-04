@@ -160,6 +160,55 @@ export function computeLineupLockAt(
   return min == null ? null : new Date(min).toISOString();
 }
 
+/** Monday–Sunday dates in Europe/Madrid for `now`. */
+function madridWeekBounds(now: Date): { from: string; to: string } {
+  const anchorDay = madridToday(now);
+  const [y, m, d] = anchorDay.split("-").map(Number);
+  const utcApprox = new Date(Date.UTC(y, m - 1, d, 12));
+  const dow = utcApprox.getUTCDay();
+  const mondayOffset = dow === 0 ? -6 : 1 - dow;
+  const monday = new Date(utcApprox);
+  monday.setUTCDate(utcApprox.getUTCDate() + mondayOffset);
+  const sunday = new Date(monday);
+  sunday.setUTCDate(monday.getUTCDate() + 6);
+  const fmt = (dt: Date) => {
+    const yyyy = dt.getUTCFullYear();
+    const mm = String(dt.getUTCMonth() + 1).padStart(2, "0");
+    const dd = String(dt.getUTCDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
+  return { from: fmt(monday), to: fmt(sunday) };
+}
+
+/**
+ * Earliest real tip-off of the open jornada's current Madrid week.
+ * Counts fixtures tagged for `jornada` inside that week, plus still-untagged
+ * fixtures in the same week (they are tagged later, at the Saturday 23:59 sync).
+ * No tipOff means the fixture is ignored — times are never invented from the date.
+ * Returns null when this week has no published kickoff for the jornada.
+ */
+export function firstWeekendKickoff(
+  jornada: number,
+  file: FixturesFile = loadFixtures(),
+  now: Date = new Date(),
+): string | null {
+  const week = madridWeekBounds(now);
+  let min: number | null = null;
+  for (const team of file.teams ?? []) {
+    for (const f of team.fixtures ?? []) {
+      const day = dateKey(f);
+      const inWeek = Boolean(day && day >= week.from && day <= week.to);
+      const taggedThisWeek = f.jornada === jornada && inWeek;
+      const untaggedThisWeek = (f.jornada == null || f.jornada === undefined) && inWeek;
+      if (!taggedThisWeek && !untaggedThisWeek) continue;
+      const ms = tipOffMs(f);
+      if (ms == null) continue;
+      if (min == null || ms < min) min = ms;
+    }
+  }
+  return min == null ? null : new Date(min).toISOString();
+}
+
 export function isLineupLocked(
   lockAt: string | null | undefined,
   now = new Date(),
