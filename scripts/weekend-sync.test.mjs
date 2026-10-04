@@ -3,8 +3,6 @@ import test from "node:test";
 import { buildFromRosters } from "./refresh-fcbq-stats.mjs";
 import {
   coverageGaps,
-  gameLogFromRestrictedRoster,
-  gameRowFromLog,
   isRestrictedPlayerStats,
   mergeTeamLogs,
   resolvePlayerLog,
@@ -473,95 +471,99 @@ test("a failed fixtures refresh never advances, including Sunday", () => {
 });
 
 const SIFONET = "c057eeae-3aae-4e33-b2ab-54fabb2700ae";
-const SIFONET_GAME = {
-  gameNumber: 1,
-  matchCallUuid: "c4fe67b2-72dd-4506-a41a-f461d8b0fc77",
-  matchDayNum: 2,
-  date: "2026-10-03",
-  home: true,
-  opponent: {
-    uuid: "f6c242ee-3edc-46ed-b127-484af4757ca2",
-    name: "AGROLLOBERA PALAU D'ANGLESOLA",
+const RESTRICTED_DF = {
+  uuid: "acd264cd-85d4-4729-a554-6198ae6a7381",
+  name: "D.F.",
+  dorsal: "5",
+  gamesPlayed: 1,
+  totals: {
+    accumulated: { pts: 0, t2m: 0, t3m: 0, ftm: 0, fta: 2, fc: 2 },
+    computed: { seconds: 1098, onCourtPlusMinus: 4, ftPer: 0 },
   },
-  teamPoints: 65,
-  opponentPoints: 45,
-  result: "W",
+  minutesByGame: { 1: 1098 },
+};
+const RESTRICTED_BODY = {
+  message: "Les estadístiques del jugador/a han estat restringides",
+  error: "1002021",
 };
 
-test("restricted Lo Sifonet player log uses the published single-game roster box", () => {
-  const person = {
-    uuid: "acd264cd-85d4-4729-a554-6198ae6a7381",
-    name: "D.F.",
-    dorsal: "5",
-    gamesPlayed: 1,
-    totals: {
-      accumulated: { pts: 0, t2m: 0, t3m: 0, ftm: 0, fta: 2, fc: 2 },
-      computed: { seconds: 1098, onCourtPlusMinus: 4, ftPer: 0 },
-    },
-    minutesByGame: { 1: 1098 },
-  };
-  const restricted = {
-    message: "Les estadístiques del jugador/a han estat restringides",
-    error: "1002021",
-  };
-  assert.equal(isRestrictedPlayerStats(405, restricted), true);
+test("restricted Lo Sifonet player D.F. is ignored and does not fail the side", () => {
+  assert.equal(isRestrictedPlayerStats(405, RESTRICTED_BODY), true);
   assert.equal(isRestrictedPlayerStats(405, { message: "nope" }), false);
-  assert.equal(isRestrictedPlayerStats(404, restricted), false);
+  assert.equal(isRestrictedPlayerStats(404, RESTRICTED_BODY), false);
 
-  const resolved = resolvePlayerLog(person, [SIFONET_GAME], {
+  const skipped = resolvePlayerLog(RESTRICTED_DF, {
     status: 405,
-    body: restricted,
+    body: RESTRICTED_BODY,
   });
-  assert.equal(resolved.fatal, undefined);
-  assert.equal(resolved.gamesPlayed, 1);
-  const row = gameRowFromLog(resolved.games[0], {
-    teamId: "masc-b",
-    fcbqTeamId: SIFONET,
-  });
-  assert.equal(row.date, "2026-10-03");
-  assert.equal(row.opponent, "AGROLLOBERA PALAU D'ANGLESOLA");
-  assert.equal(row.matchCallUuid, SIFONET_GAME.matchCallUuid);
-  assert.equal(row.result, undefined);
-  assert.equal(row.pts, 0);
-  assert.equal(row.tlc, 0);
-  assert.equal(row.tli, 2);
-  assert.equal(row.pf, 2);
-  assert.equal(row.pm, 4);
-  assert.equal(row.min, 18.3);
-  assert.equal(row.round, null);
-  assert.equal(row.jornada, null);
-  assert.equal(row.t2i, null);
+  assert.equal(skipped.skip, true);
+  assert.equal(skipped.reason, "restricted");
+  assert.equal(skipped.games, undefined);
+  assert.equal(skipped.fatal, undefined);
 
-  const mismatched = gameLogFromRestrictedRoster(
-    {
-      ...person,
-      totals: {
-        ...person.totals,
-        computed: { ...person.totals.computed, seconds: 10 },
-      },
-    },
-    [SIFONET_GAME],
-  );
-  assert.deepEqual(mismatched, []);
+  const miquelLog = {
+    date: "2026-10-03",
+    matchCallUuid: "c4fe67b2-72dd-4506-a41a-f461d8b0fc77",
+    opponent: { name: "AGROLLOBERA PALAU D'ANGLESOLA" },
+    accumulated: { pts: 9, t2m: 2, t3m: 1, ftm: 2, fta: 4, fc: 2 },
+    computed: { seconds: 1702, onCourtPlusMinus: 17 },
+  };
   const published = resolvePlayerLog(
-    { uuid: "00c6ae27-98d1-11e9-a2a5-0216824770c2", name: "MIQUEL RÚBIES PACH", gamesPlayed: 1 },
-    [SIFONET_GAME],
-    { status: 200, games: [{ date: "2026-10-03", matchCallUuid: SIFONET_GAME.matchCallUuid, accumulated: { pts: 9 } }] },
+    {
+      uuid: "00c6ae27-98d1-11e9-a2a5-0216824770c2",
+      name: "MIQUEL RÚBIES PACH",
+      gamesPlayed: 1,
+    },
+    { status: 200, games: [miquelLog] },
   );
-  assert.equal(published.games[0].accumulated.pts, 9);
-  assert.equal(published.fatal, undefined);
+  assert.equal(published.gamesPlayed, 1);
+  assert.equal(published.games[0], miquelLog);
+  assert.equal(published.skip, undefined);
 
-  const split = gameLogFromRestrictedRoster(
-    { ...person, gamesPlayed: 2, minutesByGame: { 1: 400, 2: 698 } },
-    [SIFONET_GAME, { ...SIFONET_GAME, gameNumber: 2, date: "2026-10-10" }],
+  const fatal = resolvePlayerLog(RESTRICTED_DF, {
+    status: 500,
+    body: { message: "boom" },
+  });
+  assert.equal(fatal.fatal, true);
+
+  const roster = [
+    {
+      person: RESTRICTED_DF,
+      result: { status: 405, body: RESTRICTED_BODY },
+    },
+    {
+      person: {
+        uuid: "00c6ae27-98d1-11e9-a2a5-0216824770c2",
+        name: "MIQUEL RÚBIES PACH",
+        gamesPlayed: 1,
+      },
+      result: { status: 200, games: [miquelLog] },
+    },
+  ];
+  const kept = [];
+  for (const item of roster) {
+    const resolved = resolvePlayerLog(item.person, item.result);
+    assert.equal(resolved.fatal, undefined);
+    if (resolved.skip) continue;
+    kept.push({
+      uuid: item.person.uuid,
+      name: item.person.name,
+      gamesPlayed: resolved.gamesPlayed,
+      games: resolved.games,
+    });
+  }
+  assert.equal(kept.length, 1);
+  assert.equal(kept[0].name, "MIQUEL RÚBIES PACH");
+  assert.deepEqual(kept[0].games, [miquelLog]);
+  const merged = mergeTeamLogs(
+    { players: {} },
+    [{ fcbqTeamId: SIFONET, players: kept }],
   );
-  assert.deepEqual(split, []);
-  const other = resolvePlayerLog(
-    { ...person, gamesPlayed: 2 },
-    [SIFONET_GAME],
-    { status: 500, body: { message: "boom" } },
+  assert.equal(
+    merged.unmapped.some((name) => name === "D.F."),
+    false,
   );
-  assert.equal(other.fatal, true);
+  assert.equal(merged.unmapped.includes("MIQUEL RÚBIES PACH"), true);
 });
 
 test("PJ>1 plantilla averages do not append a game row", () => {
