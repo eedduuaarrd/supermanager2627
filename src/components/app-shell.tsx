@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useLayoutEffect, useRef, type ReactNode } from "react";
 
 const NAV = [
   { href: "/jornada", label: "Inici", icon: Home },
@@ -25,9 +25,15 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isEquip = pathname === "/equip" || pathname.startsWith("/equip/");
   const isJugador = pathname.startsWith("/jugador/");
+  const mainRef = useRef<HTMLElement>(null);
+
+  useLayoutEffect(() => {
+    const main = mainRef.current;
+    if (main) main.scrollTop = 0;
+  }, [pathname]);
 
   return (
-    <div className="flex h-dvh min-h-0 flex-col overflow-x-hidden overflow-y-hidden">
+    <div className="flex h-app min-h-0 w-full flex-col overflow-x-hidden overflow-y-hidden">
       <header
         className="z-30 shrink-0 border-b border-line bg-ink/90 pt-[env(safe-area-inset-top)] backdrop-blur-md"
       >
@@ -45,6 +51,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
 
       <main
+        ref={mainRef}
         className={cn(
           "mx-auto flex w-full min-h-0 flex-1 flex-col",
           "px-4 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]",

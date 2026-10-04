@@ -442,23 +442,25 @@ function ChipCaption({
         <p
           data-court-caption="price"
           data-player-id={player.id}
-          className="mt-0.5 text-[9px] tabular-nums text-bone/65 sm:text-[10px]"
+          className="mt-[0.2rem] flex justify-center"
         >
-          <PriceLabel
-            price={player.price}
-            prevPrice={player.prevPrice}
-            compact
-            showArrow={false}
-            className="text-[9px] sm:text-[10px]"
-          />
+          <span className="court-stat-bar">
+            <PriceLabel
+              price={player.price}
+              prevPrice={player.prevPrice}
+              compact
+              showArrow={false}
+              className="text-[10px] text-bone sm:text-[11px]"
+            />
+          </span>
         </p>
       ) : chip.kind === "points" ? (
         <p
           data-court-caption="points"
           data-player-id={player.id}
-          className={statClass}
+          className="mt-[0.2rem] flex justify-center"
         >
-          {chip.text}
+          <span className="court-stat-bar">{chip.text}</span>
         </p>
       ) : (
         <p
