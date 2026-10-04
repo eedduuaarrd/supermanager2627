@@ -207,27 +207,69 @@ export function toggleHistoryRound(
 }
 
 /**
- * While the jornada is locked and still open, its chip is highlighted with no tap.
- * A tapped past chip is the only other highlight. Tapping the current chip
- * returns to that live court instead of opening a second copy.
+ * The current jornada pill stays selected while that round is open.
+ * That is the lineup window (changes allowed) and the locked live jornada.
+ * A closed round does not pin itself.
+ */
+export function currentJornadaPinned(roundStatus: "open" | "closed"): boolean {
+  return roundStatus === "open";
+}
+
+export type JornadaChipPoints = {
+  round: number;
+  points: number;
+  cumulative: number;
+  rank: number | null;
+};
+
+/**
+ * Pills for the Equip strip.
+ * Scored jornadas stay as stored. While the round is open, the current jornada
+ * is still a pill before any score row exists: 0 points, no rank, and the
+ * season total already on the books. That 0 is not written as a score.
+ */
+export function withCurrentJornadaChip<T extends JornadaChipPoints>(
+  rows: readonly T[],
+  currentRound: number,
+  pinCurrent: boolean,
+): T[] {
+  const ordered = [...rows].sort((a, b) => a.round - b.round);
+  if (!pinCurrent || !Number.isInteger(currentRound) || currentRound < 1) {
+    return ordered;
+  }
+  if (ordered.some((row) => row.round === currentRound)) return ordered;
+  const last = ordered[ordered.length - 1];
+  const chip = {
+    round: currentRound,
+    points: 0,
+    cumulative: last?.cumulative ?? 0,
+    rank: null,
+  } as T;
+  return [...ordered, chip].sort((a, b) => a.round - b.round);
+}
+
+/**
+ * While the jornada is open — lineup window or locked — its pill is selected
+ * with no tap. A tapped past pill is the only other selection. Tapping the
+ * current pill returns to that court. Edits stay on the open window.
  */
 export function historyChipActive(input: {
   round: number;
   selectedRound: number | null;
   currentRound: number;
-  inProgress: boolean;
+  pinCurrent: boolean;
 }): boolean {
   if (input.selectedRound != null) return input.selectedRound === input.round;
-  return input.inProgress && input.round === input.currentRound;
+  return input.pinCurrent && input.round === input.currentRound;
 }
 
 export function nextHistorySelection(input: {
   selectedRound: number | null;
   tappedRound: number;
   currentRound: number;
-  inProgress: boolean;
+  pinCurrent: boolean;
 }): number | null {
-  if (input.inProgress && input.tappedRound === input.currentRound) return null;
+  if (input.pinCurrent && input.tappedRound === input.currentRound) return null;
   return toggleHistoryRound(input.selectedRound, input.tappedRound);
 }
 

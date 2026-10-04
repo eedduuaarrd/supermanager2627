@@ -2,9 +2,11 @@
 
 import { useManager } from "@/components/manager-provider";
 import {
+  currentJornadaPinned,
   historyChipActive,
   nextHistorySelection,
   pastCourtFromHistory,
+  withCurrentJornadaChip,
   type PastCourtView,
 } from "@/lib/equip-court";
 import type { RoundScore } from "@/lib/types";
@@ -29,8 +31,8 @@ export function JornadaPointsHistory({
   /** Selected past jornada, or null when the court should show the current view. */
   onPastCourt?: (court: PastCourtView | null) => void;
 }) {
-  const { activeTeamId, round, lineupLocked, roundStatus } = useManager();
-  const inProgress = lineupLocked && roundStatus === "open";
+  const { activeTeamId, round, roundStatus } = useManager();
+  const pinCurrent = currentJornadaPinned(roundStatus);
   const [history, setHistory] = useState<{
     teamId: string | null;
     rows: HistoryRow[] | null;
@@ -45,6 +47,16 @@ export function JornadaPointsHistory({
   }, [onPastCourt]);
   const rows = history.teamId === activeTeamId ? history.rows : null;
   const selectedRound = selected.teamId === activeTeamId ? selected.round : null;
+  const chips = withCurrentJornadaChip(
+    (rows ?? []).map((row) => ({
+      round: row.round,
+      points: row.points,
+      cumulative: row.cumulative,
+      rank: row.rank,
+    })),
+    round,
+    pinCurrent,
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -89,15 +101,14 @@ export function JornadaPointsHistory({
     notify(row ? pastCourtFromHistory(row) : null);
   }, [rows, selectedRound]);
 
-  if (rows == null) {
-    return (
-      <p className="shrink-0 px-0.5 text-[10px] uppercase tracking-[0.14em] text-mute/70">
-        Punts de jornada…
-      </p>
-    );
-  }
-
-  if (rows.length === 0) {
+  if (chips.length === 0) {
+    if (rows == null) {
+      return (
+        <p className="shrink-0 px-0.5 text-[10px] uppercase tracking-[0.14em] text-mute/70">
+          Punts de jornada…
+        </p>
+      );
+    }
     return (
       <p className="shrink-0 px-0.5 text-[10px] text-mute/70">
         <span className="uppercase tracking-[0.14em]">Punts de jornada</span>
@@ -107,7 +118,8 @@ export function JornadaPointsHistory({
     );
   }
 
-  const seasonTotal = rows[rows.length - 1]?.cumulative ?? 0;
+  const seasonTotal =
+    rows == null ? null : (rows[rows.length - 1]?.cumulative ?? 0);
 
   return (
     <div className="shrink-0 space-y-1.5 px-0.5">
@@ -117,7 +129,9 @@ export function JornadaPointsHistory({
         </p>
         <p className="text-[11px] tabular-nums text-mute">
           Temporada{" "}
-          <span className="font-display text-xs text-bone/90">{seasonTotal}</span>
+          <span className="font-display text-xs text-bone/90">
+            {seasonTotal == null ? "…" : seasonTotal}
+          </span>
         </p>
       </div>
       <div
@@ -125,12 +139,12 @@ export function JornadaPointsHistory({
         role="list"
         aria-label="Historial de punts per jornada"
       >
-        {rows.map((row) => {
+        {chips.map((row) => {
           const active = historyChipActive({
             round: row.round,
             selectedRound,
             currentRound: round,
-            inProgress,
+            pinCurrent,
           });
           return (
             <button
@@ -146,7 +160,7 @@ export function JornadaPointsHistory({
                     selectedRound: cur.teamId === activeTeamId ? cur.round : null,
                     tappedRound: row.round,
                     currentRound: round,
-                    inProgress,
+                    pinCurrent,
                   }),
                 }))
               }
@@ -167,7 +181,7 @@ export function JornadaPointsHistory({
                 J{row.round}
               </span>
               <span className="font-display text-[1.35rem] leading-none tabular-nums tracking-wide text-bone">
-                {row.points}
+                {rows == null && row.round === round ? "…" : row.points}
               </span>
               {row.rank != null ? (
                 <span
