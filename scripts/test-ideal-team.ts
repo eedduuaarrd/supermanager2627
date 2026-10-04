@@ -81,7 +81,8 @@ async function main() {
     counts[player.position] += 1;
     const stat = fantasyStatFromGame(getPlayerGameForRound(id, 1));
     assert.equal(stat.source, "VAL");
-    const score = live.scores.find((s) => s.playerId === id);
+    const score: { playerId: string; points: number } | undefined =
+      live.scores.find((entry) => entry.playerId === id);
     assert.equal(score?.points, stat.points);
     if (player.photoUrl) {
       const file = path.join(root, "public", player.photoUrl.replace(/^\//, ""));
