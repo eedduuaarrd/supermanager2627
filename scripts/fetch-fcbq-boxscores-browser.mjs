@@ -8,8 +8,10 @@
  *   /v1/fcbq/teams/{team}/stats
  *   /v1/fcbq/players/{person}/teams/{team}/stats
  *
- * Writes `ingest.ok` + `ingest.at` on the stats file. Weekend sync treats a
- * missing or stale ingest as fail-closed and does not score or advance.
+ * Writes `ingest.ok` + `ingest.at` on the stats file. A player whose personal
+ * log is restricted (HTTP 405, error 1002021) still contributes the single
+ * game published on the team roster. Sunday close can score stored boxes
+ * even when this ingest fails.
  *
  * Usage:
  *   node scripts/fetch-fcbq-boxscores-browser.mjs
@@ -22,7 +24,11 @@ import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
 import puppeteer from "puppeteer-core";
 import { CLUB_TEAMS } from "./fetch-fcbq-fixtures.mjs";
-import { coverageGaps, mergeTeamLogs } from "./fcbq-boxscores.mjs";
+import {
+  coverageGaps,
+  mergeTeamLogs,
+  resolvePlayerLog,
+} from "./fcbq-boxscores.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
@@ -182,7 +188,17 @@ async function msGet(url, authorization) {
     },
   });
   if (!res.ok) {
-    throw new Error(`${url} HTTP ${res.status}`);
+    let body = null;
+    try {
+      body = await res.json();
+    } catch {
+      body = null;
+    }
+    const detail = typeof body?.message === "string" ? `: ${body.message}` : "";
+    const err = new Error(`${url} HTTP ${res.status}${detail}`);
+    err.status = res.status;
+    err.body = body;
+    throw err;
   }
   return res.json();
 }
@@ -194,24 +210,37 @@ async function fetchTeamLogs(authorization) {
     try {
       const body = await msGet(`${MS}/teams/${team.fcbqTeamId}/stats`, authorization);
       const roster = Array.isArray(body?.roster) ? body.roster : [];
+      const teamGames = Array.isArray(body?.games) ? body.games : [];
       const players = [];
       for (const person of roster) {
         if (!person?.uuid || !person?.name) continue;
         await sleep(80);
-        const log = await msGet(
-          `${MS}/players/${person.uuid}/teams/${team.fcbqTeamId}/stats`,
-          authorization,
-        );
+        const url = `${MS}/players/${person.uuid}/teams/${team.fcbqTeamId}/stats`;
+        let resolved;
+        try {
+          const log = await msGet(url, authorization);
+          resolved = resolvePlayerLog(person, teamGames, {
+            status: 200,
+            games: Array.isArray(log?.games) ? log.games : [],
+          });
+        } catch (err) {
+          resolved = resolvePlayerLog(person, teamGames, {
+            status: err.status,
+            body: err.body,
+          });
+          if (resolved.fatal) throw err;
+        }
+        if (resolved.skip) {
+          console.warn(
+            `restricted player stats, no single published game: ${team.shortName} ${person.name}`,
+          );
+          continue;
+        }
         players.push({
           uuid: person.uuid,
           name: person.name,
-          gamesPlayed:
-            typeof person.gamesPlayed === "number"
-              ? person.gamesPlayed
-              : Array.isArray(log?.games)
-                ? log.games.length
-                : 0,
-          games: Array.isArray(log?.games) ? log.games : [],
+          gamesPlayed: resolved.gamesPlayed,
+          games: resolved.games,
         });
       }
       teamLogs.push({
@@ -291,9 +320,11 @@ async function main() {
   const { teamLogs, errors } = await fetchTeamLogs(authorization);
   const merged = mergeTeamLogs(existing, teamLogs);
   const gaps = coverageGaps(merged.players, merged.expectations);
-  // Team-season 404 is "no published stats" (Lo Sifonet B today), not a scrape
-  // outage. Other HTTP failures still fail closed. Weekend scoring only
-  // requires box scores for club sides that actually have fantasy players.
+  // Team-season 404 is "no published stats", not a scrape outage. A restricted
+  // personal log (HTTP 405) is handled per player above. Other HTTP failures
+  // still fail this ingest. Weekend scoring only requires box scores for club
+  // sides that actually have fantasy players, and Sunday close does not wait
+  // on a failed ingest.
   const unavailable = errors.filter((e) => /HTTP 404/.test(e));
   const fatal = errors.filter((e) => !/HTTP 404/.test(e));
   const ok =

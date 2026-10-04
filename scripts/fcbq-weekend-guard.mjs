@@ -2,8 +2,11 @@
  * Hands-off weekend scoring guard.
  *
  * A fantasy jornada is one Madrid club week (Mon–Sun), not one calendar day.
- * The Sat and Sun 23:59 timers may both run; only one of them may close+advance,
- * and only after every club fixture of that week has a real box score.
+ * The Sat and Sun 23:59 timers may both run; only one of them may close+advance.
+ * Saturday does not close while a later fixture in the week is still ahead.
+ * Sunday scores the open jornada from real box rows already stored and opens
+ * the next one even when ingest failed or a tracked club side has no box
+ * (those players stay DNP). It does not invent stats or results.
  */
 
 export function madridDay(date = new Date()) {
@@ -215,10 +218,8 @@ export function decideWeekendAdvance({
   const week = madridWeek(now);
   const assignments = planAssignments(stats, round, week, fixturesFile);
   const base = { week, assignments, missing: [] };
+  const sundayClose = isMadridSunday(now);
 
-  if (!ingestOk) {
-    return { advance: false, reason: "stats-ingest-failed", ...base };
-  }
   if (!fixturesOk) {
     return { advance: false, reason: "fixtures-refresh-failed", ...base };
   }
@@ -234,6 +235,13 @@ export function decideWeekendAdvance({
     return { advance: false, reason: "week-still-open", ...base };
   }
 
+  // Saturday (and any non-Sunday run) still refuses a failed ingest or a
+  // played fixture with no box. Sunday 23:59 scores whatever real rows are
+  // already stored and opens the next jornada anyway.
+  if (!sundayClose && !ingestOk) {
+    return { advance: false, reason: "stats-ingest-failed", ...base };
+  }
+
   const missing = club
     .filter((f) => teamIsTracked(stats, f.teamId) && !teamHasBoxScore(stats, f))
     .map((f) => ({
@@ -241,10 +249,10 @@ export function decideWeekendAdvance({
       date: fixtureDay(f),
       opponent: f.opponent ?? null,
     }));
-  if (missing.length) {
+  if (!sundayClose && missing.length) {
     return { advance: false, reason: "missing-box-scores", ...base, missing };
   }
-  if (gamesOnRound(stats, round, assignments) === 0) {
+  if (!sundayClose && gamesOnRound(stats, round, assignments) === 0) {
     return { advance: false, reason: "no-box-scores", ...base };
   }
   return { advance: true, reason: "ok", ...base, missing };

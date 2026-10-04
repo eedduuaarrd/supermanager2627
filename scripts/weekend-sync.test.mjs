@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { buildFromRosters } from "./refresh-fcbq-stats.mjs";
-import { mergeTeamLogs, coverageGaps } from "./fcbq-boxscores.mjs";
+import {
+  coverageGaps,
+  gameLogFromRestrictedRoster,
+  gameRowFromLog,
+  isRestrictedPlayerStats,
+  mergeTeamLogs,
+  resolvePlayerLog,
+} from "./fcbq-boxscores.mjs";
 import {
   applyAssignments,
   decideWeekendAdvance,
@@ -264,8 +271,11 @@ test("box scores for an already-tagged jornada are not retagged onto the open ro
   assert.equal(decision.assignments[0].round, 2);
 });
 
-test("missing box score for a played fixture does not advance", () => {
+test("Saturday still refuses a missing box when the week is already complete", () => {
   const fixtures = clubFile();
+  // No later tip-off: Saturday would be allowed to close if every box existed.
+  fixtures.teams[1].fixtures[0].date = "2026-10-03";
+  fixtures.teams[1].fixtures[0].tipOff = "2026-10-03T12:00:00+02:00";
   fixtures.teams[1].fixtures[0].result = "L";
   const stats = {
     players: {
@@ -280,7 +290,7 @@ test("missing box score for a played fixture does not advance", () => {
     round: 2,
     fixturesFile: fixtures,
     stats,
-    now: SUN,
+    now: SAT,
     ingestOk: true,
     fixturesOk: true,
   });
@@ -290,6 +300,111 @@ test("missing box score for a played fixture does not advance", () => {
     decision.missing.map((m) => m.teamId),
     ["fem-b"],
   );
+});
+
+test("Sunday close scores stored boxes when ingest fails and a club side has no box", () => {
+  const fixtures = clubFile();
+  fixtures.teams[1].fixtures[0].result = null;
+  const stats = {
+    players: {
+      "marc-escoda": {
+        teamId: "masc-a",
+        games: [game({ date: "2026-10-03", round: null, jornada: null, pts: 11 })],
+      },
+      "jana-alarcon": {
+        teamId: "fem-b",
+        games: [game({ date: "2026-09-27", teamId: "fem-b", round: 1, jornada: 1, pts: 4 })],
+      },
+    },
+  };
+  const before = JSON.parse(JSON.stringify(stats));
+  const decision = decideWeekendAdvance({
+    round: 2,
+    fixturesFile: fixtures,
+    stats,
+    now: SUN,
+    ingestOk: false,
+    fixturesOk: true,
+  });
+  assert.equal(decision.advance, true, decision.reason);
+  assert.equal(decision.reason, "ok");
+  assert.deepEqual(
+    decision.missing.map((m) => m.teamId),
+    ["fem-b"],
+  );
+  assert.equal(decision.assignments.length, 1);
+  assert.equal(decision.assignments[0].playerId, "marc-escoda");
+  assert.equal(decision.assignments[0].round, 2);
+  assert.equal(applyAssignments(stats, decision.assignments), 1);
+  assert.equal(stats.players["marc-escoda"].games[0].jornada, 2);
+  assert.equal(stats.players["marc-escoda"].games[0].pts, 11);
+  assert.equal(stats.players["jana-alarcon"].games.length, 1);
+  assert.equal(stats.players["jana-alarcon"].games[0].jornada, 1);
+  assert.deepEqual(stats.players["jana-alarcon"].games[0], before.players["jana-alarcon"].games[0]);
+
+  const again = decideWeekendAdvance({
+    round: 3,
+    fixturesFile: fixtures,
+    stats,
+    now: SUN,
+    scoredWeekKey: decision.week.key,
+    ingestOk: false,
+    fixturesOk: true,
+  });
+  assert.equal(again.advance, false);
+  assert.equal(again.reason, "already-scored-this-week");
+});
+
+test("Sunday still opens the next jornada when no tracked side has a box", () => {
+  const fixtures = clubFile();
+  fixtures.teams[1].fixtures[0].result = null;
+  const stats = {
+    players: {
+      "marc-escoda": {
+        teamId: "masc-a",
+        games: [game({ date: "2026-09-27", round: 1, jornada: 1 })],
+      },
+      "jana-alarcon": {
+        teamId: "fem-b",
+        games: [game({ date: "2026-09-27", teamId: "fem-b", round: 1, jornada: 1 })],
+      },
+    },
+  };
+  const decision = decideWeekendAdvance({
+    round: 2,
+    fixturesFile: fixtures,
+    stats,
+    now: SUN,
+    ingestOk: false,
+    fixturesOk: true,
+  });
+  assert.equal(decision.advance, true, decision.reason);
+  assert.equal(decision.assignments.length, 0);
+  assert.deepEqual(
+    decision.missing.map((m) => m.teamId),
+    ["masc-a", "fem-b"],
+  );
+  assert.equal(applyAssignments(stats, decision.assignments), 0);
+  assert.equal(stats.players["marc-escoda"].games.length, 1);
+  assert.equal(stats.players["jana-alarcon"].games.length, 1);
+});
+
+test("Saturday does not close a later game when ingest failed", () => {
+  const stats = {
+    players: {
+      "marc-escoda": { games: [game({})] },
+    },
+  };
+  const decision = decideWeekendAdvance({
+    round: 2,
+    fixturesFile: clubFile(),
+    stats,
+    now: SAT,
+    ingestOk: false,
+    fixturesOk: true,
+  });
+  assert.equal(decision.advance, false);
+  assert.equal(decision.reason, "week-still-open");
 });
 
 test("a club side with no fantasy players does not block the week", () => {
@@ -329,32 +444,124 @@ test("a club side with no fantasy players does not block the week", () => {
   assert.equal(decision.missing.length, 0);
 });
 
-test("stale or failed ingest and failed fixtures never advance", () => {
+test("a failed fixtures refresh never advances, including Sunday", () => {
   const stats = {
     players: { "marc-escoda": { games: [game({ round: 2, jornada: 2 })] } },
   };
   const fixtures = clubFile();
   fixtures.teams[1].fixtures[0].result = "L";
-  const ingest = decideWeekendAdvance({
-    round: 2,
-    fixturesFile: fixtures,
-    stats,
-    now: SUN,
-    ingestOk: false,
-    fixturesOk: true,
-  });
-  assert.equal(ingest.reason, "stats-ingest-failed");
-  assert.equal(ingest.advance, false);
   const fixturesFail = decideWeekendAdvance({
     round: 2,
     fixturesFile: fixtures,
     stats,
     now: SUN,
-    ingestOk: true,
+    ingestOk: false,
     fixturesOk: false,
   });
   assert.equal(fixturesFail.reason, "fixtures-refresh-failed");
   assert.equal(fixturesFail.advance, false);
+  const saturdayIngest = decideWeekendAdvance({
+    round: 2,
+    fixturesFile: fixtures,
+    stats,
+    now: SAT,
+    ingestOk: false,
+    fixturesOk: true,
+  });
+  assert.equal(saturdayIngest.advance, false);
+  assert.notEqual(saturdayIngest.reason, "ok");
+});
+
+const SIFONET = "c057eeae-3aae-4e33-b2ab-54fabb2700ae";
+const SIFONET_GAME = {
+  gameNumber: 1,
+  matchCallUuid: "c4fe67b2-72dd-4506-a41a-f461d8b0fc77",
+  matchDayNum: 2,
+  date: "2026-10-03",
+  home: true,
+  opponent: {
+    uuid: "f6c242ee-3edc-46ed-b127-484af4757ca2",
+    name: "AGROLLOBERA PALAU D'ANGLESOLA",
+  },
+  teamPoints: 65,
+  opponentPoints: 45,
+  result: "W",
+};
+
+test("restricted Lo Sifonet player log uses the published single-game roster box", () => {
+  const person = {
+    uuid: "acd264cd-85d4-4729-a554-6198ae6a7381",
+    name: "D.F.",
+    dorsal: "5",
+    gamesPlayed: 1,
+    totals: {
+      accumulated: { pts: 0, t2m: 0, t3m: 0, ftm: 0, fta: 2, fc: 2 },
+      computed: { seconds: 1098, onCourtPlusMinus: 4, ftPer: 0 },
+    },
+    minutesByGame: { 1: 1098 },
+  };
+  const restricted = {
+    message: "Les estadístiques del jugador/a han estat restringides",
+    error: "1002021",
+  };
+  assert.equal(isRestrictedPlayerStats(405, restricted), true);
+  assert.equal(isRestrictedPlayerStats(405, { message: "nope" }), false);
+  assert.equal(isRestrictedPlayerStats(404, restricted), false);
+
+  const resolved = resolvePlayerLog(person, [SIFONET_GAME], {
+    status: 405,
+    body: restricted,
+  });
+  assert.equal(resolved.fatal, undefined);
+  assert.equal(resolved.gamesPlayed, 1);
+  const row = gameRowFromLog(resolved.games[0], {
+    teamId: "masc-b",
+    fcbqTeamId: SIFONET,
+  });
+  assert.equal(row.date, "2026-10-03");
+  assert.equal(row.opponent, "AGROLLOBERA PALAU D'ANGLESOLA");
+  assert.equal(row.matchCallUuid, SIFONET_GAME.matchCallUuid);
+  assert.equal(row.result, undefined);
+  assert.equal(row.pts, 0);
+  assert.equal(row.tlc, 0);
+  assert.equal(row.tli, 2);
+  assert.equal(row.pf, 2);
+  assert.equal(row.pm, 4);
+  assert.equal(row.min, 18.3);
+  assert.equal(row.round, null);
+  assert.equal(row.jornada, null);
+  assert.equal(row.t2i, null);
+
+  const mismatched = gameLogFromRestrictedRoster(
+    {
+      ...person,
+      totals: {
+        ...person.totals,
+        computed: { ...person.totals.computed, seconds: 10 },
+      },
+    },
+    [SIFONET_GAME],
+  );
+  assert.deepEqual(mismatched, []);
+  const published = resolvePlayerLog(
+    { uuid: "00c6ae27-98d1-11e9-a2a5-0216824770c2", name: "MIQUEL RÚBIES PACH", gamesPlayed: 1 },
+    [SIFONET_GAME],
+    { status: 200, games: [{ date: "2026-10-03", matchCallUuid: SIFONET_GAME.matchCallUuid, accumulated: { pts: 9 } }] },
+  );
+  assert.equal(published.games[0].accumulated.pts, 9);
+  assert.equal(published.fatal, undefined);
+
+  const split = gameLogFromRestrictedRoster(
+    { ...person, gamesPlayed: 2, minutesByGame: { 1: 400, 2: 698 } },
+    [SIFONET_GAME, { ...SIFONET_GAME, gameNumber: 2, date: "2026-10-10" }],
+  );
+  assert.deepEqual(split, []);
+  const other = resolvePlayerLog(
+    { ...person, gamesPlayed: 2 },
+    [SIFONET_GAME],
+    { status: 500, body: { message: "boom" } },
+  );
+  assert.equal(other.fatal, true);
 });
 
 test("PJ>1 plantilla averages do not append a game row", () => {

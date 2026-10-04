@@ -7,8 +7,10 @@
  * is still ahead, and a second run the same week cannot advance an empty jornada.
  *
  * 1) Ingest per-game box scores (msstats via Chrome). Plantilla PJ>1 averages
- *    are not enough — if ingest fails or a played fixture has no box score,
- *    do not score or advance (fail-closed).
+ *    are not box scores. Sunday 23:59 still scores the open jornada from the
+ *    real rows already in player-stats.json and opens the next one when ingest
+ *    fails or a tracked club side has no box (those players stay DNP).
+ *    Saturday does not close while a later game in the week is still ahead.
  * 2) Refresh fixtures.json from FCBQ calendars via Chrome CDP (no Edu cookie);
  *    optional FCBQ_COOKIE / --from-api still supported as fallbacks.
  *    A fixtures fetch failure also skips score/advance (lock still updates).
@@ -266,7 +268,7 @@ async function main() {
   if (dryRun) {
     log("dry-run — skip live box-score ingest");
   } else if (skipRefresh) {
-    log("skip box-score ingest (--skip-refresh) — will not score/advance");
+    log("skip box-score ingest (--skip-refresh)");
   } else {
     log("fetch-fcbq-boxscores-browser");
     try {
@@ -277,7 +279,7 @@ async function main() {
       }
     } catch (err) {
       ingestOk = false;
-      log(`stats ingest FAIL: ${err.message} — will not score/advance`);
+      log(`stats ingest FAIL: ${err.message}`);
     }
   }
 
@@ -332,10 +334,12 @@ async function main() {
     return;
   }
 
-  let hardFail = !ingestOk || !fixturesOk;
+  // A failed box ingest must not block Sunday's close. It still fails the
+  // run when this pass does not score (Saturday, or Sunday with the week open).
+  let hardFail = !fixturesOk || (!ingestOk && !decision.advance);
   let scoreApplied = false;
 
-  if (!skipScore && ingestOk) {
+  if (!skipScore && (ingestOk || decision.advance)) {
     const assigned = applyAssignments(stats, decision.assignments);
     if (assigned > 0) saveStats(stats);
     log(`assigned ${assigned} game row(s) (this club week / already-tagged fixtures only)`);

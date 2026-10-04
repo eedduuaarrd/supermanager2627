@@ -194,6 +194,103 @@ export function mergeTeamLogs(existing, teamLogs) {
   };
 }
 
+/**
+ * msstats answers HTTP 405 + error 1002021 when a player's own log is
+ * restricted ("Les estadístiques del jugador/a han estat restringides").
+ * The team roster still publishes that player's totals.
+ */
+export function isRestrictedPlayerStats(status, body) {
+  if (status !== 405 || !body || typeof body !== "object") return false;
+  if (String(body.error) === "1002021") return true;
+  return typeof body.message === "string" && /restringid/i.test(body.message);
+}
+
+/**
+ * One real game from a restricted player's published roster totals.
+ * Season totals are that game only when gamesPlayed is 1 and the team
+ * calendar identifies it (minutesByGame key, or the only team game).
+ * More than one game cannot be split without inventing a box, so this
+ * returns nothing.
+ */
+export function gameLogFromRestrictedRoster(person, teamGames) {
+  if (person?.gamesPlayed !== 1) return [];
+  const totals = person?.totals;
+  const acc = totals?.accumulated;
+  const computed = totals?.computed;
+  if (!acc || typeof acc !== "object" || !computed || typeof computed !== "object") {
+    return [];
+  }
+  const minutes = person?.minutesByGame;
+  const keys =
+    minutes && typeof minutes === "object" && !Array.isArray(minutes)
+      ? Object.keys(minutes)
+      : [];
+  const games = Array.isArray(teamGames) ? teamGames : [];
+  let game = null;
+  if (keys.length === 1) {
+    const gameNumber = Number(keys[0]);
+    if (!Number.isFinite(gameNumber)) return [];
+    game = games.find((g) => g?.gameNumber === gameNumber) ?? null;
+    const listed = minutes[keys[0]];
+    if (
+      game &&
+      typeof computed.seconds === "number" &&
+      typeof listed === "number" &&
+      computed.seconds !== listed
+    ) {
+      return [];
+    }
+  } else if (keys.length === 0 && games.length === 1) {
+    game = games[0];
+  }
+  if (!game || typeof game.date !== "string" || !game.date) return [];
+  return [
+    {
+      gameNumber: game.gameNumber ?? null,
+      matchCallUuid: game.matchCallUuid ?? null,
+      matchDayNum: game.matchDayNum ?? null,
+      date: game.date,
+      home: typeof game.home === "boolean" ? game.home : null,
+      played: true,
+      opponent: game.opponent ?? null,
+      teamPoints: game.teamPoints ?? null,
+      opponentPoints: game.opponentPoints ?? null,
+      result: game.result ?? null,
+      accumulated: { ...acc },
+      computed: {
+        seconds: typeof computed.seconds === "number" ? computed.seconds : null,
+        onCourtPlusMinus:
+          typeof computed.onCourtPlusMinus === "number"
+            ? computed.onCourtPlusMinus
+            : null,
+        ftPer: typeof computed.ftPer === "number" ? computed.ftPer : null,
+      },
+    },
+  ];
+}
+
+/**
+ * Player log to merge. A restricted personal URL is not fatal: use the
+ * published single-game roster box, or skip when that box cannot be
+ * attributed to one game. Any other HTTP failure stays fatal.
+ */
+export function resolvePlayerLog(person, teamGames, result) {
+  if (result?.status === 200) {
+    const games = Array.isArray(result.games) ? result.games : [];
+    return {
+      games,
+      gamesPlayed:
+        typeof person?.gamesPlayed === "number" ? person.gamesPlayed : games.length,
+    };
+  }
+  if (isRestrictedPlayerStats(result?.status, result?.body)) {
+    const games = gameLogFromRestrictedRoster(person, teamGames);
+    if (!games.length) return { skip: true, reason: "restricted-no-split" };
+    return { games, gamesPlayed: games.length };
+  }
+  return { fatal: true };
+}
+
 /** Players whose stored rows don't cover the published gamesPlayed. */
 export function coverageGaps(statsPlayers, expectations) {
   const gaps = [];
