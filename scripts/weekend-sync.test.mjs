@@ -15,7 +15,15 @@ import {
   madridDay,
   madridWeek,
   shouldUpdateMarketPrices,
+  weekendSyncShouldFail,
 } from "./fcbq-weekend-guard.mjs";
+import {
+  CALENDAR_FETCH_TIMEOUT_MS,
+  CALENDAR_PAGE_TIMEOUT_MS,
+  CALENDAR_SECURITY_TIMEOUT_MS,
+  calendarWaitDecision,
+  isFederationSecurityPage,
+} from "./fetch-fcbq-fixtures.mjs";
 import {
   computeMarketPrice,
   nextMarketEntry,
@@ -448,17 +456,19 @@ test("a club side with no fantasy players does not block the week", () => {
   assert.equal(decision.missing.length, 0);
 });
 
-test("a failed fixtures refresh never advances, including Sunday", () => {
+test("a failed fixtures refresh does not advance before Sunday", () => {
   const stats = {
     players: { "marc-escoda": { games: [game({ round: 2, jornada: 2 })] } },
   };
   const fixtures = clubFile();
+  fixtures.teams[1].fixtures[0].date = "2026-10-03";
+  fixtures.teams[1].fixtures[0].tipOff = "2026-10-03T12:00:00+02:00";
   fixtures.teams[1].fixtures[0].result = "L";
   const fixturesFail = decideWeekendAdvance({
     round: 2,
     fixturesFile: fixtures,
     stats,
-    now: SUN,
+    now: SAT,
     ingestOk: false,
     fixturesOk: false,
   });
@@ -474,6 +484,129 @@ test("a failed fixtures refresh never advances, including Sunday", () => {
   });
   assert.equal(saturdayIngest.advance, false);
   assert.notEqual(saturdayIngest.reason, "ok");
+});
+
+test("Sunday does not close while a later fixture is still ahead", () => {
+  const fixtures = clubFile();
+  fixtures.teams[1].fixtures[0].date = "2026-10-05";
+  fixtures.teams[1].fixtures[0].tipOff = "2026-10-05T12:00:00+02:00";
+  fixtures.teams[1].fixtures[0].result = null;
+  const decision = decideWeekendAdvance({
+    round: 2,
+    fixturesFile: fixtures,
+    stats: {
+      players: { "marc-escoda": { games: [game({ round: 2, jornada: 2 })] } },
+    },
+    now: SUN,
+    ingestOk: false,
+    fixturesOk: false,
+  });
+  assert.equal(decision.advance, false);
+  assert.equal(decision.reason, "week-still-open");
+});
+
+test("Sunday still advances when the public msstats JWT is missing", () => {
+  const fixtures = clubFile();
+  fixtures.teams[1].fixtures[0].result = null;
+  const stats = {
+    players: {
+      "marc-escoda": {
+        teamId: "masc-a",
+        games: [game({ date: "2026-10-03", round: null, jornada: null, pts: 11 })],
+      },
+      "jana-alarcon": {
+        teamId: "fem-b",
+        games: [game({ date: "2026-09-27", teamId: "fem-b", round: 1, jornada: 1, pts: 4 })],
+      },
+    },
+  };
+  const before = JSON.parse(JSON.stringify(stats));
+  // fetch-fcbq-boxscores-browser.mjs throws this and exits 1.
+  const jwtMiss = "No s'ha obtingut el JWT públic de msstats";
+  assert.match(jwtMiss, /JWT públic de msstats/);
+  const decision = decideWeekendAdvance({
+    round: 2,
+    fixturesFile: fixtures,
+    stats,
+    now: SUN,
+    ingestOk: false,
+    fixturesOk: true,
+  });
+  assert.equal(decision.advance, true, decision.reason);
+  assert.equal(decision.reason, "ok");
+  assert.equal(applyAssignments(stats, decision.assignments), 1);
+  assert.equal(stats.players["marc-escoda"].games[0].pts, 11);
+  assert.equal(stats.players["jana-alarcon"].games.length, before.players["jana-alarcon"].games.length);
+  assert.equal(stats.players["jana-alarcon"].games[0].jornada, 1);
+  assert.equal(
+    idealRoundToLock({
+      isSunday: true,
+      currentRound: 2,
+      advance: decision.advance,
+      reason: decision.reason,
+    }),
+    2,
+  );
+});
+
+test("Sunday still advances when the calendar hits the security check or times out", () => {
+  const fixtures = clubFile();
+  fixtures.teams[1].fixtures[0].result = null;
+  const stats = {
+    players: {
+      "marc-escoda": {
+        teamId: "masc-a",
+        games: [game({ date: "2026-10-03", round: null, jornada: null, pts: 9 })],
+      },
+      "jana-alarcon": {
+        teamId: "fem-b",
+        games: [game({ date: "2026-09-27", teamId: "fem-b", round: 1, jornada: 1, pts: 4 })],
+      },
+    },
+  };
+  const beforeJana = JSON.parse(JSON.stringify(stats.players["jana-alarcon"].games));
+  const security = decideWeekendAdvance({
+    round: 2,
+    fixturesFile: fixtures,
+    stats,
+    now: SUN,
+    ingestOk: false,
+    fixturesOk: false,
+  });
+  assert.equal(security.advance, true, security.reason);
+  assert.equal(security.reason, "ok");
+  assert.notEqual(security.reason, "fixtures-refresh-failed");
+  assert.deepEqual(
+    security.missing.map((m) => m.teamId),
+    ["fem-b"],
+  );
+  assert.equal(security.assignments.length, 1);
+  assert.equal(security.assignments[0].playerId, "marc-escoda");
+  assert.equal(applyAssignments(stats, security.assignments), 1);
+  assert.equal(stats.players["marc-escoda"].games[0].jornada, 2);
+  assert.equal(stats.players["marc-escoda"].games[0].pts, 9);
+  assert.deepEqual(stats.players["jana-alarcon"].games, beforeJana);
+
+  const again = decideWeekendAdvance({
+    round: 3,
+    fixturesFile: fixtures,
+    stats,
+    now: SUN,
+    scoredWeekKey: security.week.key,
+    ingestOk: false,
+    fixturesOk: false,
+  });
+  assert.equal(again.advance, false);
+  assert.equal(again.reason, "already-scored-this-week");
+  assert.equal(
+    idealRoundToLock({
+      isSunday: true,
+      currentRound: 3,
+      advance: again.advance,
+      reason: again.reason,
+    }),
+    2,
+  );
 });
 
 const SIFONET = "c057eeae-3aae-4e33-b2ab-54fabb2700ae";
@@ -704,6 +837,145 @@ test("coverage fails closed when a published game is missing from the log", () =
   assert.equal(gaps.length, 1);
   assert.equal(gaps[0].stored, 1);
   assert.equal(gaps[0].gamesPlayed, 2);
+});
+
+const SECURITY_TITLE = "Verificació de seguretat · Bàsquet Català";
+
+test("calendar security page and timeout give up inside a bounded wait", () => {
+  assert.equal(CALENDAR_SECURITY_TIMEOUT_MS, 15_000);
+  assert.equal(CALENDAR_FETCH_TIMEOUT_MS, 90_000);
+  assert.ok(CALENDAR_SECURITY_TIMEOUT_MS < 90_000);
+  assert.ok(CALENDAR_PAGE_TIMEOUT_MS < 90_000);
+  assert.equal(isFederationSecurityPage({ title: SECURITY_TITLE }), true);
+  assert.equal(
+    isFederationSecurityPage({
+      title: "Calendari",
+      body: "CONFIRMA QUE ETS UNA PERSONA",
+    }),
+    true,
+  );
+  assert.equal(
+    isFederationSecurityPage({ title: "Federació Catalana de Bàsquet", body: "Hora" }),
+    false,
+  );
+
+  assert.equal(
+    calendarWaitDecision({ elapsedMs: 0, title: SECURITY_TITLE }),
+    "wait",
+  );
+  assert.equal(
+    calendarWaitDecision({
+      elapsedMs: CALENDAR_SECURITY_TIMEOUT_MS - 1,
+      title: SECURITY_TITLE,
+    }),
+    "wait",
+  );
+  assert.equal(
+    calendarWaitDecision({
+      elapsedMs: CALENDAR_SECURITY_TIMEOUT_MS,
+      title: SECURITY_TITLE,
+    }),
+    "security",
+  );
+  // The old loop was still waiting at 90s on this exact title.
+  assert.equal(
+    calendarWaitDecision({ elapsedMs: 90_000, title: SECURITY_TITLE }),
+    "security",
+  );
+  assert.notEqual(
+    calendarWaitDecision({ elapsedMs: 90_000, title: SECURITY_TITLE }),
+    "wait",
+  );
+
+  assert.equal(
+    calendarWaitDecision({
+      elapsedMs: CALENDAR_PAGE_TIMEOUT_MS,
+      title: "Calendari",
+      body: "",
+    }),
+    "timeout",
+  );
+  assert.equal(
+    calendarWaitDecision({
+      elapsedMs: CALENDAR_PAGE_TIMEOUT_MS - 1,
+      title: "Calendari",
+    }),
+    "wait",
+  );
+  assert.equal(
+    calendarWaitDecision({
+      elapsedMs: 1_000,
+      title: "Calendari",
+      hasHora: true,
+    }),
+    "ok",
+  );
+});
+
+test("Sunday close is not a failed run when ingest and the calendar both failed", () => {
+  assert.equal(
+    weekendSyncShouldFail({
+      fixturesOk: false,
+      ingestOk: false,
+      advance: true,
+      reason: "ok",
+    }),
+    false,
+  );
+  assert.equal(
+    weekendSyncShouldFail({
+      fixturesOk: true,
+      ingestOk: false,
+      advance: true,
+      reason: "ok",
+    }),
+    false,
+  );
+  assert.equal(
+    weekendSyncShouldFail({
+      fixturesOk: false,
+      ingestOk: false,
+      advance: false,
+      reason: "already-scored-this-week",
+    }),
+    false,
+  );
+  assert.equal(
+    weekendSyncShouldFail({
+      fixturesOk: false,
+      ingestOk: true,
+      advance: false,
+      reason: "fixtures-refresh-failed",
+    }),
+    true,
+  );
+  assert.equal(
+    weekendSyncShouldFail({
+      fixturesOk: true,
+      ingestOk: false,
+      advance: false,
+      reason: "week-still-open",
+    }),
+    true,
+  );
+  assert.equal(
+    weekendSyncShouldFail({
+      fixturesOk: true,
+      ingestOk: true,
+      advance: false,
+      reason: "week-still-open",
+    }),
+    false,
+  );
+  assert.equal(
+    weekendSyncShouldFail({
+      fixturesOk: true,
+      ingestOk: true,
+      advance: false,
+      reason: "missing-box-scores",
+    }),
+    true,
+  );
 });
 
 test("Sunday close ticks stored prices even when ingest failed", () => {

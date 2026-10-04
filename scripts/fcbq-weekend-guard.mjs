@@ -3,10 +3,12 @@
  *
  * A fantasy jornada is one Madrid club week (Mon–Sun), not one calendar day.
  * The Sat and Sun 23:59 timers may both run; only one of them may close+advance.
- * Saturday does not close while a later fixture in the week is still ahead.
+ * Saturday does not close while a later fixture in the week is still ahead,
+ * and a failed calendar refresh on Saturday does not advance.
  * Sunday scores the open jornada from real box rows already stored and opens
- * the next one even when ingest failed or a tracked club side has no box
- * (those players stay DNP). It does not invent stats or results.
+ * the next one even when the public msstats JWT is missing, ingest failed,
+ * or the calendar hit the federation security check / timed out. Players
+ * with no stored row stay DNP. It does not invent stats or results.
  */
 
 export function madridDay(date = new Date()) {
@@ -220,11 +222,15 @@ export function decideWeekendAdvance({
   const base = { week, assignments, missing: [] };
   const sundayClose = isMadridSunday(now);
 
-  if (!fixturesOk) {
-    return { advance: false, reason: "fixtures-refresh-failed", ...base };
-  }
+  // A second pass the same week must not advance again, even when this run's
+  // calendar fetch failed. That reason is also what locks the ideal team.
   if (scoredWeekKey && scoredWeekKey === week.key) {
     return { advance: false, reason: "already-scored-this-week", ...base };
+  }
+  // Saturday keeps a failed refresh as a hard stop: the file on disk may be
+  // missing a later game. Sunday 23:59 scores the rows already stored.
+  if (!fixturesOk && !sundayClose) {
+    return { advance: false, reason: "fixtures-refresh-failed", ...base };
   }
 
   const club = fixturesForClubWeek(fixturesFile, round, week);
@@ -305,4 +311,23 @@ export function shouldUpdateMarketPrices({
   if (skipPrices) return false;
   if (ingestOk) return true;
   return isSunday;
+}
+
+/**
+ * Whether weekend-sync should exit 1.
+ * Sunday exits 0 after it scores from stored games, even when ingest failed
+ * or the calendar hit the security check / timed out. A second run that is
+ * already scored is not a failure. Saturday still fails closed on a bad
+ * ingest, a bad calendar, or a missing box.
+ */
+export function weekendSyncShouldFail({
+  fixturesOk = true,
+  ingestOk = true,
+  advance = false,
+  reason = "",
+} = {}) {
+  if (reason === "missing-box-scores") return true;
+  if (advance) return false;
+  if (reason === "already-scored-this-week") return false;
+  return !fixturesOk || !ingestOk;
 }
