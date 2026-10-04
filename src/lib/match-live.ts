@@ -1,13 +1,16 @@
 /**
- * When one Balaguer club game finishes, score the fantasy players who
- * have a real box score for that game.
- * Tip-off after match_live_since: score and push once.
- * Tip-off before that clock: if the jornada is open and both scores plus
- * at least one real VAL exist, score once and do not push. If the data
- * is not ready, wait and retry — do not store a skip that blocks scoring.
+ * When a club game finishes, score the fantasy players who have a real
+ * box score for that game. The minute poll does this as the result lands,
+ * not in the Sunday 23:59 batch.
+ * A result push goes out once per finished match, from jornada 3 onward,
+ * for every club side. Jornada 1 and 2 are scored when the box is real and
+ * never notified, including games that finish after match_live_since.
+ * No backfill: a tip-off before that clock is scored without a push.
+ * An untagged game in the open jornada's Madrid week counts as that
+ * jornada, so a Saturday finish does not wait for the 23:59 tag.
+ * Missing score, jornada, or standout waits — nothing is invented.
  * A row already marked skipped is scored once when the box exists, still
- * without a push. Ideal-team pushes are untouched. The minute poll also
- * runs the jornada-start notifier.
+ * without a push. Ideal-team and jornada-start pushes are untouched.
  */
 import { CAPTAIN_MULTIPLIER, getPlayer } from "@/data/roster";
 import { getCurrentRound, getDb } from "@/lib/db";
@@ -31,6 +34,9 @@ import fs from "node:fs";
 import path from "node:path";
 
 const BASELINE_KEY = "match_live_since";
+
+/** First fantasy jornada that gets a result push. Earlier jornadas never notify. */
+export const MATCH_PUSH_FROM_JORNADA = 3;
 
 const SIDE_NAME: Record<TeamId, string> = {
   "masc-a": "Teixidó",
@@ -163,8 +169,8 @@ function boxVal(box: MatchBox): { val: number; minutes: number } | null {
 
 function sameGame(box: MatchBox, teamId: string, fixture: ClubFixture): boolean {
   if (box.teamId !== teamId) return false;
-  if (fixture.matchCallUuid && box.matchCallUuid === fixture.matchCallUuid) {
-    return true;
+  if (fixture.matchCallUuid && box.matchCallUuid) {
+    return box.matchCallUuid === fixture.matchCallUuid;
   }
   const day = fixture.date?.slice(0, 10) ?? "";
   const boxDay = box.date?.slice(0, 10) ?? "";
@@ -194,11 +200,45 @@ function openRoundForFixture(
 }
 
 /**
+ * Jornada this match would notify for.
+ * An explicit tag wins. An untagged game counts as the open jornada only
+ * when it falls in that Madrid week — the same rule live scoring uses.
+ * Otherwise null. Never invent a number.
+ */
+export function jornadaForMatchPush(
+  fixture: ClubFixture,
+  currentRound: number,
+  roundStatus: "open" | "closed",
+  now: Date,
+): number | null {
+  if (typeof fixture.jornada === "number" && Number.isFinite(fixture.jornada)) {
+    return fixture.jornada;
+  }
+  return openRoundForFixture(fixture, currentRound, roundStatus, now);
+}
+
+/**
+ * Push only from jornada 3, and only for a tip-off at or after the
+ * match-live clock. Jornada 1, jornada 2, an unknown jornada, and any
+ * earlier tip-off stay silent.
+ */
+export function matchEndMayPush(
+  jornada: number | null,
+  tipOffMs: number,
+  baselineMs: number,
+): boolean {
+  if (jornada == null || jornada < MATCH_PUSH_FROM_JORNADA) return false;
+  if (tipOffMs < baselineMs) return false;
+  return true;
+}
+
+/**
  * Decide what to do with each club fixture.
  * No score numbers and no player VAL are invented: missing data waits.
- * A tip-off before `baselineMs` is scored without a push when the open
- * jornada already has both scores and a real VAL. It is never stored as
- * a skip. A later tip-off is scored and pushed.
+ * Jornada 1 and 2, and any tip-off before `baselineMs`, are scored without
+ * a push when the open jornada already has both scores and a real VAL.
+ * They are never stored as a skip. From jornada 3, a later tip-off is
+ * scored and pushed once the standout is a real box-score VAL.
  */
 export function planClubMatches(input: {
   fixtures: FixturesFile;
@@ -249,7 +289,13 @@ export function planClubMatches(input: {
         val: p.val,
         minutes: p.minutes,
       }));
-      if (tipOffMs < input.baselineMs) {
+      const pushJornada = jornadaForMatchPush(
+        fixture,
+        input.currentRound,
+        input.roundStatus,
+        input.now,
+      );
+      if (!matchEndMayPush(pushJornada, tipOffMs, input.baselineMs)) {
         if (round == null) {
           plans.push({ key, action: "wait", tipOffMs, round: null, players: [] });
           continue;
@@ -533,8 +579,8 @@ export type MatchLiveResult = {
 
 /**
  * Seal the first-run clock. Score a finished open-jornada game once.
- * Push only when the tip-off is at or after that clock. Injectable `send`
- * avoids the network.
+ * Push once when the match is jornada 3 or later and the tip-off is at or
+ * after that clock. Injectable `send` avoids the network.
  */
 export async function runMatchLive(opts?: {
   now?: Date;
