@@ -16,7 +16,8 @@
     "test:weekend-sync": "node --test scripts/weekend-sync.test.mjs",
     "test:ideal-team": "npx --yes tsx scripts/test-ideal-team.ts",
     "test:push": "npx --yes tsx scripts/test-push.ts",
-    "test:match-live": "npx --yes tsx scripts/test-match-live.ts"
+    "test:match-live": "npx --yes tsx scripts/test-match-live.ts",
+    "test:equip-court": "npx --yes tsx scripts/test-equip-court.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

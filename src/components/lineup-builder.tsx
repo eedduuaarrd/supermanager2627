@@ -6,10 +6,12 @@ import type { SaveStatus } from "@/components/manager-provider";
 import { Button } from "@/components/ui/button";
 import {
   formatPrice,
+  getPlayer,
   LINEUP_SIZE,
   LINEUP_SLOTS,
   POSITION_LABEL,
 } from "@/data/roster";
+import { formatCourtPoints } from "@/lib/equip-court";
 import {
   countByPosition,
   issueMessage,
@@ -35,13 +37,19 @@ interface LineupBuilderProps {
   /** Tip-off / jornada lock — court becomes read-only. */
   readOnly?: boolean;
   lockMessage?: string | null;
-  /** Fantasy VAL from a club game that has already finished. */
+  /**
+   * `points`: raw jornada number, or "-" when that player has no score.
+   * `price`: quote only (editable window, and the next jornada after Sunday close).
+   */
+  caption?: "price" | "points";
+  /** Raw VAL by player id. Used only when `caption` is `points`. */
   playedVals?: Record<string, number>;
-}
-
-function formatLiveVal(points: number): string {
-  const rounded = Math.round(points * 10) / 10;
-  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+  /**
+   * When set, the court shows this squad instead of the editable lineup
+   * (a past jornada). Edits stay disabled and the lock banner stays hidden.
+   */
+  courtPlayerIds?: string[];
+  courtCaptainId?: string | null;
 }
 
 function softHint(
@@ -86,8 +94,13 @@ export function LineupBuilder({
   error,
   readOnly = false,
   lockMessage = null,
+  caption = "price",
   playedVals,
+  courtPlayerIds,
+  courtCaptainId = null,
 }: LineupBuilderProps) {
+  const historyView = courtPlayerIds != null;
+  const editsLocked = readOnly || historyView;
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pickerSlot, setPickerSlot] = useState<null | {
     slotIndex: number;
@@ -126,9 +139,11 @@ export function LineupBuilder({
   const feedback = saveFeedback(saveStatus, error);
   const hint = softHint(filled, Boolean(lineup.captainId), counts);
 
-  const selectedPlayers = lineup.playerIds
-    .map((id) => roster.find((p) => p.id === id))
-    .filter(Boolean) as Player[];
+  const displayIds = courtPlayerIds ?? lineup.playerIds;
+  const displayCaptainId = historyView ? courtCaptainId : lineup.captainId;
+  const selectedPlayers = displayIds
+    .map((id) => roster.find((p) => p.id === id) ?? getPlayer(id))
+    .filter((p): p is Player => Boolean(p));
 
   const selectedPlayer =
     selectedPlayers.find((p) => p.id === selectedId) ?? null;
@@ -144,7 +159,7 @@ export function LineupBuilder({
   }
 
   function removePlayer(id: string) {
-    if (readOnly) return;
+    if (editsLocked) return;
     const playerIds = lineup.playerIds.filter((x) => x !== id);
     let captainId = lineup.captainId;
     if (captainId === id) captainId = null;
@@ -153,7 +168,7 @@ export function LineupBuilder({
   }
 
   function addPlayer(id: string, position: Position) {
-    if (readOnly) return;
+    if (editsLocked) return;
     if (lineup.playerIds.includes(id)) return;
     if (lineup.playerIds.length >= LINEUP_SIZE) return;
     const player = roster.find((p) => p.id === id);
@@ -166,7 +181,7 @@ export function LineupBuilder({
   }
 
   function setCaptain(id: string) {
-    if (readOnly) return;
+    if (editsLocked) return;
     onChange({
       ...lineup,
       captainId: id,
@@ -176,7 +191,7 @@ export function LineupBuilder({
   }
 
   function handleEmptySlot(slot: { slotIndex: number; position: Position }) {
-    if (readOnly) return;
+    if (editsLocked) return;
     setSelectedId(null);
     setPickerSlot(slot);
   }
@@ -189,7 +204,7 @@ export function LineupBuilder({
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-2">
-      {readOnly ? (
+      {readOnly && !historyView ? (
         <div className="shrink-0 px-0.5 py-1 text-sm text-amber-100/90">
           {lockMessage ??
             "Finestra de transferències tancada. Només lectura fins diumenge 23:59 (Madrid)."}
@@ -226,13 +241,13 @@ export function LineupBuilder({
       <section className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <CourtBoard
           players={selectedPlayers}
-          captainId={lineup.captainId}
+          captainId={displayCaptainId}
           selectedId={selectedId}
           onSelect={setSelectedId}
-          onEmptySlot={handleEmptySlot}
+          onEmptySlot={editsLocked ? undefined : handleEmptySlot}
           fillHeight
-          jornadaPointsById={playedVals}
-          jornadaOnlyKnown
+          caption={caption}
+          jornadaPointsById={caption === "points" ? (playedVals ?? {}) : undefined}
         />
       </section>
 
@@ -262,7 +277,7 @@ export function LineupBuilder({
         </div>
       )}
 
-      {!readOnly && (
+      {!editsLocked && (
         <MarketSheet
           open={pickerSlot != null}
           position={pickerSlot?.position ?? null}
@@ -299,12 +314,16 @@ export function LineupBuilder({
                   {selectedPlayer.name}
                 </p>
                 <p className="text-xs text-mute">
-                  {playedVals && selectedPlayer.id in playedVals
-                    ? `VAL ${formatLiveVal(playedVals[selectedPlayer.id])} · Veure fitxa`
+                  {caption === "points"
+                    ? `${
+                        playedVals && selectedPlayer.id in playedVals
+                          ? formatCourtPoints(playedVals[selectedPlayer.id])
+                          : "-"
+                      } · Veure fitxa`
                     : `VAL ${selectedPlayer.avgVal} · Veure fitxa`}
                 </p>
               </Link>
-              {!readOnly && (
+              {!editsLocked && (
                 <>
                   <Button
                     type="button"
