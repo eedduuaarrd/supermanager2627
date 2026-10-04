@@ -344,7 +344,8 @@ async function main() {
       return 1;
     },
   });
-  assert.deepEqual(sent, []);
+  // A copy: strict deepEqual would narrow `sent` to `never[]` and reject later pushes.
+  assert.deepEqual(sent.slice(), []);
   assert.equal(second.scoredTeams, 1);
   assert.equal(sent.length, 0);
   assert.equal(
