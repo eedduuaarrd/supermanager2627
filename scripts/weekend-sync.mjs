@@ -386,6 +386,7 @@ async function main() {
       const ideal = await postAdmin("ideal", { round: idealTarget });
       if (ideal.stored) {
         log(`ideal team J${idealTarget} stored`);
+        if (ideal.push) log(`ideal push ${JSON.stringify(ideal.push)}`);
       } else {
         log(
           `ideal team unchanged: ${ideal.reason} for J${idealTarget} (keeping J${ideal.keptRound ?? "none"})`,

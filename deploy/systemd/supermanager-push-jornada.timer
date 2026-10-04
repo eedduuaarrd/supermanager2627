@@ -1,0 +1,13 @@
+[Unit]
+Description=Check jornada kickoff push every minute (Europe/Madrid)
+
+[Timer]
+# Fires at the first real tip-off of the open jornada. A 20-minute grace
+# in the API covers a missed minute; jornadas already started are skipped.
+OnCalendar=*-*-* *:0/1:00 Europe/Madrid
+AccuracySec=15s
+Persistent=true
+Unit=supermanager-push-jornada.service
+
+[Install]
+WantedBy=timers.target

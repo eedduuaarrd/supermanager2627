@@ -1,5 +1,6 @@
 "use client";
 
+import { PushOptIn } from "@/components/push-opt-in";
 import { useManager } from "@/components/manager-provider";
 import { TeamManager } from "@/components/team-manager";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,8 @@ export default function ComptePage() {
       </section>
 
       <TeamManager />
+
+      <PushOptIn />
 
       <section className="border border-line bg-panel/80 px-4 py-3">
         <p className="text-[10px] uppercase tracking-[0.18em] text-mute">
