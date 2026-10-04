@@ -124,22 +124,41 @@ const APP_VIEWPORT_SCRIPT = `(function(){
     var vv = window.visualViewport;
     var visible = vv && vv.height > 0 ? vv.height : window.innerHeight;
     if (!(visible > 0)) return;
-    var dynamic = probe(
-      "position:fixed;left:0;top:0;height:100dvh;width:0;visibility:hidden;pointer-events:none;",
-      function(el){ return el.getBoundingClientRect().height; }
-    );
     var safeTop = probe(
       "position:fixed;visibility:hidden;padding-top:env(safe-area-inset-top);",
       function(el){ return px(el, "padding-top"); }
     );
-    // iOS standalone: the first visualViewport is short by the status bar
-    // (safe-area-inset-top, ~47–59px), then it grows into 100dvh. 100dvh is
-    // already the full screen on that first frame. The Safari toolbar gap is
-    // larger (~70px+); adopting it would make the shell taller than the
-    // visible page and clip Equip again. A keyboard shrink is larger still.
-    var limit = safeTop > 0 ? safeTop + 2 : 62;
+    // On this iPhone visualViewport stays short by the status bar (~47px)
+    // and a fixed 100dvh box is clamped to that same viewport, so comparing
+    // those two never grows the shell. innerHeight and screen.height include
+    // the status bar. Accept a taller candidate only when the extra height is
+    // that inset. A Safari toolbar or the keyboard is larger; using it would
+    // push Equip below the visible page.
+    var limit = safeTop > 0 ? safeTop + 4 : 62;
+    var screenH = window.screen && window.screen.height;
+    var dpr = window.devicePixelRatio || 1;
+    if (screenH > 1400 && dpr > 1) screenH = screenH / dpr;
+    var phone = window.matchMedia("(max-width: 520px)").matches;
+    var candidates = [
+      visible,
+      window.innerHeight,
+      probe(
+        "position:fixed;left:0;top:0;height:100dvh;width:0;visibility:hidden;pointer-events:none;",
+        function(el){ return el.getBoundingClientRect().height; }
+      ),
+      probe(
+        "position:absolute;left:0;top:0;height:100lvh;width:0;visibility:hidden;pointer-events:none;",
+        function(el){ return el.getBoundingClientRect().height; }
+      )
+    ];
+    // screen.height is the whole phone. On a desktop it is the monitor, so
+    // only consider it when the window is phone-sized.
+    if (phone && screenH > 0 && screenH < 1400) candidates.push(screenH);
     var height = visible;
-    if (dynamic > visible && dynamic - visible <= limit) height = dynamic;
+    for (var i = 0; i < candidates.length; i++) {
+      var candidate = candidates[i];
+      if (candidate > height && candidate - visible <= limit) height = candidate;
+    }
     document.documentElement.style.setProperty("--app-height", height + "px");
     document.documentElement.style.setProperty("--app-top", "0px");
   }

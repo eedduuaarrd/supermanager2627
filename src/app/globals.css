@@ -176,17 +176,8 @@ body.h-app {
     linear-gradient(180deg, rgb(92 69 48 / 12%) 0%, transparent 100%);
 }
 
-.hub-fade {
-  animation: hub-fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.hub-fade-delay {
-  animation: hub-fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
-}
-
-.hub-fade-late {
-  animation: hub-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
-}
+/* No entrance transform or opacity layer. iOS clips the Oswald "2" to the
+   composited border box, so the round number stays cut off like a Z. */
 
 .hub-badge {
   animation: hub-badge-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
@@ -204,19 +195,6 @@ body.h-app {
   filter: brightness(1.08);
 }
 
-.hub-rank {
-  animation: hub-fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
-}
-
-@keyframes hub-fade-up {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 @keyframes hub-badge-in {
   from {
     opacity: 0;
@@ -229,11 +207,7 @@ body.h-app {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hub-fade,
-  .hub-fade-delay,
-  .hub-fade-late,
-  .hub-badge,
-  .hub-rank {
+  .hub-badge {
     animation: none !important;
   }
   .hub-cta:active {
