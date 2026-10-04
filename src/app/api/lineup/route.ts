@@ -6,7 +6,7 @@ import {
   isLineupLocked,
 } from "@/lib/fixtures";
 import { getLineupLockAt, getRoundStatus } from "@/lib/rounds";
-import { playedValsForTeam } from "@/lib/match-live";
+import { inProgressCourtPointsForTeam } from "@/lib/match-live";
 import { ensureLineupRow, saveLineup } from "@/lib/scoring";
 import {
   ensureActiveTeamId,
@@ -106,6 +106,7 @@ export async function GET() {
   const round = getCurrentRound();
   const lock = lockState();
   const row = ensureLineupRow(teamId, round);
+  const lineup = lineupPayload(row);
   const transfer = transferPayload(teamId, row, lock);
   return NextResponse.json({
     round,
@@ -116,8 +117,8 @@ export async function GET() {
     transfer,
     budget: row.budget ?? INITIAL_BUDGET,
     teamId,
-    lineup: lineupPayload(row),
-    playedVals: playedValsForTeam(teamId, round),
+    lineup,
+    playedVals: inProgressCourtPointsForTeam(teamId, round, lineup.playerIds),
   });
 }
 

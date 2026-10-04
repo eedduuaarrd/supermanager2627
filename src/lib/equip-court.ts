@@ -3,7 +3,7 @@ import { CAPTAIN_MULTIPLIER, resolvePlayerId } from "@/data/roster";
 /**
  * What the Equip court prints under a player.
  * - `price`: quote only (lineup still editable, including the next jornada after Sunday close)
- * - `points`: raw jornada VAL, or "-" when that player has no score (not yet played, or DNP)
+ * - `points`: jornada number; captain is raw VAL ×2; "-" until that match ends; 0 if it ended and they did not play
  * - `ideal`: Equip ideal popup — "VAL n" / "VAL —", unchanged
  */
 export type CourtCaptionMode = "price" | "points" | "ideal";
@@ -18,8 +18,21 @@ export type PastCourtView = {
   round: number;
   playerIds: string[];
   captainId: string | null;
-  /** Raw VAL for players who actually played. Omitted ids render as "-". */
+  /**
+   * Number under each player. Captain is raw VAL ×2. Everyone else is raw VAL.
+   * 0 means the match is over and they did not play, or the valuation really was 0.
+   * Omitted ids render as "-".
+   */
   pointsById: Record<string, number>;
+};
+
+/** A club match that can decide "-" versus 0 for players who are not in the score list. */
+export type CourtMatchSheet = {
+  teamId: string;
+  jornada: number | null;
+  finished: boolean;
+  /** Empty when the result is in but the box sheet has not arrived. */
+  boxPlayerIds: string[];
 };
 
 type ScoreLike = {
@@ -39,25 +52,124 @@ export function formatCourtPoints(points: number): string {
   return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
 }
 
-/** Plain jornada number. Missing, DNP, and non-finite values are a single "-". */
+/** Plain jornada number. No score yet is "-". A stored 0 stays "0". */
 export function pointsCaptionText(points: number | null | undefined): string {
   if (typeof points !== "number" || !Number.isFinite(points)) return "-";
   return formatCourtPoints(points);
 }
 
 /**
- * Unmultiplied fantasy VAL. Captain ×2 lives on `points` and in the team total only.
- * DNP is null so the chip can show "-", not 0.
+ * Number printed under a player on the locked court and on a past jornada.
+ * Captain is raw VAL ×2, the same figure already stored on `points` and in the
+ * jornada total. Everyone else is raw VAL. A finished DNP is 0, including the
+ * captain. No score row at all is null ("-" until the match ends).
+ * Legacy rows without `val` use `points`, which is already doubled for the captain.
  */
-export function rawCourtVal(
+export function courtPlayerPoints(
   score: ScoreLike | undefined,
   isCaptain: boolean,
 ): number | null {
-  if (!score || score.dnp) return null;
-  if (typeof score.val === "number" && Number.isFinite(score.val)) return score.val;
+  if (!score) return null;
+  if (score.dnp) return 0;
+  if (typeof score.val === "number" && Number.isFinite(score.val)) {
+    if (isCaptain && CAPTAIN_MULTIPLIER > 0) return score.val * CAPTAIN_MULTIPLIER;
+    return score.val;
+  }
   if (typeof score.points !== "number" || !Number.isFinite(score.points)) return null;
-  if (isCaptain && CAPTAIN_MULTIPLIER > 0) return score.points / CAPTAIN_MULTIPLIER;
   return score.points;
+}
+
+function finiteScore(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function sameMatch(
+  box: { teamId: string; matchCallUuid?: string | null; date?: string | null },
+  teamId: string,
+  fixture: { matchCallUuid?: string | null; date?: string | null },
+): boolean {
+  if (box.teamId !== teamId) return false;
+  if (fixture.matchCallUuid && box.matchCallUuid === fixture.matchCallUuid) return true;
+  const day = fixture.date?.slice(0, 10) ?? "";
+  const boxDay = box.date?.slice(0, 10) ?? "";
+  return Boolean(day && boxDay && day === boxDay);
+}
+
+/** Club matches for one fantasy round, with the players who appear on each box sheet. */
+export function buildCourtMatchSheets(input: {
+  round: number;
+  teams: {
+    teamId: string;
+    fixtures: {
+      jornada?: number | null;
+      teamPoints?: number | null;
+      opponentPoints?: number | null;
+      matchCallUuid?: string | null;
+      date?: string | null;
+    }[];
+  }[];
+  boxes: {
+    playerId: string;
+    teamId: string;
+    matchCallUuid?: string | null;
+    date?: string | null;
+  }[];
+}): CourtMatchSheet[] {
+  const sheets: CourtMatchSheet[] = [];
+  for (const team of input.teams) {
+    for (const fixture of team.fixtures) {
+      if (fixture.jornada !== input.round) continue;
+      const boxPlayerIds = input.boxes
+        .filter((box) => sameMatch(box, team.teamId, fixture))
+        .map((box) => box.playerId);
+      sheets.push({
+        teamId: team.teamId,
+        jornada: fixture.jornada ?? null,
+        finished:
+          finiteScore(fixture.teamPoints) && finiteScore(fixture.opponentPoints),
+        boxPlayerIds,
+      });
+    }
+  }
+  return sheets;
+}
+
+/**
+ * Numbers for the locked, still-open court.
+ * A valuation (including a real 0) wins. Otherwise 0 only when that player's
+ * match has a result and a box sheet that does not include them. Everyone
+ * else stays off the map so the chip can show "-".
+ */
+export function pointsForInProgressCourt(input: {
+  round: number;
+  playerIds: string[];
+  scores: ScoreLike[];
+  captainId?: string | null;
+  teamOf: (playerId: string) => string | null;
+  matches: CourtMatchSheet[];
+}): Record<string, number> {
+  const captainId = input.captainId ? canon(input.captainId) : null;
+  const out: Record<string, number> = {};
+  for (const score of input.scores) {
+    const id = canon(score.playerId);
+    const raw = courtPlayerPoints(score, captainId != null && id === captainId);
+    if (raw == null) continue;
+    out[id] = raw;
+  }
+  for (const playerId of input.playerIds) {
+    const id = canon(playerId);
+    if (id in out) continue;
+    const teamId = input.teamOf(id);
+    if (!teamId) continue;
+    const matches = input.matches.filter(
+      (match) => match.teamId === teamId && match.jornada === input.round && match.finished,
+    );
+    const withSheet = matches.filter((match) => match.boxPlayerIds.length > 0);
+    if (withSheet.length === 0) continue;
+    const appeared = withSheet.some((match) => match.boxPlayerIds.includes(id));
+    if (!appeared) out[id] = 0;
+  }
+  return out;
 }
 
 export function courtChipCaption(input: {
@@ -94,6 +206,31 @@ export function toggleHistoryRound(
   return selected === round ? null : round;
 }
 
+/**
+ * While the jornada is locked and still open, its chip is highlighted with no tap.
+ * A tapped past chip is the only other highlight. Tapping the current chip
+ * returns to that live court instead of opening a second copy.
+ */
+export function historyChipActive(input: {
+  round: number;
+  selectedRound: number | null;
+  currentRound: number;
+  inProgress: boolean;
+}): boolean {
+  if (input.selectedRound != null) return input.selectedRound === input.round;
+  return input.inProgress && input.round === input.currentRound;
+}
+
+export function nextHistorySelection(input: {
+  selectedRound: number | null;
+  tappedRound: number;
+  currentRound: number;
+  inProgress: boolean;
+}): number | null {
+  if (input.inProgress && input.tappedRound === input.currentRound) return null;
+  return toggleHistoryRound(input.selectedRound, input.tappedRound);
+}
+
 export function pastCourtFromHistory(row: {
   round: number;
   captainId: string | null;
@@ -107,7 +244,7 @@ export function pastCourtFromHistory(row: {
   const pointsById: Record<string, number> = {};
   for (const score of row.scores) {
     const id = canon(score.playerId);
-    const raw = rawCourtVal(score, captainId != null && id === captainId);
+    const raw = courtPlayerPoints(score, captainId != null && id === captainId);
     if (raw == null) continue;
     pointsById[id] = raw;
   }
