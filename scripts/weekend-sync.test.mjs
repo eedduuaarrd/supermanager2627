@@ -14,7 +14,13 @@ import {
   isMadridSunday,
   madridDay,
   madridWeek,
+  shouldUpdateMarketPrices,
 } from "./fcbq-weekend-guard.mjs";
+import {
+  computeMarketPrice,
+  nextMarketEntry,
+  shouldTickPrice,
+} from "./compute-market-price.mjs";
 
 const MASC = "5f55017e-893e-4323-8b41-b58323ea8f73";
 const FEMB = "a5c75f3f-ca35-4553-9eb6-a29780eb2007";
@@ -698,4 +704,62 @@ test("coverage fails closed when a published game is missing from the log", () =
   assert.equal(gaps.length, 1);
   assert.equal(gaps[0].stored, 1);
   assert.equal(gaps[0].gamesPlayed, 2);
+});
+
+test("Sunday close ticks stored prices even when ingest failed", () => {
+  assert.equal(
+    shouldUpdateMarketPrices({ ingestOk: false, isSunday: true }),
+    true,
+  );
+  assert.equal(
+    shouldUpdateMarketPrices({ ingestOk: true, isSunday: false }),
+    true,
+  );
+  assert.equal(
+    shouldUpdateMarketPrices({ ingestOk: false, isSunday: false }),
+    false,
+  );
+  assert.equal(
+    shouldUpdateMarketPrices({
+      skipPrices: true,
+      ingestOk: false,
+      isSunday: true,
+    }),
+    false,
+  );
+});
+
+test("a new stored game moves that price and a missing box does not", () => {
+  const kept = (current, gamesPlayed, avgVal) => {
+    if (!shouldTickPrice(current, gamesPlayed)) return { ...current };
+    return nextMarketEntry(avgVal, current, "2026-10-04T21:59:00Z", gamesPlayed);
+  };
+
+  const prev = { price: 10000, prevPrice: 10000, pricedGames: 1 };
+  assert.equal(shouldTickPrice(prev, 2), true);
+  assert.equal(shouldTickPrice(prev, 1), false);
+  assert.equal(shouldTickPrice(prev, 0), false);
+
+  const grown = kept(prev, 2, 20);
+  assert.equal(grown.price, computeMarketPrice(20, 10000));
+  assert.equal(grown.price, 11500);
+  assert.equal(grown.prevPrice, 10000);
+  assert.equal(grown.pricedGames, 2);
+  assert.ok(grown.price >= 500);
+  assert.equal(grown.price % 500, 0);
+
+  // Same game count would jump another ±15% if the tick ran again.
+  assert.notEqual(nextMarketEntry(20, grown, "2026-10-04T22:00:00Z", 2).price, 11500);
+  const retick = kept(grown, 2, 20);
+  assert.equal(retick.price, 11500);
+  assert.equal(retick.prevPrice, 10000);
+  assert.equal(retick.pricedGames, 2);
+
+  const quiet = kept(
+    { price: 10000, prevPrice: 10000, pricedGames: 1 },
+    1,
+    99,
+  );
+  assert.equal(quiet.price, 10000);
+  assert.equal(quiet.pricedGames, 1);
 });

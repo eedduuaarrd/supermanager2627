@@ -290,3 +290,19 @@ export function idealRoundToLock({
   }
   return null;
 }
+
+/**
+ * Whether this weekend run should call update-market-prices.
+ * Sunday ticks from games already stored, even when ingest failed.
+ * Saturday still waits for a successful ingest. The price script keeps
+ * the anti-retick: a player only moves when their scored-game count grew.
+ */
+export function shouldUpdateMarketPrices({
+  skipPrices = false,
+  ingestOk = false,
+  isSunday = false,
+} = {}) {
+  if (skipPrices) return false;
+  if (ingestOk) return true;
+  return isSunday;
+}

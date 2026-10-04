@@ -18,7 +18,9 @@
  * 4) Assign this week's untagged game rows; score + open next via ADMIN API
  *    only when the guard allows it
  *    (opening next jornada resets transfer snapshots + canvis counters)
- * 5) Tick broker market prices after a successful ingest (anti-retick if no new games)
+ * 5) Tick broker prices from real stored games (anti-retick if the scored-game
+ *    count did not grow). Sunday does this even when ingest failed, so one
+ *    missing box does not freeze everyone else. Saturday still waits for ingest.
  * 6) Recompute lineup_lock_at from fixtures tip-offs (null if none published)
  *    Transfer window: Sun 23:59 Madrid → first tip-off; max 3 canvis per team
  * 7) Sunday only: persist the ideal lineup for the jornada this run locks in.
@@ -53,6 +55,7 @@ import {
   decideWeekendAdvance,
   idealRoundToLock,
   isMadridSunday,
+  shouldUpdateMarketPrices,
 } from "./fcbq-weekend-guard.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -402,11 +405,22 @@ async function main() {
     }
   }
 
-  // Broker tick when ingest succeeded: ±15% only if scored-game count grew.
-  // Writes src/data/market-prices.json; app reads it at runtime (no rebuild).
-  if (!skipPrices && ingestOk) {
+  // Prices come from games already in player-stats.json. Sunday ticks even
+  // when ingest failed. The script skips anyone whose scored-game count
+  // did not grow. Writes market-prices.json; the app reads it at runtime.
+  if (
+    shouldUpdateMarketPrices({
+      skipPrices,
+      ingestOk,
+      isSunday: sunday,
+    })
+  ) {
     try {
-      log("update-market-prices (normal tick, anti-retick)");
+      log(
+        ingestOk
+          ? "update-market-prices (normal tick, anti-retick)"
+          : "update-market-prices (stored games, anti-retick)",
+      );
       runNode("scripts/update-market-prices.mjs");
     } catch (err) {
       hardFail = true;
