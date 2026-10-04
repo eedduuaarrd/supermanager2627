@@ -9,9 +9,9 @@
  *   /v1/fcbq/players/{person}/teams/{team}/stats
  *
  * Writes `ingest.ok` + `ingest.at` on the stats file. A player whose personal
- * log is restricted (HTTP 405, error 1002021) still contributes the single
- * game published on the team roster. Sunday close can score stored boxes
- * even when this ingest fails.
+ * log is restricted (HTTP 405, error 1002021) is ignored. The rest of that
+ * side still comes from each player's own game log. Sunday close can score
+ * stored boxes even when this ingest fails.
  *
  * Usage:
  *   node scripts/fetch-fcbq-boxscores-browser.mjs
@@ -210,7 +210,6 @@ async function fetchTeamLogs(authorization) {
     try {
       const body = await msGet(`${MS}/teams/${team.fcbqTeamId}/stats`, authorization);
       const roster = Array.isArray(body?.roster) ? body.roster : [];
-      const teamGames = Array.isArray(body?.games) ? body.games : [];
       const players = [];
       for (const person of roster) {
         if (!person?.uuid || !person?.name) continue;
@@ -219,12 +218,12 @@ async function fetchTeamLogs(authorization) {
         let resolved;
         try {
           const log = await msGet(url, authorization);
-          resolved = resolvePlayerLog(person, teamGames, {
+          resolved = resolvePlayerLog(person, {
             status: 200,
             games: Array.isArray(log?.games) ? log.games : [],
           });
         } catch (err) {
-          resolved = resolvePlayerLog(person, teamGames, {
+          resolved = resolvePlayerLog(person, {
             status: err.status,
             body: err.body,
           });
@@ -232,7 +231,7 @@ async function fetchTeamLogs(authorization) {
         }
         if (resolved.skip) {
           console.warn(
-            `restricted player stats, no single published game: ${team.shortName} ${person.name}`,
+            `restricted player stats, ignored: ${team.shortName} ${person.name}`,
           );
           continue;
         }
@@ -321,10 +320,10 @@ async function main() {
   const merged = mergeTeamLogs(existing, teamLogs);
   const gaps = coverageGaps(merged.players, merged.expectations);
   // Team-season 404 is "no published stats", not a scrape outage. A restricted
-  // personal log (HTTP 405) is handled per player above. Other HTTP failures
-  // still fail this ingest. Weekend scoring only requires box scores for club
-  // sides that actually have fantasy players, and Sunday close does not wait
-  // on a failed ingest.
+  // personal log (HTTP 405) is ignored; it does not fail the side. Other HTTP
+  // failures still fail this ingest. Weekend scoring only requires box scores
+  // for club sides that actually have fantasy players, and Sunday close does
+  // not wait on a failed ingest.
   const unavailable = errors.filter((e) => /HTTP 404/.test(e));
   const fatal = errors.filter((e) => !/HTTP 404/.test(e));
   const ok =
