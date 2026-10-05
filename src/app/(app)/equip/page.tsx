@@ -98,6 +98,11 @@ function EquipContent() {
           playedVals={court.pointsById}
           courtPlayerIds={past ? court.playerIds : undefined}
           courtCaptainId={past ? court.captainId : undefined}
+          snapshotIds={transfer?.snapshotIds ?? []}
+          transferUnlimited={Boolean(transfer?.unlimited)}
+          maxChanges={transfer?.maxChanges ?? null}
+          removalsRemaining={transfer?.removalsRemaining ?? null}
+          maxRemovals={transfer?.maxRemovals ?? null}
         />
       </div>
     </div>

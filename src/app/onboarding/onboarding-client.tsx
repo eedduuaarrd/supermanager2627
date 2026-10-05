@@ -37,7 +37,7 @@ export function OnboardingClient() {
         <li>Toca + a la pista (només la posició d&apos;aquell slot)</li>
         <li>
           Equip nou: canvis il·limitats fins al tip-off; després, màxim 3 canvis
-          per jornada
+          i 3 baixes per jornada
         </li>
       </ul>
       <Button

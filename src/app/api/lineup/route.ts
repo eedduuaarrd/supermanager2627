@@ -19,6 +19,7 @@ import { parsePlayerIds } from "@/lib/game";
 import {
   buildTransferState,
   maxChangesExceededCa,
+  maxRemovalsExceededCa,
   parseSnapshotIds,
 } from "@/lib/transfers";
 
@@ -171,7 +172,9 @@ export async function PUT(req: Request) {
 
   const result = saveLineup(teamId, playerIds, captainId);
   if (!result.ok) {
-    const isLimit = result.error === maxChangesExceededCa();
+    const isLimit =
+      result.error === maxChangesExceededCa() ||
+      result.error === maxRemovalsExceededCa();
     return NextResponse.json(
       { error: result.error },
       { status: isLimit ? 403 : 400 },
