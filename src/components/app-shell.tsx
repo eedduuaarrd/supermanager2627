@@ -89,8 +89,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               <li key={href}>
                 <Link
                   href={href}
+                  aria-label={label}
+                  aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex h-full min-h-11 flex-col items-center justify-center gap-0.5 px-1 text-[10px] uppercase tracking-[0.12em] transition-colors",
+                    "flex h-full min-h-11 items-center justify-center px-1 transition-colors",
                     "touch-manipulation",
                     active
                       ? "text-grana-bright"
@@ -98,10 +100,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                   )}
                 >
                   <Icon
-                    className={cn("size-5 shrink-0", active && "stroke-[2.25]")}
+                    className={cn("size-6 shrink-0", active && "stroke-[2.25]")}
                     aria-hidden
                   />
-                  <span className="max-w-full truncate">{label}</span>
+                  <span className="sr-only">{label}</span>
                 </Link>
               </li>
             );
