@@ -3,7 +3,6 @@
 import { PlayerAvatar } from "@/components/player-avatar";
 import {
   formatPrice,
-  POSITION_LABEL,
   TEAM_ORDER,
   TEAMS,
   teamLabel,
@@ -37,6 +36,13 @@ const TEAM_CHIP: Record<TeamId, string> = {
   "masc-b": "Sifonet B",
   "fem-a": "Cudós A",
   "fem-b": "Farratges B",
+};
+
+/** Full Catalan position names — never B / A / P letters on this page. */
+const POS_LABEL: Record<Position, string> = {
+  B: "Base",
+  A: "Alero",
+  P: "Pivot",
 };
 
 const POSITIONS: Position[] = ["B", "A", "P"];
@@ -74,7 +80,7 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
             Jugadors
           </h1>
           <p className="mt-1 text-sm text-mute">
-            Mercat del club · compara per preu i Mitj. VAL
+            Mercat del club · compara per preu i mitjana
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -162,8 +168,7 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
                 key={p}
                 active={pos === p}
                 onClick={() => setPos(p)}
-                label={p}
-                title={POSITION_LABEL[p]}
+                label={POS_LABEL[p]}
               />
             ))}
           </div>
@@ -186,7 +191,7 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
           </button>
         ) : (
           <p className="text-[10px] uppercase tracking-[0.12em] text-mute/70">
-            VAL · PJ · Últ
+            Mitj. · PJ · Últ
           </p>
         )}
       </div>
@@ -228,16 +233,14 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
                   <p className="mt-0.5 truncate text-[11px] text-mute">
                     {teamLabel(p.teamId)}
                     <span className="text-mute/50"> · </span>
-                    <span title={POSITION_LABEL[p.position]}>
-                      {p.position}
-                    </span>
+                    <span>{POS_LABEL[p.position]}</span>
                   </p>
                   <dl className="mt-1.5 flex items-baseline gap-3 text-[11px] tabular-nums">
                     <div className="flex items-baseline gap-1">
                       <dt className="text-[9px] uppercase tracking-[0.12em] text-mute/80">
-                        VAL
+                        Mitj.
                       </dt>
-                      <dd className="font-semibold text-grana-bright">
+                      <dd className="font-semibold text-bone">
                         {fmtVal(p.avgVal)}
                       </dd>
                     </div>
@@ -328,21 +331,18 @@ function PosSeg({
   active,
   onClick,
   label,
-  title,
 }: {
   active: boolean;
   onClick: () => void;
   label: string;
-  title?: string;
 }) {
   return (
     <button
       type="button"
-      title={title}
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "flex h-9 items-center justify-center text-[11px] font-semibold uppercase tracking-[0.12em] transition-colors touch-manipulation",
+        "flex h-9 items-center justify-center px-1 text-[10px] font-semibold uppercase tracking-[0.08em] transition-colors touch-manipulation",
         "border-r border-line last:border-r-0",
         active
           ? "bg-grana/20 text-bone"
