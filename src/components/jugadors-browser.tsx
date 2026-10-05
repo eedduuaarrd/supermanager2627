@@ -17,11 +17,31 @@ import { useMemo, useState } from "react";
 
 type TeamFilter = "all" | TeamId;
 type PosFilter = "all" | Position;
-type PriceSort = "desc" | "asc";
+/** What to order the list by — never the broker € delta. */
+type SortKey = "price" | "avgVal" | "lastVal";
+type SortDir = "desc" | "asc";
+
+const SORT_KEYS: { key: SortKey; label: string }[] = [
+  { key: "price", label: "Preu" },
+  { key: "avgVal", label: "Mitjana" },
+  { key: "lastVal", label: "Última" },
+];
 
 function fmtVal(n: number | null): string {
   if (n == null || Number.isNaN(n)) return "—";
   return Number.isInteger(n) ? String(n) : n.toFixed(1);
+}
+
+/** Null / missing VAL sorts after real numbers (both directions). */
+function compareNullableNum(
+  a: number | null,
+  b: number | null,
+  dir: SortDir,
+): number {
+  if (a == null && b == null) return 0;
+  if (a == null) return 1;
+  if (b == null) return -1;
+  return dir === "desc" ? b - a : a - b;
 }
 
 /** Broker € delta only — never the full quote (avoids “↑ 11.500 €” confusion). */
@@ -50,7 +70,8 @@ const POSITIONS: Position[] = ["B", "A", "P"];
 export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
   const [team, setTeam] = useState<TeamFilter>("all");
   const [pos, setPos] = useState<PosFilter>("all");
-  const [sort, setSort] = useState<PriceSort>("desc");
+  const [sortKey, setSortKey] = useState<SortKey>("price");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   const filtersActive = team !== "all" || pos !== "all";
 
@@ -60,12 +81,19 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
     if (pos !== "all") list = list.filter((p) => p.position === pos);
     const copy = [...list];
     copy.sort((a, b) => {
-      const delta = sort === "desc" ? b.price - a.price : a.price - b.price;
+      let delta = 0;
+      if (sortKey === "price") {
+        delta = sortDir === "desc" ? b.price - a.price : a.price - b.price;
+      } else if (sortKey === "avgVal") {
+        delta = compareNullableNum(a.avgVal, b.avgVal, sortDir);
+      } else {
+        delta = compareNullableNum(a.lastVal, b.lastVal, sortDir);
+      }
       if (delta !== 0) return delta;
       return a.name.localeCompare(b.name, "ca");
     });
     return copy;
-  }, [players, team, pos, sort]);
+  }, [players, team, pos, sortKey, sortDir]);
 
   function clearFilters() {
     setTeam("all");
@@ -83,41 +111,66 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
             Mercat del club · compara per preu i mitjana
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="space-y-1.5">
           <span className="text-[10px] uppercase tracking-[0.14em] text-mute">
             Ordena
           </span>
-          <div
-            className="inline-flex border border-line bg-panel/50"
-            role="group"
-            aria-label="Ordenació per preu"
-          >
-            <button
-              type="button"
-              aria-pressed={sort === "desc"}
-              onClick={() => setSort("desc")}
-              className={cn(
-                "h-9 px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors touch-manipulation",
-                sort === "desc"
-                  ? "bg-grana text-bone"
-                  : "text-mute hover:bg-white/[0.04] hover:text-bone",
-              )}
+          <div className="flex flex-wrap items-center gap-2">
+            <div
+              className="inline-flex border border-line bg-panel/50"
+              role="group"
+              aria-label="Criteri d'ordenació"
             >
-              Preu més alt
-            </button>
-            <button
-              type="button"
-              aria-pressed={sort === "asc"}
-              onClick={() => setSort("asc")}
-              className={cn(
-                "h-9 border-l border-line px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors touch-manipulation",
-                sort === "asc"
-                  ? "bg-grana text-bone"
-                  : "text-mute hover:bg-white/[0.04] hover:text-bone",
-              )}
+              {SORT_KEYS.map(({ key, label }, i) => (
+                <button
+                  key={key}
+                  type="button"
+                  aria-pressed={sortKey === key}
+                  onClick={() => setSortKey(key)}
+                  className={cn(
+                    "h-9 px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors touch-manipulation",
+                    i > 0 && "border-l border-line",
+                    sortKey === key
+                      ? "bg-grana text-bone"
+                      : "text-mute hover:bg-white/[0.04] hover:text-bone",
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div
+              className="inline-flex border border-line bg-panel/50"
+              role="group"
+              aria-label="Direcció d'ordenació"
             >
-              Preu més baix
-            </button>
+              <button
+                type="button"
+                aria-pressed={sortDir === "desc"}
+                onClick={() => setSortDir("desc")}
+                className={cn(
+                  "h-9 px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors touch-manipulation",
+                  sortDir === "desc"
+                    ? "bg-grana text-bone"
+                    : "text-mute hover:bg-white/[0.04] hover:text-bone",
+                )}
+              >
+                Més alt
+              </button>
+              <button
+                type="button"
+                aria-pressed={sortDir === "asc"}
+                onClick={() => setSortDir("asc")}
+                className={cn(
+                  "h-9 border-l border-line px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors touch-manipulation",
+                  sortDir === "asc"
+                    ? "bg-grana text-bone"
+                    : "text-mute hover:bg-white/[0.04] hover:text-bone",
+                )}
+              >
+                Més baix
+              </button>
+            </div>
           </div>
         </div>
       </header>
