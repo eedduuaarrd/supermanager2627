@@ -1,17 +1,18 @@
 "use client";
 
 import { PlayerAvatar } from "@/components/player-avatar";
-import { PriceLabel } from "@/components/price-label";
 import {
+  formatPrice,
   POSITION_LABEL,
   TEAM_ORDER,
   TEAMS,
   teamLabel,
 } from "@/data/roster";
 import type { JugadorListItem } from "@/lib/jugadors-list";
+import { priceDelta } from "@/lib/market-price";
 import type { Position, TeamId } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { ArrowDown, ArrowUp, X } from "lucide-react";
+import { X } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -22,6 +23,12 @@ type PriceSort = "desc" | "asc";
 function fmtVal(n: number | null): string {
   if (n == null || Number.isNaN(n)) return "—";
   return Number.isInteger(n) ? String(n) : n.toFixed(1);
+}
+
+/** Broker € delta only — never the full quote (avoids “↑ 11.500 €” confusion). */
+function fmtDelta(delta: number): string {
+  const abs = formatPrice(Math.abs(delta));
+  return delta > 0 ? `+${abs}` : `−${abs}`;
 }
 
 /** Shorter chip labels — full name stays in the row. */
@@ -61,36 +68,52 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
 
   return (
     <div className="flex flex-col gap-4 pb-5">
-      <header className="space-y-1">
-        <div className="flex items-end justify-between gap-3">
+      <header className="space-y-2">
+        <div>
           <h1 className="font-display text-3xl tracking-wide text-bone">
             Jugadors
           </h1>
-          <button
-            type="button"
-            onClick={() => setSort((s) => (s === "desc" ? "asc" : "desc"))}
-            className={cn(
-              "inline-flex h-9 shrink-0 items-center gap-1.5 border border-line px-2.5",
-              "text-[11px] font-semibold uppercase tracking-[0.14em] text-bone",
-              "transition-colors hover:border-bone/40 hover:bg-white/[0.04] touch-manipulation",
-            )}
-            aria-label={
-              sort === "desc"
-                ? "Ordenat de més car a més barat. Canvia a més barat primer."
-                : "Ordenat de més barat a més car. Canvia a més car primer."
-            }
-          >
-            Preu
-            {sort === "desc" ? (
-              <ArrowDown className="size-3.5 text-grana-bright" aria-hidden />
-            ) : (
-              <ArrowUp className="size-3.5 text-grana-bright" aria-hidden />
-            )}
-          </button>
+          <p className="mt-1 text-sm text-mute">
+            Mercat del club · compara per preu i Mitj. VAL
+          </p>
         </div>
-        <p className="text-sm text-mute">
-          Mercat del club · compara per preu i Mitj. VAL
-        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] uppercase tracking-[0.14em] text-mute">
+            Ordena
+          </span>
+          <div
+            className="inline-flex border border-line bg-panel/50"
+            role="group"
+            aria-label="Ordenació per preu"
+          >
+            <button
+              type="button"
+              aria-pressed={sort === "desc"}
+              onClick={() => setSort("desc")}
+              className={cn(
+                "h-9 px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors touch-manipulation",
+                sort === "desc"
+                  ? "bg-grana text-bone"
+                  : "text-mute hover:bg-white/[0.04] hover:text-bone",
+              )}
+            >
+              Preu més alt
+            </button>
+            <button
+              type="button"
+              aria-pressed={sort === "asc"}
+              onClick={() => setSort("asc")}
+              className={cn(
+                "h-9 border-l border-line px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors touch-manipulation",
+                sort === "asc"
+                  ? "bg-grana text-bone"
+                  : "text-mute hover:bg-white/[0.04] hover:text-bone",
+              )}
+            >
+              Preu més baix
+            </button>
+          </div>
+        </div>
       </header>
 
       <div className="space-y-3" role="search" aria-label="Filtres de jugadors">
@@ -233,17 +256,40 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
                   </dl>
                 </div>
 
-                <div className="shrink-0 self-center text-right">
-                  <PriceLabel
-                    price={p.price}
-                    prevPrice={p.prevPrice}
-                    className="font-display text-lg font-normal tracking-wide"
-                  />
-                </div>
+                <MarketQuote price={p.price} prevPrice={p.prevPrice} />
               </Link>
             </li>
           ))}
         </ul>
+      )}
+    </div>
+  );
+}
+
+function MarketQuote({
+  price,
+  prevPrice,
+}: {
+  price: number;
+  prevPrice: number | null;
+}) {
+  const delta = priceDelta(price, prevPrice);
+
+  return (
+    <div className="shrink-0 self-center text-right">
+      <p className="font-display text-lg tabular-nums tracking-wide text-bone">
+        {formatPrice(price)}
+      </p>
+      {delta != null && (
+        <p
+          className={cn(
+            "mt-0.5 text-[11px] tabular-nums",
+            delta > 0 ? "text-emerald-400" : "text-red-400",
+          )}
+          title="Variació vs cotització anterior"
+        >
+          {fmtDelta(delta)}
+        </p>
       )}
     </div>
   );
