@@ -9,6 +9,7 @@ import {
   Home,
   Trophy,
   UserRound,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -18,6 +19,7 @@ const NAV = [
   { href: "/jornada", label: "Inici", icon: Home },
   { href: "/equip", label: "Equip", icon: ClipboardList },
   { href: "/classificacio", label: "Classificació", icon: Trophy },
+  { href: "/jugadors", label: "Jugadors", icon: Users },
   { href: "/compte", label: "Compte", icon: UserRound },
 ] as const;
 
@@ -73,7 +75,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         <ul
           className={cn(
-            "mx-auto grid h-[3.75rem] min-h-[3.75rem] grid-cols-4",
+            "mx-auto grid h-[3.75rem] min-h-[3.75rem] grid-cols-5",
             "max-w-lg md:max-w-xl",
             isEquip && "lg:max-w-2xl xl:max-w-3xl",
           )}
