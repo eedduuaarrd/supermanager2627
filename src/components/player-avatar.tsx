@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 /** 1–2 uppercase initials from a player name (first + last word). */
@@ -33,42 +33,17 @@ const SIZE = {
 const INITIALS_SURFACE =
   "bg-[linear-gradient(145deg,var(--panel-2)_0%,var(--ink-soft)_52%,color-mix(in_srgb,var(--grana)_42%,var(--ink))_100%)] text-bone ring-1 ring-white/14 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]";
 
-export function PlayerAvatar({
+function InitialsFallback({
   name,
-  photoUrl,
-  size = "md",
+  letters,
+  dim,
   className,
 }: {
   name: string;
-  photoUrl?: string | null;
-  size?: "sm" | "md" | "lg";
+  letters: string;
+  dim: string;
   className?: string;
 }) {
-  const [broken, setBroken] = useState(false);
-  const dim = SIZE[size];
-  const letters = playerInitials(name);
-  const src = photoUrl?.trim() || null;
-
-  useEffect(() => {
-    setBroken(false);
-  }, [src]);
-
-  if (src && !broken) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={src}
-        alt={name}
-        onError={() => setBroken(true)}
-        className={cn(
-          "shrink-0 rounded-full object-cover object-top ring-1 ring-white/15",
-          dim,
-          className,
-        )}
-      />
-    );
-  }
-
   return (
     <div
       role="img"
@@ -84,5 +59,62 @@ export function PlayerAvatar({
     >
       <span className="translate-y-[0.5px] select-none">{letters}</span>
     </div>
+  );
+}
+
+export function PlayerAvatar({
+  name,
+  photoUrl,
+  size = "md",
+  className,
+}: {
+  name: string;
+  photoUrl?: string | null;
+  size?: "sm" | "md" | "lg";
+  className?: string;
+}) {
+  const [broken, setBroken] = useState(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+  const dim = SIZE[size];
+  const letters = playerInitials(name);
+  const src = photoUrl?.trim() || null;
+
+  useEffect(() => {
+    setBroken(false);
+  }, [src]);
+
+  // Cached/failed loads can finish before React attaches onError.
+  useEffect(() => {
+    const img = imgRef.current;
+    if (!img || !src) return;
+    if (img.complete && img.naturalWidth === 0) {
+      setBroken(true);
+    }
+  }, [src, broken]);
+
+  if (!src || broken) {
+    return (
+      <InitialsFallback
+        name={name}
+        letters={letters}
+        dim={dim}
+        className={className}
+      />
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      ref={imgRef}
+      src={src}
+      alt={name}
+      onError={() => setBroken(true)}
+      className={cn(
+        "shrink-0 rounded-full object-cover object-top ring-1 ring-white/15",
+        dim,
+        className,
+      )}
+    />
   );
 }
