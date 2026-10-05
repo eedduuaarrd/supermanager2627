@@ -217,7 +217,7 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
           {filtered.map((p) => (
             <li key={p.id}>
               <Link
-                href={`/jugador/${encodeURIComponent(p.id)}`}
+                href={`/jugador/${encodeURIComponent(p.id)}?from=jugadors`}
                 className="group flex items-center gap-3 py-3 transition-colors active:bg-white/[0.04] hover:bg-white/[0.025] touch-manipulation"
               >
                 <PlayerAvatar
