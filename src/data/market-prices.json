@@ -86,6 +86,14 @@
       "updatedAt": "2026-09-29T16:02:59.185Z",
       "pricedGames": 1
     },
+    "xavier-blanch": {
+      "price": 9000,
+      "prevPrice": 9000,
+      "avgVal": 10,
+      "theoretical": 9000,
+      "updatedAt": "2026-10-04T22:57:03.000Z",
+      "pricedGames": 1
+    },
     "ares-bunol": {
       "price": 11500,
       "prevPrice": 10000,
