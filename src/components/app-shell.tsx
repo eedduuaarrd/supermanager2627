@@ -9,6 +9,7 @@ import {
   Home,
   Trophy,
   UserRound,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -18,6 +19,7 @@ const NAV = [
   { href: "/jornada", label: "Inici", icon: Home },
   { href: "/equip", label: "Equip", icon: ClipboardList },
   { href: "/classificacio", label: "Classificació", icon: Trophy },
+  { href: "/jugadors", label: "Jugadors", icon: Users },
   { href: "/compte", label: "Compte", icon: UserRound },
 ] as const;
 
@@ -73,7 +75,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         <ul
           className={cn(
-            "mx-auto grid h-[3.75rem] min-h-[3.75rem] grid-cols-4",
+            "mx-auto grid h-[3.75rem] min-h-[3.75rem] grid-cols-5",
             "max-w-lg md:max-w-xl",
             isEquip && "lg:max-w-2xl xl:max-w-3xl",
           )}
@@ -87,8 +89,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               <li key={href}>
                 <Link
                   href={href}
+                  aria-label={label}
+                  aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex h-full min-h-11 flex-col items-center justify-center gap-0.5 px-1 text-[10px] uppercase tracking-[0.12em] transition-colors",
+                    "flex h-full min-h-11 items-center justify-center px-1 transition-colors",
                     "touch-manipulation",
                     active
                       ? "text-grana-bright"
@@ -96,10 +100,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                   )}
                 >
                   <Icon
-                    className={cn("size-5 shrink-0", active && "stroke-[2.25]")}
+                    className={cn("size-6 shrink-0", active && "stroke-[2.25]")}
                     aria-hidden
                   />
-                  <span className="max-w-full truncate">{label}</span>
+                  <span className="sr-only">{label}</span>
                 </Link>
               </li>
             );
