@@ -225,6 +225,20 @@ export const ROSTER_SEED: Player[] = [
     teamIds: ["masc-a"],
     photoUrl: "/players/roger-companys.jpg",
   },
+  {
+    id: "xavier-blanch",
+    position: "A",
+    name: "Xavier Blanch Sirera",
+    number: 15,
+    pts: 11,
+    avgVal: avgFromVal(10),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "masc-a",
+    teamIds: ["masc-a"],
+    photoUrl: "/players/xavier-blanch.jpg",
+  },
   // —— Cudos Consultors CB Balaguer A (femení) ——
   {
     id: "ares-bunol",
@@ -587,7 +601,7 @@ export const CAPTAIN_MULTIPLIER = 2;
 export const WIN_BONUS = 0.2;
 
 /** GameState.version — bump when roster ids / dual-team / positions / pricing change. */
-export const GAME_VERSION = 12;
+export const GAME_VERSION = 13;
 
 export const OPPONENTS = [
   "CB Cervera",

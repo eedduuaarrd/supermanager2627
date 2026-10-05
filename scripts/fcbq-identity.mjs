@@ -20,6 +20,7 @@ export const BASE_IDS = {
   "BABACAR TOURE GASSAMA": "babacar-toure",
   "GERARD SOLDEVILA CASAS": "gerard-soldevila",
   "ROGER COMPANYS SOLA": "roger-companys",
+  "XAVIER BLANCH SIRERA": "xavier-blanch",
   "ARES BUNOL PERELLO": "ares-bunol",
   "JULIA PLA PLA": "julia-pla",
   "ANDREA PERAT GRACIA": "andrea-perat",
