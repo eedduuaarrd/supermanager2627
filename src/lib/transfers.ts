@@ -12,6 +12,10 @@
  *   buit amb un jugador nou = 1 canvi. Tornar a posar algú que ja era a
  *   l'instantània = 0.
  * - Màxim 3 canvis per equip fantasy i per jornada (fase `normal`).
+ * - Màxim 3 baixes per finestra: treure un jugador que SÍ era a l'instantània
+ *   compta com a 1 baixa quan l'instantània no és buida (equips existents).
+ *   Treure algú afegit després de l'instantània no consumeix baixa.
+ *   Instantània buida (equip nou) o fase `initial`: sense límit de baixes.
  *
  * Fase `initial` (equip nou):
  * - `fantasy_teams.transfer_phase = 'initial'` al crear l'equip.
@@ -41,6 +45,12 @@ export type TransferState = {
   changesUsed: number;
   changesRemaining: number;
   maxChanges: number;
+  /** Snapshot players no longer in the lineup (baixes). */
+  removalsUsed: number;
+  /** null when there is no removal cap (unlimited phase or empty snapshot). */
+  removalsRemaining: number | null;
+  /** null when there is no removal cap (unlimited phase or empty snapshot). */
+  maxRemovals: number | null;
   snapshotIds: string[];
   nextWindowAt: string | null;
   lockAt: string | null;
@@ -60,6 +70,72 @@ export function countChangesUsed(
     if (!snap.has(id)) n += 1;
   }
   return n;
+}
+
+/** Players that were in the snapshot and are no longer in the lineup. */
+export function countRemovalsFromSnapshot(
+  snapshotIds: string[],
+  currentIds: string[],
+): number {
+  const current = new Set(currentIds.filter(Boolean));
+  const seen = new Set<string>();
+  let n = 0;
+  for (const id of snapshotIds) {
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    if (!current.has(id)) n += 1;
+  }
+  return n;
+}
+
+/** Removal cap only applies to existing teams (non-empty snapshot). */
+export function transferLimitApplies(snapshotIds: string[]): boolean {
+  return snapshotIds.some(Boolean);
+}
+
+export function maxRemovalsExceededCa(max = MAX_TRANSFERS): string {
+  return `Has arribat al màxim de ${max} baixes d'aquesta finestra. Pots tornar a posar jugadors de l'instantània o treure jugadors afegits després.`;
+}
+
+/**
+ * Canvis (adds vs snapshot) + baixes (snapshot players removed).
+ * `unlimited` (fase `initial` amb finestra oberta) salta tots dos límits.
+ */
+export function validateTransferLimits(
+  snapshotIds: string[],
+  playerIds: string[],
+  max = MAX_TRANSFERS,
+  unlimited = false,
+): { ok: true } | { ok: false; error: string } {
+  if (unlimited) return { ok: true };
+  if (countChangesUsed(snapshotIds, playerIds) > max) {
+    return { ok: false, error: maxChangesExceededCa(max) };
+  }
+  if (
+    transferLimitApplies(snapshotIds) &&
+    countRemovalsFromSnapshot(snapshotIds, playerIds) > max
+  ) {
+    return { ok: false, error: maxRemovalsExceededCa(max) };
+  }
+  return { ok: true };
+}
+
+/** Whether removing `playerId` keeps baixes within the cap. */
+export function canRemoveSnapshotPlayer(
+  snapshotIds: string[],
+  currentIds: string[],
+  playerId: string,
+  max = MAX_TRANSFERS,
+  unlimited = false,
+): boolean {
+  if (unlimited) return true;
+  if (!transferLimitApplies(snapshotIds)) return true;
+  if (!snapshotIds.includes(playerId)) return true;
+  const after = countRemovalsFromSnapshot(
+    snapshotIds,
+    currentIds.filter((id) => id !== playerId),
+  );
+  return after <= max;
 }
 
 export function parseSnapshotIds(raw: string | null | undefined): string[] {
@@ -127,7 +203,7 @@ export function formatNextWindowCa(iso: string): string {
 }
 
 export function maxChangesExceededCa(max = MAX_TRANSFERS): string {
-  return `Has esgotat els ${max} canvis d'aquesta finestra. Només pots treure jugadors o tornar a posar els de l'instantània.`;
+  return `Has esgotat els ${max} canvis d'aquesta finestra. Només pots treure jugadors (màx. ${max} baixes de l'instantània) o tornar a posar els de l'instantània.`;
 }
 
 export function windowClosedMessageCa(
@@ -152,6 +228,12 @@ export function buildTransferState(opts: {
     opts.phase === "initial" ? "initial" : "normal";
   const unlimited = phase === "initial" && opts.windowOpen;
   const changesUsed = countChangesUsed(opts.snapshotIds, opts.currentIds);
+  const removalsUsed = countRemovalsFromSnapshot(
+    opts.snapshotIds,
+    opts.currentIds,
+  );
+  const removalCap = (isUnlimited: boolean) =>
+    !isUnlimited && transferLimitApplies(opts.snapshotIds);
   const maxChanges = unlimited ? Number.MAX_SAFE_INTEGER : MAX_TRANSFERS;
   const changesRemaining = unlimited
     ? Number.MAX_SAFE_INTEGER
@@ -164,6 +246,11 @@ export function buildTransferState(opts: {
       changesUsed,
       changesRemaining: Math.max(0, MAX_TRANSFERS - changesUsed),
       maxChanges: MAX_TRANSFERS,
+      removalsUsed,
+      removalsRemaining: removalCap(false)
+        ? Math.max(0, MAX_TRANSFERS - removalsUsed)
+        : null,
+      maxRemovals: removalCap(false) ? MAX_TRANSFERS : null,
       snapshotIds: opts.snapshotIds,
       nextWindowAt: nextSundayWindowOpenAt(),
       lockAt: opts.lockAt,
@@ -177,6 +264,11 @@ export function buildTransferState(opts: {
     changesUsed: unlimited ? 0 : changesUsed,
     changesRemaining,
     maxChanges,
+    removalsUsed: unlimited ? 0 : removalsUsed,
+    removalsRemaining: removalCap(unlimited)
+      ? Math.max(0, MAX_TRANSFERS - removalsUsed)
+      : null,
+    maxRemovals: removalCap(unlimited) ? MAX_TRANSFERS : null,
     snapshotIds: opts.snapshotIds,
     nextWindowAt: null,
     lockAt: opts.lockAt,

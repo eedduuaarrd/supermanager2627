@@ -19,6 +19,14 @@ import {
   validateLineup,
 } from "@/lib/game";
 import type { Lineup, Player, Position } from "@/lib/types";
+import {
+  MAX_TRANSFERS,
+  canRemoveSnapshotPlayer,
+  countChangesUsed,
+  countRemovalsFromSnapshot,
+  maxChangesExceededCa,
+  maxRemovalsExceededCa,
+} from "@/lib/transfers";
 import { AlertCircle, Crown, UserMinus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -48,6 +56,15 @@ interface LineupBuilderProps {
    */
   courtPlayerIds?: string[];
   courtCaptainId?: string | null;
+  /** Window snapshot ids (canvis / baixes baseline). */
+  snapshotIds?: string[];
+  /** `initial` phase with window open: no canvis / baixes caps. */
+  transferUnlimited?: boolean;
+  maxChanges?: number | null;
+  /** Server value; null when no removal cap applies. */
+  removalsRemaining?: number | null;
+  /** null when no removal cap applies (unlimited phase / empty snapshot). */
+  maxRemovals?: number | null;
 }
 
 function softHint(
@@ -95,6 +112,11 @@ export function LineupBuilder({
   playedVals,
   courtPlayerIds,
   courtCaptainId = null,
+  snapshotIds = [],
+  transferUnlimited = false,
+  maxChanges = null,
+  removalsRemaining = null,
+  maxRemovals = null,
 }: LineupBuilderProps) {
   const historyView = courtPlayerIds != null;
   const editsLocked = readOnly || historyView;
@@ -104,7 +126,24 @@ export function LineupBuilder({
     position: Position;
   }>(null);
 
+  const [localError, setLocalError] = useState<string | null>(null);
+
   const sheetOpen = selectedId != null && pickerSlot == null;
+  const changeCap = transferUnlimited ? null : (maxChanges ?? MAX_TRANSFERS);
+  const removalCap = transferUnlimited ? null : maxRemovals;
+  const baixesLeft =
+    removalCap == null
+      ? null
+      : snapshotIds.length > 0
+        ? Math.max(
+            0,
+            removalCap -
+              countRemovalsFromSnapshot(snapshotIds, lineup.playerIds),
+          )
+        : removalsRemaining;
+  const canRemove = (id: string) =>
+    removalCap == null ||
+    canRemoveSnapshotPlayer(snapshotIds, lineup.playerIds, id, removalCap);
 
   useEffect(() => {
     if (!sheetOpen) return;
@@ -156,6 +195,11 @@ export function LineupBuilder({
 
   function removePlayer(id: string) {
     if (editsLocked) return;
+    if (!canRemove(id)) {
+      setLocalError(maxRemovalsExceededCa(removalCap ?? MAX_TRANSFERS));
+      return;
+    }
+    setLocalError(null);
     const playerIds = lineup.playerIds.filter((x) => x !== id);
     let captainId = lineup.captainId;
     if (captainId === id) captainId = null;
@@ -172,7 +216,16 @@ export function LineupBuilder({
     if (player.position !== position) return;
     if (counts[position] >= LINEUP_SLOTS[position]) return;
     if (remaining < player.price) return;
-    applyLineup([...lineup.playerIds, id], lineup.captainId);
+    const nextIds = [...lineup.playerIds, id];
+    if (
+      changeCap != null &&
+      countChangesUsed(snapshotIds, nextIds) > changeCap
+    ) {
+      setLocalError(maxChangesExceededCa(changeCap));
+      return;
+    }
+    setLocalError(null);
+    applyLineup(nextIds, lineup.captainId);
     setSelectedId(null);
   }
 
@@ -225,6 +278,19 @@ export function LineupBuilder({
         </p>
       </div>
 
+      {!editsLocked && removalCap != null && baixesLeft != null && (
+        <p
+          className="shrink-0 px-0.5 text-[11px] tabular-nums text-mute"
+          aria-label="Baixes restants"
+        >
+          Baixes des de l&apos;instantània:{" "}
+          <span className={baixesLeft === 0 ? "text-amber-200" : "text-bone/80"}>
+            {baixesLeft}/{removalCap}
+          </span>{" "}
+          restants
+        </p>
+      )}
+
       <section className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <CourtBoard
           players={selectedPlayers}
@@ -254,13 +320,13 @@ export function LineupBuilder({
         </div>
       )}
 
-      {error && saveStatus === "error" && (
+      {((localError && !editsLocked) || (error && saveStatus === "error")) && (
         <div
           role="alert"
           className="flex shrink-0 gap-2 border border-red-500/35 bg-red-500/10 px-3 py-2 text-xs text-red-100"
         >
           <AlertCircle className="mt-0.5 size-3.5 shrink-0" />
-          <p>{error}</p>
+          <p>{(!editsLocked && localError) || error}</p>
         </div>
       )}
 
@@ -327,14 +393,25 @@ export function LineupBuilder({
                   <Button
                     type="button"
                     size="lg"
+                    disabled={!canRemove(selectedPlayer.id)}
+                    title={
+                      canRemove(selectedPlayer.id)
+                        ? undefined
+                        : maxRemovalsExceededCa(removalCap ?? MAX_TRANSFERS)
+                    }
                     onClick={() => removePlayer(selectedPlayer.id)}
-                    className="h-11 min-h-11 shrink-0 touch-manipulation bg-bone text-ink hover:bg-white"
+                    className="h-11 min-h-11 shrink-0 touch-manipulation bg-bone text-ink hover:bg-white disabled:opacity-40"
                   >
                     <UserMinus className="size-4" /> Treure
                   </Button>
                 </>
               )}
             </div>
+            {!editsLocked && !canRemove(selectedPlayer.id) && (
+              <p className="mx-auto mt-2 w-full max-w-lg text-[11px] text-amber-200 md:max-w-xl lg:max-w-2xl">
+                {maxRemovalsExceededCa(removalCap ?? MAX_TRANSFERS)}
+              </p>
+            )}
           </div>
         </>
       )}

@@ -39,8 +39,8 @@ import {
 import {
   MAX_TRANSFERS,
   countChangesUsed,
-  maxChangesExceededCa,
   parseSnapshotIds,
+  validateTransferLimits,
 } from "@/lib/transfers";
 
 export type StandingRow = {
@@ -458,10 +458,15 @@ export function saveLineup(
   const phase = getTeamTransferPhase(teamId, db);
   const snapshotIds = parseSnapshotIds(existing.snapshot_ids);
   const changesUsed = countChangesUsed(snapshotIds, normalizedIds);
-  // Initial roster: unlimited canvis until first tip-off lock flips phase.
-  if (phase !== "initial" && changesUsed > MAX_TRANSFERS) {
-    return { ok: false, error: maxChangesExceededCa(MAX_TRANSFERS) };
-  }
+  // Initial roster: unlimited canvis + baixes until first tip-off lock flips
+  // phase. Normal phase: max 3 canvis, and max 3 baixes when snapshot exists.
+  const limits = validateTransferLimits(
+    snapshotIds,
+    normalizedIds,
+    MAX_TRANSFERS,
+    phase === "initial",
+  );
+  if (!limits.ok) return limits;
 
   db.prepare(
     `UPDATE lineups

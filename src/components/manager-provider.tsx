@@ -24,9 +24,39 @@ export type TransferInfo = {
   changesUsed: number;
   changesRemaining: number;
   maxChanges: number;
+  /** Snapshot players removed this window (baixes). */
+  removalsUsed: number;
+  /** null when no removal cap applies (unlimited phase / empty snapshot). */
+  removalsRemaining: number | null;
+  /** null when no removal cap applies (unlimited phase / empty snapshot). */
+  maxRemovals: number | null;
+  snapshotIds: string[];
   nextWindowAt: string | null;
   message: string | null;
 };
+
+function nullableNumber(v: unknown): number | null {
+  return typeof v === "number" && Number.isFinite(v) ? v : null;
+}
+
+function parseTransferInfo(t: Record<string, unknown>): TransferInfo {
+  return {
+    windowOpen: Boolean(t.windowOpen),
+    phase: t.phase === "initial" ? "initial" : "normal",
+    unlimited: Boolean(t.unlimited),
+    changesUsed: Number(t.changesUsed ?? 0),
+    changesRemaining: Number(t.changesRemaining ?? 0),
+    maxChanges: Number(t.maxChanges ?? 3),
+    removalsUsed: Number(t.removalsUsed ?? 0),
+    removalsRemaining: nullableNumber(t.removalsRemaining),
+    maxRemovals: nullableNumber(t.maxRemovals),
+    snapshotIds: Array.isArray(t.snapshotIds)
+      ? t.snapshotIds.filter((x): x is string => typeof x === "string")
+      : [],
+    nextWindowAt: typeof t.nextWindowAt === "string" ? t.nextWindowAt : null,
+    message: typeof t.message === "string" ? t.message : null,
+  };
+}
 
 type ManagerContextValue = {
   user: SessionUser;
@@ -134,17 +164,7 @@ export function ManagerProvider({
     );
     const t = lineupData.transfer;
     if (t && typeof t === "object") {
-      setTransfer({
-        windowOpen: Boolean(t.windowOpen),
-        phase: t.phase === "initial" ? "initial" : "normal",
-        unlimited: Boolean(t.unlimited),
-        changesUsed: Number(t.changesUsed ?? 0),
-        changesRemaining: Number(t.changesRemaining ?? 0),
-        maxChanges: Number(t.maxChanges ?? 3),
-        nextWindowAt:
-          typeof t.nextWindowAt === "string" ? t.nextWindowAt : null,
-        message: typeof t.message === "string" ? t.message : null,
-      });
+      setTransfer(parseTransferInfo(t));
     } else {
       setTransfer(null);
     }
@@ -214,17 +234,7 @@ export function ManagerProvider({
         setBudget(data.budget);
         if (data.transfer && typeof data.transfer === "object") {
           const t = data.transfer;
-          setTransfer({
-            windowOpen: Boolean(t.windowOpen),
-            phase: t.phase === "initial" ? "initial" : "normal",
-            unlimited: Boolean(t.unlimited),
-            changesUsed: Number(t.changesUsed ?? 0),
-            changesRemaining: Number(t.changesRemaining ?? 0),
-            maxChanges: Number(t.maxChanges ?? 3),
-            nextWindowAt:
-              typeof t.nextWindowAt === "string" ? t.nextWindowAt : null,
-            message: typeof t.message === "string" ? t.message : null,
-          });
+          setTransfer(parseTransferInfo(t));
           if (typeof t.message === "string") setLockMessage(t.message);
         }
         if (typeof data.locked === "boolean") setLineupLocked(data.locked);
