@@ -82,16 +82,31 @@ function StatCell({
   );
 }
 
+function backNav(from: string | string[] | undefined): {
+  href: string;
+  label: string;
+} {
+  const value = Array.isArray(from) ? from[0] : from;
+  if (value === "jugadors") {
+    return { href: "/jugadors", label: "Tornar a Jugadors" };
+  }
+  return { href: "/equip", label: "Tornar a l'equip" };
+}
+
 export default async function JugadorPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string | string[] }>;
 }) {
   const { id } = await params;
+  const { from } = await searchParams;
   const detail = buildPlayerDetail(id);
   if (!detail) notFound();
 
   const { player, games, summary, meta } = detail;
+  const back = backNav(from);
   // Dual-team fantasy ids use this variant's teamId → that side's FCBQ schedule.
   const nextMatch = nextMatchForTeamId(player.teamId);
   const nextLine =
@@ -107,10 +122,10 @@ export default async function JugadorPage({
   return (
     <div className="space-y-5 pb-4">
       <Link
-        href="/equip"
+        href={back.href}
         className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.14em] text-mute hover:text-bone"
       >
-        <ArrowLeft className="size-3.5" /> Tornar a l&apos;equip
+        <ArrowLeft className="size-3.5" /> {back.label}
       </Link>
 
       <section className="flex items-start gap-3.5">
