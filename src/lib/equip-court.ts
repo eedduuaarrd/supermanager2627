@@ -234,24 +234,24 @@ export type JornadaChipPoints = {
  * The placeholder points stay 0 and are not written as a score. The pill prints
  * "-" until the first match starts.
  */
-export function withCurrentJornadaChip<T extends JornadaChipPoints>(
-  rows: readonly T[],
+export function withCurrentJornadaChip(
+  rows: readonly JornadaChipPoints[],
   currentRound: number,
   pinCurrent: boolean,
-): T[] {
+): JornadaChipPoints[] {
   const ordered = [...rows].sort((a, b) => a.round - b.round);
   if (!pinCurrent || !Number.isInteger(currentRound) || currentRound < 1) {
     return ordered;
   }
   if (ordered.some((row) => row.round === currentRound)) return ordered;
   const last = ordered[ordered.length - 1];
-  const chip = {
+  const chip: JornadaChipPoints = {
     round: currentRound,
     points: 0,
     cumulative: last?.cumulative ?? 0,
     rank: null,
     scored: false,
-  } as T;
+  };
   return [...ordered, chip].sort((a, b) => a.round - b.round);
 }
 
