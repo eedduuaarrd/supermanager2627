@@ -115,7 +115,6 @@ export function LineupBuilder({
   snapshotIds = [],
   transferUnlimited = false,
   maxChanges = null,
-  removalsRemaining = null,
   maxRemovals = null,
 }: LineupBuilderProps) {
   const historyView = courtPlayerIds != null;
@@ -131,16 +130,19 @@ export function LineupBuilder({
   const sheetOpen = selectedId != null && pickerSlot == null;
   const changeCap = transferUnlimited ? null : (maxChanges ?? MAX_TRANSFERS);
   const removalCap = transferUnlimited ? null : maxRemovals;
+  // Live vs snapshot: canvis = altes (ids not in snapshot); baixes = snap ids removed.
+  // X in «X/3» = remaining (disponibles), same helpers as API validateTransferLimits.
+  const canvisLeft =
+    changeCap == null
+      ? null
+      : Math.max(0, changeCap - countChangesUsed(snapshotIds, lineup.playerIds));
   const baixesLeft =
     removalCap == null
       ? null
-      : snapshotIds.length > 0
-        ? Math.max(
-            0,
-            removalCap -
-              countRemovalsFromSnapshot(snapshotIds, lineup.playerIds),
-          )
-        : removalsRemaining;
+      : Math.max(
+          0,
+          removalCap - countRemovalsFromSnapshot(snapshotIds, lineup.playerIds),
+        );
   const canRemove = (id: string) =>
     removalCap == null ||
     canRemoveSnapshotPlayer(snapshotIds, lineup.playerIds, id, removalCap);
@@ -278,16 +280,30 @@ export function LineupBuilder({
         </p>
       </div>
 
-      {!editsLocked && removalCap != null && baixesLeft != null && (
+      {!editsLocked && changeCap != null && canvisLeft != null && (
         <p
           className="shrink-0 px-0.5 text-[11px] tabular-nums text-mute"
-          aria-label="Baixes restants"
+          aria-label="Canvis disponibles"
         >
-          Baixes des de l&apos;instantània:{" "}
-          <span className={baixesLeft === 0 ? "text-amber-200" : "text-bone/80"}>
-            {baixesLeft}/{removalCap}
-          </span>{" "}
-          restants
+          Canvis disponibles:{" "}
+          <span
+            className={canvisLeft === 0 ? "text-amber-200" : "text-bone/80"}
+          >
+            {canvisLeft}/{changeCap}
+          </span>
+          {removalCap != null && baixesLeft != null ? (
+            <>
+              {" "}
+              · Baixes:{" "}
+              <span
+                className={
+                  baixesLeft === 0 ? "text-amber-200" : "text-bone/80"
+                }
+              >
+                {baixesLeft}/{removalCap}
+              </span>
+            </>
+          ) : null}
         </p>
       )}
 
