@@ -23,7 +23,6 @@ import {
   MAX_TRANSFERS,
   canRemoveSnapshotPlayer,
   countChangesUsed,
-  countRemovalsFromSnapshot,
   maxChangesExceededCa,
   maxRemovalsExceededCa,
 } from "@/lib/transfers";
@@ -136,13 +135,6 @@ export function LineupBuilder({
     changeCap == null
       ? null
       : Math.max(0, changeCap - countChangesUsed(snapshotIds, lineup.playerIds));
-  const baixesLeft =
-    removalCap == null
-      ? null
-      : Math.max(
-          0,
-          removalCap - countRemovalsFromSnapshot(snapshotIds, lineup.playerIds),
-        );
   const canRemove = (id: string) =>
     removalCap == null ||
     canRemoveSnapshotPlayer(snapshotIds, lineup.playerIds, id, removalCap);
@@ -291,19 +283,6 @@ export function LineupBuilder({
           >
             {canvisLeft}/{changeCap}
           </span>
-          {removalCap != null && baixesLeft != null ? (
-            <>
-              {" "}
-              · Baixes:{" "}
-              <span
-                className={
-                  baixesLeft === 0 ? "text-amber-200" : "text-bone/80"
-                }
-              >
-                {baixesLeft}/{removalCap}
-              </span>
-            </>
-          ) : null}
         </p>
       )}
 
