@@ -281,9 +281,9 @@ export function LineupBuilder({
       {!editsLocked && removalCap != null && baixesLeft != null && (
         <p
           className="shrink-0 px-0.5 text-[11px] tabular-nums text-mute"
-          aria-label="Baixes restants"
+          aria-label="Canvis disponibles"
         >
-          Baixes des de l&apos;instantània:{" "}
+          Canvis disponibles:{" "}
           <span className={baixesLeft === 0 ? "text-amber-200" : "text-bone/80"}>
             {baixesLeft}/{removalCap}
           </span>{" "}
