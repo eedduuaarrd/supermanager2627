@@ -115,10 +115,8 @@ export function LineupBuilder({
   snapshotIds = [],
   transferUnlimited = false,
   maxChanges = null,
-  removalsRemaining: _removalsRemaining = null,
   maxRemovals = null,
 }: LineupBuilderProps) {
-  void _removalsRemaining;
   const historyView = courtPlayerIds != null;
   const editsLocked = readOnly || historyView;
   const [selectedId, setSelectedId] = useState<string | null>(null);
