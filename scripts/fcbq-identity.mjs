@@ -23,8 +23,8 @@ export const BASE_IDS = {
   "XAVIER BLANCH SIRERA": "xavier-blanch",
   // Teixidó A — names as msstats returns them (accents stripped by normName):
   // JOAN BOLADERES NOGUEROLA, DAVID OLTRA CARRANZA, MIQUEL RÚBIES PACH,
-  // SANTI SANSALONI QUELIZ. Rúbies/Sansaloni also appear for Lo Sifonet B;
-  // the roster only has them as masc-a, so those B games are off-roster.
+  // SANTI SANSALONI QUELIZ. Rúbies/Sansaloni also play for Lo Sifonet B, so
+  // they are dual-team ids (see DUAL_BASES), like Júlia Pla.
   "JOAN BOLADERES NOGUEROLA": "joan-boladeres",
   "DAVID OLTRA CARRANZA": "david-oltra",
   "MIQUEL RUBIES PACH": "miquel-rubies",
@@ -56,7 +56,24 @@ export const BASE_IDS = {
   "JANA ALARCON SOLANES": "jana-alarcon",
 };
 
-const DUAL_BASES = new Set(["julia-pla", "queralt-sole", "mariama-mballo"]);
+const DUAL_BASES = new Set([
+  "julia-pla",
+  "queralt-sole",
+  "mariama-mballo",
+  // Teixidó A + Lo Sifonet B (since J3): miquel-rubies__teixido-a / __sifonet-b
+  "miquel-rubies",
+  "santi-sansaloni",
+]);
+
+/**
+ * Plain ids that became dual-team after data already existed under them.
+ * Mirrors LEGACY_PLAYER_ID_MAP in src/data/roster.ts for the data files
+ * (player-stats.json / market-prices.json): see scripts/migrate-dual-ids.mjs.
+ */
+export const RENAMED_IDS = {
+  "miquel-rubies": "miquel-rubies__teixido-a",
+  "santi-sansaloni": "santi-sansaloni__teixido-a",
+};
 
 export function normName(s) {
   return String(s ?? "")

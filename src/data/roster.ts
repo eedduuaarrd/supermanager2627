@@ -29,7 +29,7 @@ import marketPricesJson from "@/data/market-prices.json";
  *   budget column = efectiu (cash); buy/sell al preu actual.
  *   8×10k = 80k < 100k: hi ha marge per completar la plantilla de 8.
  *
- * Regles: plantilla 8, pressupost 100.000 € (mercat multi-equip, 34 entrades).
+ * Regles: plantilla 8, pressupost 100.000 € (mercat multi-equip, 41 entrades).
  */
 
 export interface TeamInfo {
@@ -226,7 +226,7 @@ export const ROSTER_SEED: Player[] = [
     photoUrl: "/players/roger-companys.jpg",
   },
   {
-    id: "santi-sansaloni",
+    id: "santi-sansaloni__teixido-a",
     position: "B",
     name: "Santi Sansaloni Queliz",
     number: 7,
@@ -238,9 +238,10 @@ export const ROSTER_SEED: Player[] = [
     teamId: "masc-a",
     teamIds: ["masc-a"],
     photoUrl: null,
+    note: "També al mercat com a santi-sansaloni__sifonet-b (Lo Sifonet CB Balaguer B).",
   },
   {
-    id: "miquel-rubies",
+    id: "miquel-rubies__teixido-a",
     position: "A",
     name: "Miquel Rúbies Pach",
     number: 14,
@@ -252,6 +253,7 @@ export const ROSTER_SEED: Player[] = [
     teamId: "masc-a",
     teamIds: ["masc-a"],
     photoUrl: null,
+    note: "També al mercat com a miquel-rubies__sifonet-b (Lo Sifonet CB Balaguer B).",
   },
   {
     id: "xavier-blanch",
@@ -297,6 +299,38 @@ export const ROSTER_SEED: Player[] = [
   },
 
   // —— Lo Sifonet CB Balaguer B (masculí) ——
+  // Rúbies i Sansaloni juguen també al Teixidó A: fila pròpia per equip (com Júlia Pla).
+  // Seed = box J2 Agrollobera (03/10): Rúbies 9 PTS, VAL 22; Sansaloni 14 PTS, VAL 33.
+  {
+    id: "miquel-rubies__sifonet-b",
+    position: "A",
+    name: "Miquel Rúbies Pach",
+    number: 14,
+    pts: 9,
+    avgVal: avgFromVal(22),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "masc-b",
+    teamIds: ["masc-b"],
+    photoUrl: null,
+    note: "També al mercat com a miquel-rubies__teixido-a (Teixidó Associats CB Balaguer A).",
+  },
+  {
+    id: "santi-sansaloni__sifonet-b",
+    position: "B",
+    name: "Santi Sansaloni Queliz",
+    number: 7,
+    pts: 14,
+    avgVal: avgFromVal(33),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "masc-b",
+    teamIds: ["masc-b"],
+    photoUrl: null,
+    note: "També al mercat com a santi-sansaloni__teixido-a (Teixidó Associats CB Balaguer A).",
+  },
   {
     id: "isaac-osei",
     position: "P",
@@ -758,6 +792,9 @@ export const LEGACY_PLAYER_ID_MAP: Record<string, string> = {
   "mariana-mballo__farratges-b": "mariama-mballo__farratges-b",
   "mariama-mballo": "mariama-mballo__farratges-b",
   "ada-dorienie": "ada-domene",
+  // Dual-team since J3 (Teixidó A + Lo Sifonet B): plain id = primary (Teixidó A).
+  "miquel-rubies": "miquel-rubies__teixido-a",
+  "santi-sansaloni": "santi-sansaloni__teixido-a",
 };
 
 export function resolvePlayerId(id: string): string | null {

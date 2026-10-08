@@ -8,7 +8,8 @@ import {
   mergeTeamLogs,
   resolvePlayerLog,
 } from "./fcbq-boxscores.mjs";
-import { fantasyIdFor, parseRosterTeams } from "./fcbq-identity.mjs";
+import { fantasyIdFor, parseRosterTeams, RENAMED_IDS } from "./fcbq-identity.mjs";
+import { migrateDualIds } from "./migrate-dual-ids.mjs";
 import { readFileSync } from "node:fs";
 import {
   applyAssignments,
@@ -700,19 +701,26 @@ test("restricted Lo Sifonet player D.F. is ignored and does not fail the side", 
   const merged = mergeTeamLogs(
     { players: {} },
     [{ fcbqTeamId: SIFONET, players: kept }],
-    { roster: new Map([["miquel-rubies", ["masc-a"]]]) },
+    {
+      roster: new Map([
+        ["miquel-rubies__teixido-a", ["masc-a"]],
+        ["miquel-rubies__sifonet-b", ["masc-b"]],
+      ]),
+    },
   );
   assert.equal(
     merged.unmapped.some((name) => name === "D.F."),
     false,
   );
   assert.equal(merged.unmatched.length, 0);
-  // Rúbies is a Teixidó A fantasy player; his Lo Sifonet B game is off-roster.
-  assert.deepEqual(
-    merged.offRoster.map((o) => [o.playerId, o.teamId]),
-    [["miquel-rubies", "masc-b"]],
-  );
-  assert.equal(merged.players["miquel-rubies"], undefined);
+  assert.equal(merged.offRoster.length, 0);
+  // Rúbies is dual-team (like Júlia Pla): his Lo Sifonet B game lands on the B id.
+  const b = merged.players["miquel-rubies__sifonet-b"];
+  assert.equal(b.teamId, "masc-b");
+  assert.equal(b.games.length, 1);
+  assert.equal(b.games[0].teamId, "masc-b");
+  assert.equal(b.games[0].val, 22);
+  assert.equal(merged.players["miquel-rubies__teixido-a"], undefined);
 });
 
 const boxLog = (date, uuid, pts, seconds = 600) => ({
@@ -728,8 +736,10 @@ test("the 10 Teixidó A / Lo Sifonet B box-score names map to their roster ids",
     ["XAVIER BLANCH SIRERA", MASC, "xavier-blanch"],
     ["JOAN BOLADERES NOGUEROLA", MASC, "joan-boladeres"],
     ["DAVID OLTRA CARRANZA", MASC, "david-oltra"],
-    ["MIQUEL RÚBIES PACH", MASC, "miquel-rubies"],
-    ["SANTI SANSALONI QUELIZ", MASC, "santi-sansaloni"],
+    ["MIQUEL RÚBIES PACH", MASC, "miquel-rubies__teixido-a"],
+    ["SANTI SANSALONI QUELIZ", MASC, "santi-sansaloni__teixido-a"],
+    ["MIQUEL RÚBIES PACH", SIFONET, "miquel-rubies__sifonet-b"],
+    ["SANTI SANSALONI QUELIZ", SIFONET, "santi-sansaloni__sifonet-b"],
     ["JORDI GENSANA PEDRA", SIFONET, "jordi-gensana"],
     ["JOAN BARRI CASTELL", SIFONET, "joan-barri"],
     ["ORIOL BRINGUÉ QUILES", SIFONET, "oriol-bringue"],
@@ -753,8 +763,10 @@ test("roster.ts parses into player ids with their club sides", () => {
     "xavier-blanch",
     "joan-boladeres",
     "david-oltra",
-    "miquel-rubies",
-    "santi-sansaloni",
+    "miquel-rubies__teixido-a",
+    "santi-sansaloni__teixido-a",
+    "miquel-rubies__sifonet-b",
+    "santi-sansaloni__sifonet-b",
     "jordi-gensana",
     "joan-barri",
     "oriol-bringue",
@@ -866,6 +878,93 @@ test("a 0-second call-up is not stored as a game (PJ does not count it)", () => 
   assert.equal(games[0].jornada, 2);
   assert.equal(games[0].val, 19);
   assert.equal(coverageGaps(merged.players, merged.expectations).length, 0);
+});
+
+test("dual-team ids: both sides score separately, no double counting", () => {
+  const roster = parseRosterTeams(
+    readFileSync(new URL("../src/data/roster.ts", import.meta.url), "utf8"),
+  );
+  const sameDay = (uuid, pts, fc, ftm, fta, pm) => ({
+    date: "2026-10-03",
+    matchCallUuid: uuid,
+    accumulated: { pts, t2m: 0, t3m: 0, ftm, fta, fc },
+    computed: { seconds: 900, onCourtPlusMinus: pm },
+  });
+  const merged = mergeTeamLogs(
+    { players: {} },
+    [
+      {
+        fcbqTeamId: MASC,
+        players: [
+          { name: "SANTI SANSALONI QUELIZ", gamesPlayed: 1, games: [sameDay("teixido", 4, 2, 0, 0, -2)] },
+        ],
+      },
+      {
+        fcbqTeamId: SIFONET,
+        players: [
+          { name: "SANTI SANSALONI QUELIZ", gamesPlayed: 1, games: [sameDay("sifonet", 14, 3, 3, 4, 23)] },
+        ],
+      },
+    ],
+    { roster },
+  );
+  const a = merged.players["santi-sansaloni__teixido-a"].games;
+  const b = merged.players["santi-sansaloni__sifonet-b"].games;
+  assert.deepEqual(a.map((g) => [g.teamId, g.matchCallUuid, g.val]), [["masc-a", "teixido", 0]]);
+  assert.deepEqual(b.map((g) => [g.teamId, g.matchCallUuid, g.val]), [["masc-b", "sifonet", 33]]);
+  assert.equal(merged.unmatched.length + merged.offRoster.length, 0);
+  assert.equal(coverageGaps(merged.players, merged.expectations).length, 0);
+  assert.equal(merged.players["santi-sansaloni"], undefined);
+});
+
+test("migrate-dual-ids moves stats + quote to the primary id and is idempotent", () => {
+  assert.equal(RENAMED_IDS["miquel-rubies"], "miquel-rubies__teixido-a");
+  const row = { date: "2026-10-03", jornada: 2, round: 2, teamId: "masc-a", matchCallUuid: "m2", val: -4 };
+  const stats = {
+    players: {
+      "miquel-rubies": { playerId: "miquel-rubies", teamId: "masc-a", games: [row] },
+      "hector-lozano": { playerId: "hector-lozano", teamId: "masc-a", games: [] },
+    },
+  };
+  const prices = { prices: { "miquel-rubies": { price: 8000, prevPrice: 8000, pricedGames: 1 } } };
+  const changes = migrateDualIds(stats, prices);
+  assert.equal(changes.length, 2);
+  assert.equal(stats.players["miquel-rubies"], undefined);
+  assert.equal(stats.players["miquel-rubies__teixido-a"].playerId, "miquel-rubies__teixido-a");
+  assert.deepEqual(stats.players["miquel-rubies__teixido-a"].games, [row]);
+  assert.ok(stats.players["hector-lozano"]);
+  assert.deepEqual(prices.prices["miquel-rubies__teixido-a"], { price: 8000, prevPrice: 8000, pricedGames: 1 });
+  assert.equal(prices.prices["miquel-rubies"], undefined);
+  assert.deepEqual(migrateDualIds(stats, prices), []);
+
+  // New second-team id gets the launch seed so the next tick prices its games.
+  const seeded = migrateDualIds(stats, prices, RENAMED_IDS, [
+    "miquel-rubies__teixido-a",
+    "miquel-rubies__sifonet-b",
+  ], "2026-10-08T00:00:00.000Z");
+  assert.deepEqual(seeded, ["market-prices: seed miquel-rubies__sifonet-b at 10000 (pricedGames 0)"]);
+  assert.equal(prices.prices["miquel-rubies__sifonet-b"].pricedGames, 0);
+  assert.equal(prices.prices["miquel-rubies__teixido-a"].price, 8000);
+  assert.equal(
+    shouldTickPrice(prices.prices["miquel-rubies__sifonet-b"], 1),
+    true,
+  );
+
+  // Ingest already wrote the new id (untagged): old J2 tag is kept, no duplicate row.
+  const s2 = {
+    players: {
+      "santi-sansaloni": { playerId: "santi-sansaloni", games: [{ ...row, matchCallUuid: "x" }] },
+      "santi-sansaloni__teixido-a": {
+        playerId: "santi-sansaloni__teixido-a",
+        games: [{ date: "2026-10-03", teamId: "masc-a", matchCallUuid: "x", jornada: null, round: null }],
+      },
+    },
+  };
+  migrateDualIds(s2, { prices: {} });
+  const g = s2.players["santi-sansaloni__teixido-a"].games;
+  assert.equal(g.length, 1);
+  assert.equal(g[0].jornada, 2);
+  assert.equal(s2.players["santi-sansaloni"], undefined);
 });
 
 test("PJ>1 plantilla averages do not append a game row", () => {
