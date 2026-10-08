@@ -92,6 +92,27 @@ function fillGame(prev, next) {
 }
 
 /**
+ * msstats lists a called-up player who never got on court as a game with
+ * 0 seconds and all-zero counters. FCBQ's PJ does not count it, and storing
+ * it would invent a 0-VAL "game" (prices/averages). Treat it as not played.
+ */
+export function isNotPlayedLog(raw) {
+  const computed = raw?.computed ?? {};
+  const acc = raw?.accumulated ?? {};
+  const seconds =
+    typeof computed.seconds === "number"
+      ? computed.seconds
+      : typeof computed.min === "number"
+        ? computed.min * 60
+        : null;
+  if (seconds !== 0) return false;
+  const counters = [acc.pts, acc.t2m, acc.t3m, acc.ftm, acc.fta, acc.fc];
+  if (counters.some((v) => typeof v === "number" && v !== 0)) return false;
+  const pm = computed.onCourtPlusMinus ?? acc.pm;
+  return !(typeof pm === "number" && pm !== 0);
+}
+
+/**
  * Merge one player's published game log into their existing history.
  * The earliest undated legacy row (PJ=1 seed) absorbs the earliest new game
  * so jornada 1 is not duplicated. Later games stay untagged for weekend sync.
@@ -100,7 +121,7 @@ function fillGame(prev, next) {
 export function mergePlayerLog(entry, incomingGames, ctx) {
   const games = Array.isArray(entry.games) ? entry.games : [];
   entry.games = games;
-  const sorted = [...incomingGames].sort((a, b) =>
+  const sorted = [...incomingGames].filter((raw) => !isNotPlayedLog(raw)).sort((a, b) =>
     String(a.date || "").localeCompare(String(b.date || "")),
   );
   const consumed = new Set();
@@ -141,8 +162,19 @@ export function mergePlayerLog(entry, incomingGames, ctx) {
 /**
  * @param {object} existing player-stats document
  * @param {Array<{ fcbqTeamId: string, competition?: string, players: Array<{ uuid?: string, name: string, games: object[], gamesPlayed?: number }> }>} teamLogs
+ * @param {{ roster?: Map<string, string[]> }} [options] fantasy roster
+ *   (id → teamIds) from parseRosterTeams. When given, a mapped id that is not
+ *   in the roster is `unmatched`, and a game for a side the roster entry does
+ *   not belong to is `offRoster` (kept out of that player's history).
+ *
+ * `unmatched` lists federation players with real games that cannot land on a
+ * fantasy roster entry. The ingest treats any of them as not ok so a missing
+ * identity mapping is noticed instead of silently scoring that player as DNP.
+ * Players without a game (bench/DNP, restricted logs already dropped) never
+ * count as unmatched.
  */
-export function mergeTeamLogs(existing, teamLogs) {
+export function mergeTeamLogs(existing, teamLogs, options = {}) {
+  const roster = options.roster instanceof Map ? options.roster : null;
   const players = {};
   for (const [pid, prev] of Object.entries(existing.players ?? {})) {
     players[pid] = {
@@ -153,14 +185,52 @@ export function mergeTeamLogs(existing, teamLogs) {
 
   const expectations = [];
   const unmapped = [];
+  const unmatched = [];
+  const offRoster = [];
   let appended = 0;
 
   for (const team of teamLogs ?? []) {
     for (const p of team.players ?? []) {
+      const played = (p.games ?? []).filter((g) => !isNotPlayedLog(g));
       const id = fantasyIdFor(p.name, team.fcbqTeamId);
       if (!id) {
         unmapped.push(p.name);
+        if (played.length > 0) {
+          unmatched.push({
+            name: p.name,
+            fcbqTeamId: team.fcbqTeamId,
+            reason: "no-identity",
+            games: played.length,
+          });
+        }
         continue;
+      }
+      if (roster) {
+        const teamIds = roster.get(id.playerId);
+        if (!teamIds) {
+          if (played.length > 0) {
+            unmatched.push({
+              name: p.name,
+              fcbqTeamId: team.fcbqTeamId,
+              playerId: id.playerId,
+              reason: "not-in-roster",
+              games: played.length,
+            });
+          }
+          continue;
+        }
+        if (!teamIds.includes(id.teamId)) {
+          if (played.length > 0) {
+            offRoster.push({
+              name: p.name,
+              playerId: id.playerId,
+              teamId: id.teamId,
+              rosterTeamIds: teamIds,
+              games: played.length,
+            });
+          }
+          continue;
+        }
       }
       const entry = (players[id.playerId] ??= {
         playerId: id.playerId,
@@ -181,7 +251,7 @@ export function mergeTeamLogs(existing, teamLogs) {
         playerId: id.playerId,
         teamId: id.teamId,
         name: p.name,
-        gamesPlayed: typeof p.gamesPlayed === "number" ? p.gamesPlayed : (p.games ?? []).length,
+        gamesPlayed: typeof p.gamesPlayed === "number" ? p.gamesPlayed : played.length,
       });
     }
   }
@@ -190,6 +260,8 @@ export function mergeTeamLogs(existing, teamLogs) {
     players,
     appended,
     unmapped,
+    unmatched,
+    offRoster,
     expectations,
   };
 }

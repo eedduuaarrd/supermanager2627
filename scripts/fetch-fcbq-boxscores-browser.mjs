@@ -29,10 +29,12 @@ import {
   mergeTeamLogs,
   resolvePlayerLog,
 } from "./fcbq-boxscores.mjs";
+import { parseRosterTeams } from "./fcbq-identity.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
 const OUT = process.env.FCBQ_STATS_OUT || join(root, "src/data/player-stats.json");
+const ROSTER = process.env.FCBQ_ROSTER || join(root, "src/data/roster.ts");
 const MS = "https://msstats.optimalwayconsulting.com/v1/fcbq";
 
 const args = process.argv.slice(2);
@@ -300,8 +302,28 @@ async function withChrome(fn) {
   }
 }
 
+function loadRoster() {
+  const roster = parseRosterTeams(readFileSync(ROSTER, "utf8"));
+  if (roster.size === 0) throw new Error(`roster sense jugadors: ${ROSTER}`);
+  return roster;
+}
+
+function shortNameFor(fcbqTeamId) {
+  return CLUB_TEAMS.find((t) => t.fcbqTeamId === fcbqTeamId)?.shortName ?? fcbqTeamId;
+}
+
 async function main() {
   const existing = loadExisting();
+  let roster;
+  try {
+    roster = loadRoster();
+  } catch (err) {
+    writeStats(existing, {
+      ingest: { ok: false, error: `roster: ${err.message}`, teams: 0 },
+    });
+    console.error("Box-score ingest failed before fetch: roster", err.message);
+    process.exit(1);
+  }
   let authorization;
   try {
     authorization = await withChrome(async (page) => {
@@ -317,8 +339,27 @@ async function main() {
   }
 
   const { teamLogs, errors } = await fetchTeamLogs(authorization);
-  const merged = mergeTeamLogs(existing, teamLogs);
+  const merged = mergeTeamLogs(existing, teamLogs, { roster });
   const gaps = coverageGaps(merged.players, merged.expectations);
+  const unmatched = merged.unmatched.map(
+    (u) =>
+      `${shortNameFor(u.fcbqTeamId)}: ${u.name} (${u.reason}${u.playerId ? ` ${u.playerId}` : ""}, ${u.games} partit/s)`,
+  );
+  // Roster players of a tracked side that msstats does not list at all.
+  // Not fatal (may simply not be inscribed / not played yet), but visible.
+  const seen = new Set(
+    merged.expectations.map((e) => e.playerId),
+  );
+  for (const o of merged.offRoster) seen.add(o.playerId);
+  const scrapedTeams = new Set(
+    teamLogs
+      .map((t) => CLUB_TEAMS.find((c) => c.fcbqTeamId === t.fcbqTeamId))
+      .filter(Boolean)
+      .map((c) => c.teamId),
+  );
+  const absent = [...roster]
+    .filter(([id, teamIds]) => !seen.has(id) && teamIds.some((t) => scrapedTeams.has(t)))
+    .map(([id]) => id);
   // Team-season 404 is "no published stats", not a scrape outage. A restricted
   // personal log (HTTP 405) is ignored; it does not fail the side. Other HTTP
   // failures still fail this ingest. Weekend scoring only requires box scores
@@ -330,7 +371,8 @@ async function main() {
     fatal.length === 0 &&
     teamLogs.length + unavailable.length === CLUB_TEAMS.length &&
     merged.expectations.length > 0 &&
-    gaps.length === 0;
+    gaps.length === 0 &&
+    unmatched.length === 0;
 
   writeStats(existing, {
     players: merged.players,
@@ -338,6 +380,9 @@ async function main() {
       ok,
       appended: merged.appended,
       unmapped: merged.unmapped,
+      unmatched,
+      offRoster: merged.offRoster,
+      absent,
       gaps,
       errors: fatal,
       unavailable,
@@ -350,6 +395,21 @@ async function main() {
   );
   if (unavailable.length) {
     console.warn("No season stats (404), not blocking:", unavailable.join(" | "));
+  }
+  if (absent.length) {
+    console.warn(
+      `roster players not listed by msstats (DNP / sense partits, no bloqueja): ${absent.join(", ")}`,
+    );
+  }
+  for (const o of merged.offRoster) {
+    console.warn(
+      `off-roster (ignored): ${o.name} ${o.games} partit/s amb ${o.teamId}; al roster ${o.playerId} és ${o.rosterTeamIds.join(",")}`,
+    );
+  }
+  if (unmatched.length) {
+    console.error(
+      `!!! UNMATCHED FCBQ PLAYERS (${unmatched.length}) — afegeix-los a scripts/fcbq-identity.mjs i src/data/roster.ts: ${unmatched.join(" | ")}`,
+    );
   }
   if (!ok) {
     if (gaps.length) {
