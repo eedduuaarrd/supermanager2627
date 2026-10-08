@@ -1,6 +1,6 @@
 {
-  "extractedAt": "2026-10-08",
-  "source": "msstats.optimalwayconsulting.com player game logs",
+  "extractedAt": "2026-09-28",
+  "source": "basquetcatala.cat estadistica/equip (team plantilla tables)",
   "teamUrls": [
     "https://www.basquetcatala.cat/estadistica/equip/5f55017e-893e-4323-8b41-b58323ea8f73",
     "https://www.basquetcatala.cat/estadistica/equip/c057eeae-3aae-4e33-b2ab-54fabb2700ae",
@@ -20,16 +20,16 @@
     "marc-escoda": {
       "playerId": "marc-escoda",
       "fcbqName": "MARC ESCODA ANGERRI",
-      "fcbqPersonId": "fea69726-98d0-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "masc-a",
       "games": [
         {
-          "date": "2026-09-27",
+          "date": null,
           "round": 1,
-          "opponent": "C.B. TORREFARRERA A",
+          "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
           "min": 18,
           "pts": 6,
           "t2c": 3,
@@ -40,28 +40,27 @@
           "tli": 0,
           "val": 7,
           "pm": 4,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 3,
-          "matchCallUuid": "90e8d06b-162e-4458-a218-0846fb5cc43a"
+          "pf": 3
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 24
     },
     "gerard-soldevila": {
       "playerId": "gerard-soldevila",
       "fcbqName": "GERARD SOLDEVILA CASAS",
-      "fcbqPersonId": "fc08aa5f-98d0-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "masc-a",
       "games": [
         {
-          "date": "2026-09-27",
+          "date": null,
           "round": 1,
-          "opponent": "C.B. TORREFARRERA A",
+          "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
           "min": 16.1,
           "pts": 0,
           "t2c": 0,
@@ -72,50 +71,27 @@
           "tli": 0,
           "val": -5,
           "pm": -2,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 3,
-          "matchCallUuid": "90e8d06b-162e-4458-a218-0846fb5cc43a"
-        },
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "CB CAPPONT",
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "matchCallUuid": "2c53c6d0-96d3-4af9-a807-944352a25cbe",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 13.9,
-          "pts": 0,
-          "t2c": 0,
-          "t2i": null,
-          "t3c": 0,
-          "t3i": null,
-          "tlc": 0,
-          "tli": 0,
-          "pf": 1,
-          "val": 12,
-          "pm": 13,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
+          "pf": 3
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 26
     },
     "toni-salud": {
       "playerId": "toni-salud",
       "fcbqName": "TONI SALUD GARCIA",
-      "fcbqPersonId": "fef7d48c-98d0-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "masc-a",
       "games": [
         {
-          "date": "2026-09-27",
+          "date": null,
           "round": 1,
-          "opponent": "C.B. TORREFARRERA A",
+          "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
           "min": 24.2,
           "pts": 9,
           "t2c": 4,
@@ -126,51 +102,28 @@
           "tli": 4,
           "val": 8,
           "pm": 4,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 2,
-          "matchCallUuid": "90e8d06b-162e-4458-a218-0846fb5cc43a"
-        },
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "CB CAPPONT",
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "matchCallUuid": "2c53c6d0-96d3-4af9-a807-944352a25cbe",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 20.1,
-          "pts": 4,
-          "t2c": 1,
-          "t2i": null,
-          "t3c": 0,
-          "t3i": null,
-          "tlc": 2,
-          "tli": 2,
-          "pf": 4,
-          "val": 8,
-          "pm": 8,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
+          "pf": 2
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 43
     },
     "gerard-garcia": {
       "playerId": "gerard-garcia",
       "fcbqName": "GERARD GARCIA ROSAURO",
-      "fcbqPersonId": "006f3a77-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "masc-a",
       "games": [
         {
-          "date": "2026-09-27",
+          "date": null,
           "round": 1,
-          "opponent": "C.B. TORREFARRERA A",
+          "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 26.5,
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
+          "min": 26.4,
           "pts": 8,
           "t2c": 0,
           "t2i": 0,
@@ -180,50 +133,27 @@
           "tli": 4,
           "val": 1,
           "pm": -3,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 2,
-          "matchCallUuid": "90e8d06b-162e-4458-a218-0846fb5cc43a"
-        },
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "CB CAPPONT",
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "matchCallUuid": "2c53c6d0-96d3-4af9-a807-944352a25cbe",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 22,
-          "pts": 12,
-          "t2c": 3,
-          "t2i": null,
-          "t3c": 1,
-          "t3i": null,
-          "tlc": 3,
-          "tli": 4,
-          "pf": 3,
-          "val": 15,
-          "pm": 7,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
+          "pf": 2
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 0
     },
     "ivan-franco": {
       "playerId": "ivan-franco",
       "fcbqName": "IVAN FRANCO GUERRERO",
-      "fcbqPersonId": "8e7f9d92-2c2e-4ae8-ac9e-9ada56ad7563",
+      "fcbqPersonId": null,
       "teamId": "masc-a",
       "games": [
         {
-          "date": "2026-09-27",
+          "date": null,
           "round": 1,
-          "opponent": "C.B. TORREFARRERA A",
+          "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
           "min": 27.5,
           "pts": 9,
           "t2c": 1,
@@ -234,50 +164,27 @@
           "tli": 5,
           "val": -8,
           "pm": -15,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 1,
-          "matchCallUuid": "90e8d06b-162e-4458-a218-0846fb5cc43a"
-        },
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "CB CAPPONT",
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "matchCallUuid": "2c53c6d0-96d3-4af9-a807-944352a25cbe",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 15.8,
-          "pts": 0,
-          "t2c": 0,
-          "t2i": null,
-          "t3c": 0,
-          "t3i": null,
-          "tlc": 0,
-          "tli": 0,
-          "pf": 3,
-          "val": 15,
-          "pm": 18,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
+          "pf": 1
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 6
     },
     "hector-lozano": {
       "playerId": "hector-lozano",
       "fcbqName": "HECTOR LOZANO MARTINEZ",
-      "fcbqPersonId": "cc3cd271-df22-4334-a717-27cae846889f",
+      "fcbqPersonId": null,
       "teamId": "masc-a",
       "games": [
         {
-          "date": "2026-09-27",
+          "date": null,
           "round": 1,
-          "opponent": "C.B. TORREFARRERA A",
+          "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
           "min": 23.5,
           "pts": 15,
           "t2c": 2,
@@ -288,50 +195,27 @@
           "tli": 2,
           "val": 9,
           "pm": -3,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 3,
-          "matchCallUuid": "90e8d06b-162e-4458-a218-0846fb5cc43a"
-        },
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "CB CAPPONT",
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "matchCallUuid": "2c53c6d0-96d3-4af9-a807-944352a25cbe",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 21.7,
-          "pts": 10,
-          "t2c": 0,
-          "t2i": null,
-          "t3c": 2,
-          "t3i": null,
-          "tlc": 4,
-          "tli": 4,
-          "pf": 2,
-          "val": 6,
-          "pm": -2,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
+          "pf": 3
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 19
     },
     "roger-companys": {
       "playerId": "roger-companys",
       "fcbqName": "ROGER COMPANYS SOLÀ",
-      "fcbqPersonId": "ff67b989-98d0-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "masc-a",
       "games": [
         {
-          "date": "2026-09-27",
+          "date": null,
           "round": 1,
-          "opponent": "C.B. TORREFARRERA A",
+          "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
           "min": 14.1,
           "pts": 0,
           "t2c": 0,
@@ -342,50 +226,27 @@
           "tli": 2,
           "val": -5,
           "pm": 1,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 4,
-          "matchCallUuid": "90e8d06b-162e-4458-a218-0846fb5cc43a"
-        },
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "CB CAPPONT",
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "matchCallUuid": "2c53c6d0-96d3-4af9-a807-944352a25cbe",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 16.8,
-          "pts": 2,
-          "t2c": 1,
-          "t2i": null,
-          "t3c": 0,
-          "t3i": null,
-          "tlc": 0,
-          "tli": 0,
-          "pf": 0,
-          "val": 3,
-          "pm": 1,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
+          "pf": 4
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 8
     },
     "babacar-toure": {
       "playerId": "babacar-toure",
       "fcbqName": "BABACAR TOURE GASSAMA",
-      "fcbqPersonId": "0136cf44-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "masc-a",
       "games": [
         {
-          "date": "2026-09-27",
+          "date": null,
           "round": 1,
-          "opponent": "C.B. TORREFARRERA A",
+          "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
           "min": 23,
           "pts": 6,
           "t2c": 3,
@@ -396,28 +257,27 @@
           "tli": 1,
           "val": -12,
           "pm": -15,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 2,
-          "matchCallUuid": "90e8d06b-162e-4458-a218-0846fb5cc43a"
+          "pf": 2
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 68
     },
     "eduard-bernat": {
       "playerId": "eduard-bernat",
       "fcbqName": "EDUARD BERNAT SUCARRAT",
-      "fcbqPersonId": "005e5d7e-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "masc-a",
       "games": [
         {
-          "date": "2026-09-27",
+          "date": null,
           "round": 1,
-          "opponent": "C.B. TORREFARRERA A",
+          "opponent": null,
           "teamId": "masc-a",
           "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
+          "competition": "TEMPORADA 2026 - 1A TERRITORIAL SÈNIOR MASCULÍ -1A FASE - GRUP 01",
           "min": 27.1,
           "pts": 10,
           "t2c": 1,
@@ -428,50 +288,27 @@
           "tli": 3,
           "val": -1,
           "pm": -6,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 4,
-          "matchCallUuid": "90e8d06b-162e-4458-a218-0846fb5cc43a"
-        },
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "CB CAPPONT",
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "matchCallUuid": "2c53c6d0-96d3-4af9-a807-944352a25cbe",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 14.6,
-          "pts": 14,
-          "t2c": 2,
-          "t2i": null,
-          "t3c": 2,
-          "t3i": null,
-          "tlc": 4,
-          "tli": 5,
-          "pf": 1,
-          "val": 22,
-          "pm": 10,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
+          "pf": 4
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 20
     },
     "clara-paniagua": {
       "playerId": "clara-paniagua",
       "fcbqName": "CLARA PANIAGUA MARVÀ",
-      "fcbqPersonId": "febc4ea1-98d0-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-a",
       "games": [
         {
-          "date": "2026-09-25",
+          "date": null,
           "round": 1,
-          "opponent": "MECVIL MANRESA CBF B",
+          "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "COPA CATALUNYA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 18.3,
           "pts": 2,
           "t2c": 1,
@@ -482,28 +319,27 @@
           "tli": 0,
           "val": -5,
           "pm": -2,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 5,
-          "matchCallUuid": "25fe684d-5342-4350-b3df-2ba657065352"
+          "pf": 5
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 10
     },
     "andrea-perat": {
       "playerId": "andrea-perat",
       "fcbqName": "ANDREA PERAT GRACIA",
-      "fcbqPersonId": "fefd6bf1-98d0-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-a",
       "games": [
         {
-          "date": "2026-09-25",
+          "date": null,
           "round": 1,
-          "opponent": "MECVIL MANRESA CBF B",
+          "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "COPA CATALUNYA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 27.4,
           "pts": 8,
           "t2c": 3,
@@ -514,29 +350,28 @@
           "tli": 3,
           "val": 22,
           "pm": 19,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 4,
-          "matchCallUuid": "25fe684d-5342-4350-b3df-2ba657065352"
+          "pf": 4
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 21
     },
     "julia-pla__cudos-a": {
       "playerId": "julia-pla__cudos-a",
       "fcbqName": "JÚLIA PLA PLA",
-      "fcbqPersonId": "fea6e7e8-98d0-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-a",
       "games": [
         {
-          "date": "2026-09-25",
+          "date": null,
           "round": 1,
-          "opponent": "MECVIL MANRESA CBF B",
+          "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "COPA CATALUNYA FEMENINA",
-          "min": 29.5,
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
+          "min": 29.4,
           "pts": 13,
           "t2c": 4,
           "t2i": 11,
@@ -546,28 +381,27 @@
           "tli": 2,
           "val": 27,
           "pm": 18,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 4,
-          "matchCallUuid": "25fe684d-5342-4350-b3df-2ba657065352"
+          "pf": 4
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 13
     },
     "ares-bunol": {
       "playerId": "ares-bunol",
       "fcbqName": "ARES BUÑOL PERELLÓ",
-      "fcbqPersonId": "0078b1d2-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-a",
       "games": [
         {
-          "date": "2026-09-25",
+          "date": null,
           "round": 1,
-          "opponent": "MECVIL MANRESA CBF B",
+          "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "COPA CATALUNYA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 28.4,
           "pts": 15,
           "t2c": 1,
@@ -578,28 +412,27 @@
           "tli": 6,
           "val": 34,
           "pm": 24,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 3,
-          "matchCallUuid": "25fe684d-5342-4350-b3df-2ba657065352"
+          "pf": 3
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 11
     },
     "queralt-sole__cudos-a": {
       "playerId": "queralt-sole__cudos-a",
       "fcbqName": "QUERALT SOLE TORRES",
-      "fcbqPersonId": "00592c86-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-a",
       "games": [
         {
-          "date": "2026-09-25",
+          "date": null,
           "round": 1,
-          "opponent": "MECVIL MANRESA CBF B",
+          "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "COPA CATALUNYA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 10.9,
           "pts": 5,
           "t2c": 2,
@@ -610,28 +443,27 @@
           "tli": 2,
           "val": -11,
           "pm": -13,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 2,
-          "matchCallUuid": "25fe684d-5342-4350-b3df-2ba657065352"
+          "pf": 2
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 23
     },
     "monica-fontanet": {
       "playerId": "monica-fontanet",
       "fcbqName": "MONICA FONTANET MALLOL",
-      "fcbqPersonId": "00bb467d-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-a",
       "games": [
         {
-          "date": "2026-09-25",
+          "date": null,
           "round": 1,
-          "opponent": "MECVIL MANRESA CBF B",
+          "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "COPA CATALUNYA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 19.4,
           "pts": 6,
           "t2c": 0,
@@ -642,28 +474,27 @@
           "tli": 0,
           "val": 17,
           "pm": 13,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 2,
-          "matchCallUuid": "25fe684d-5342-4350-b3df-2ba657065352"
+          "pf": 2
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 95
     },
     "mariama-mballo__cudos-a": {
       "playerId": "mariama-mballo__cudos-a",
       "fcbqName": "MARIAMA MBALLO DIALLO",
-      "fcbqPersonId": "00d4ba16-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-a",
       "games": [
         {
-          "date": "2026-09-25",
+          "date": null,
           "round": 1,
-          "opponent": "MECVIL MANRESA CBF B",
+          "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "COPA CATALUNYA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 10.6,
           "pts": 1,
           "t2c": 0,
@@ -674,28 +505,27 @@
           "tli": 2,
           "val": -12,
           "pm": -12,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 0,
-          "matchCallUuid": "25fe684d-5342-4350-b3df-2ba657065352"
+          "pf": 0
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 27
     },
     "ada-domene": {
       "playerId": "ada-domene",
       "fcbqName": "ADA DOMENE MORALEDA",
-      "fcbqPersonId": "01104d56-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-a",
       "games": [
         {
-          "date": "2026-09-25",
+          "date": null,
           "round": 1,
-          "opponent": "MECVIL MANRESA CBF B",
+          "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "COPA CATALUNYA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 13,
           "pts": 0,
           "t2c": 0,
@@ -706,28 +536,27 @@
           "tli": 0,
           "val": -17,
           "pm": -17,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 0,
-          "matchCallUuid": "25fe684d-5342-4350-b3df-2ba657065352"
+          "pf": 0
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 24
     },
     "martina-benitez": {
       "playerId": "martina-benitez",
       "fcbqName": "MARTINA BENÍTEZ FARRANDO",
-      "fcbqPersonId": "00a25abc-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-a",
       "games": [
         {
-          "date": "2026-09-25",
+          "date": null,
           "round": 1,
-          "opponent": "MECVIL MANRESA CBF B",
+          "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "COPA CATALUNYA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 15.7,
           "pts": 1,
           "t2c": 0,
@@ -738,28 +567,27 @@
           "tli": 2,
           "val": -16,
           "pm": -15,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 1,
-          "matchCallUuid": "25fe684d-5342-4350-b3df-2ba657065352"
+          "pf": 1
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 79
     },
     "neus-escoda": {
       "playerId": "neus-escoda",
       "fcbqName": "NEUS ESCODA ANGERRI",
-      "fcbqPersonId": "00d5f4e8-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-a",
       "games": [
         {
-          "date": "2026-09-25",
+          "date": null,
           "round": 1,
-          "opponent": "MECVIL MANRESA CBF B",
+          "opponent": null,
           "teamId": "fem-a",
           "fcbqTeamId": "839e2243-48dc-4459-aec5-a2dadeb3ad53",
-          "competition": "COPA CATALUNYA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 26.8,
           "pts": 8,
           "t2c": 3,
@@ -770,28 +598,27 @@
           "tli": 4,
           "val": 20,
           "pm": 15,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 1,
-          "matchCallUuid": "25fe684d-5342-4350-b3df-2ba657065352"
+          "pf": 1
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 88
     },
     "julia-pla__farratges-b": {
       "playerId": "julia-pla__farratges-b",
       "fcbqName": "JÚLIA PLA PLA",
-      "fcbqPersonId": "fea6e7e8-98d0-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
         {
-          "date": "2026-09-26",
+          "date": null,
           "round": 1,
-          "opponent": "COOPERATIVA D'IVARS CB ALPICAT",
+          "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 24.4,
           "pts": 15,
           "t2c": 3,
@@ -802,28 +629,27 @@
           "tli": 5,
           "val": 16,
           "pm": 7,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 4,
-          "matchCallUuid": "496005f9-4412-4880-babd-71645944bbaf"
+          "pf": 4
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 13
     },
     "nuria-jimenez": {
       "playerId": "nuria-jimenez",
       "fcbqName": "NÚRIA JIMÉNEZ ARAN",
-      "fcbqPersonId": "00417321-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
         {
-          "date": "2026-09-26",
+          "date": null,
           "round": 1,
-          "opponent": "COOPERATIVA D'IVARS CB ALPICAT",
+          "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 29,
           "pts": 2,
           "t2c": 1,
@@ -834,28 +660,27 @@
           "tli": 0,
           "val": 1,
           "pm": 1,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 2,
-          "matchCallUuid": "496005f9-4412-4880-babd-71645944bbaf"
+          "pf": 2
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 30
     },
     "queralt-sole__farratges-b": {
       "playerId": "queralt-sole__farratges-b",
       "fcbqName": "QUERALT SOLE TORRES",
-      "fcbqPersonId": "00592c86-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
         {
-          "date": "2026-09-26",
+          "date": null,
           "round": 1,
-          "opponent": "COOPERATIVA D'IVARS CB ALPICAT",
+          "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 37.5,
           "pts": 29,
           "t2c": 11,
@@ -866,28 +691,27 @@
           "tli": 12,
           "val": 20,
           "pm": -1,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 3,
-          "matchCallUuid": "496005f9-4412-4880-babd-71645944bbaf"
+          "pf": 3
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 23
     },
     "mariama-mballo__farratges-b": {
       "playerId": "mariama-mballo__farratges-b",
       "fcbqName": "MARIAMA MBALLO DIALLO",
-      "fcbqPersonId": "00d4ba16-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
         {
-          "date": "2026-09-26",
+          "date": null,
           "round": 1,
-          "opponent": "COOPERATIVA D'IVARS CB ALPICAT",
+          "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 29.7,
           "pts": 2,
           "t2c": 1,
@@ -898,28 +722,27 @@
           "tli": 0,
           "val": 10,
           "pm": 12,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 4,
-          "matchCallUuid": "496005f9-4412-4880-babd-71645944bbaf"
+          "pf": 4
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 27
     },
     "jana-roldan": {
       "playerId": "jana-roldan",
       "fcbqName": "JANA ROLDAN ARANDILLA",
-      "fcbqPersonId": "0043de94-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
         {
-          "date": "2026-09-26",
+          "date": null,
           "round": 1,
-          "opponent": "COOPERATIVA D'IVARS CB ALPICAT",
+          "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 19.3,
           "pts": 5,
           "t2c": 0,
@@ -930,28 +753,27 @@
           "tli": 5,
           "val": 4,
           "pm": 0,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 1,
-          "matchCallUuid": "496005f9-4412-4880-babd-71645944bbaf"
+          "pf": 1
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 8
     },
     "xenia-andreu": {
       "playerId": "xenia-andreu",
       "fcbqName": "XENIA ANDREU MONELL",
-      "fcbqPersonId": "0152fb0d-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
         {
-          "date": "2026-09-26",
+          "date": null,
           "round": 1,
-          "opponent": "COOPERATIVA D'IVARS CB ALPICAT",
+          "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 11.1,
           "pts": 1,
           "t2c": 0,
@@ -962,28 +784,27 @@
           "tli": 2,
           "val": -10,
           "pm": -9,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 1,
-          "matchCallUuid": "496005f9-4412-4880-babd-71645944bbaf"
+          "pf": 1
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 93
     },
     "abril-gracia": {
       "playerId": "abril-gracia",
       "fcbqName": "ABRIL GRÀCIA PALACÍN",
-      "fcbqPersonId": "00c6aec6-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
         {
-          "date": "2026-09-26",
+          "date": null,
           "round": 1,
-          "opponent": "COOPERATIVA D'IVARS CB ALPICAT",
+          "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 8.6,
           "pts": 2,
           "t2c": 0,
@@ -994,28 +815,27 @@
           "tli": 2,
           "val": -2,
           "pm": -3,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 1,
-          "matchCallUuid": "496005f9-4412-4880-babd-71645944bbaf"
+          "pf": 1
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 33
     },
     "gina-betbese": {
       "playerId": "gina-betbese",
       "fcbqName": "GINA BETBESÉ SÁNCHEZ",
-      "fcbqPersonId": "010c1cb6-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
         {
-          "date": "2026-09-26",
+          "date": null,
           "round": 1,
-          "opponent": "COOPERATIVA D'IVARS CB ALPICAT",
+          "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 2.7,
           "pts": 0,
           "t2c": 0,
@@ -1026,28 +846,27 @@
           "tli": 0,
           "val": -7,
           "pm": -6,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 1,
-          "matchCallUuid": "496005f9-4412-4880-babd-71645944bbaf"
+          "pf": 1
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 11
     },
     "gina-trilla": {
       "playerId": "gina-trilla",
       "fcbqName": "GINA TRILLA PINIÉS",
-      "fcbqPersonId": "008d8cc3-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
         {
-          "date": "2026-09-26",
+          "date": null,
           "round": 1,
-          "opponent": "COOPERATIVA D'IVARS CB ALPICAT",
+          "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 33.5,
           "pts": 0,
           "t2c": 0,
@@ -1058,28 +877,27 @@
           "tli": 4,
           "val": 7,
           "pm": 11,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 0,
-          "matchCallUuid": "496005f9-4412-4880-babd-71645944bbaf"
+          "pf": 0
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 25
     },
     "jana-alarcon": {
       "playerId": "jana-alarcon",
       "fcbqName": "JANA ALARCON SOLANES",
-      "fcbqPersonId": "010c2021-98d1-11e9-a2a5-0216824770c2",
+      "fcbqPersonId": null,
       "teamId": "fem-b",
       "games": [
         {
-          "date": "2026-09-26",
+          "date": null,
           "round": 1,
-          "opponent": "COOPERATIVA D'IVARS CB ALPICAT",
+          "opponent": null,
           "teamId": "fem-b",
           "fcbqTeamId": "a5c75f3f-ca35-4553-9eb6-a29780eb2007",
-          "competition": "C.C. SEGONA CATEGORIA FEMENINA",
+          "competition": "TEMPORADA 2026 - FASE PRÈVIA - 01",
           "min": 4.2,
           "pts": 0,
           "t2c": 0,
@@ -1090,357 +908,13 @@
           "tli": 0,
           "val": -3,
           "pm": -2,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
+          "note": "Mostreig FCBQ (PJ=1). VAL fantasy = PTS − FC − (TLI−TLC) + PM.",
           "jornada": 1,
-          "pf": 1,
-          "matchCallUuid": "496005f9-4412-4880-babd-71645944bbaf"
+          "pf": 1
         }
       ],
-      "source": "fcbq-player-game-log",
+      "source": "fcbq-team-page-aggregate",
       "number": 24
-    },
-    "miquel-rubies": {
-      "playerId": "miquel-rubies",
-      "fcbqName": "MIQUEL RÚBIES PACH",
-      "fcbqPersonId": "00c6ae27-98d1-11e9-a2a5-0216824770c2",
-      "teamId": "masc-a",
-      "games": [
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "CB CAPPONT",
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "matchCallUuid": "2c53c6d0-96d3-4af9-a807-944352a25cbe",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 11.3,
-          "pts": 2,
-          "t2c": 1,
-          "t2i": null,
-          "t3c": 0,
-          "t3i": null,
-          "tlc": 0,
-          "tli": 0,
-          "pf": 2,
-          "val": -4,
-          "pm": -4,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
-        }
-      ],
-      "source": "fcbq-player-game-log"
-    },
-    "joan-boladeres": {
-      "playerId": "joan-boladeres",
-      "fcbqName": "JOAN BOLADERES NOGUEROLA",
-      "fcbqPersonId": "fddce700-98d0-11e9-a2a5-0216824770c2",
-      "teamId": "masc-a",
-      "games": [
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "CB CAPPONT",
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "matchCallUuid": "2c53c6d0-96d3-4af9-a807-944352a25cbe",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 19.6,
-          "pts": 11,
-          "t2c": 5,
-          "t2i": null,
-          "t3c": 0,
-          "t3i": null,
-          "tlc": 1,
-          "tli": 2,
-          "pf": 3,
-          "val": 24,
-          "pm": 17,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
-        }
-      ],
-      "source": "fcbq-player-game-log"
-    },
-    "david-oltra": {
-      "playerId": "david-oltra",
-      "fcbqName": "DAVID OLTRA CARRANZA",
-      "fcbqPersonId": "006a05d6-98d1-11e9-a2a5-0216824770c2",
-      "teamId": "masc-a",
-      "games": [
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "CB CAPPONT",
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "matchCallUuid": "2c53c6d0-96d3-4af9-a807-944352a25cbe",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 13.1,
-          "pts": 11,
-          "t2c": 3,
-          "t2i": null,
-          "t3c": 0,
-          "t3i": null,
-          "tlc": 5,
-          "tli": 8,
-          "pf": 2,
-          "val": 19,
-          "pm": 13,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
-        }
-      ],
-      "source": "fcbq-player-game-log"
-    },
-    "santi-sansaloni": {
-      "playerId": "santi-sansaloni",
-      "fcbqName": "SANTI SANSALONI QUELIZ",
-      "fcbqPersonId": "01116293-98d1-11e9-a2a5-0216824770c2",
-      "teamId": "masc-a",
-      "games": [
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "CB CAPPONT",
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "matchCallUuid": "2c53c6d0-96d3-4af9-a807-944352a25cbe",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 10.8,
-          "pts": 4,
-          "t2c": 2,
-          "t2i": null,
-          "t3c": 0,
-          "t3i": null,
-          "tlc": 0,
-          "tli": 0,
-          "pf": 2,
-          "val": 0,
-          "pm": -2,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
-        }
-      ],
-      "source": "fcbq-player-game-log"
-    },
-    "xavier-blanch": {
-      "playerId": "xavier-blanch",
-      "fcbqName": "XAVIER BLANCH SIRERA",
-      "fcbqPersonId": "fddcd827-98d0-11e9-a2a5-0216824770c2",
-      "teamId": "masc-a",
-      "games": [
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "CB CAPPONT",
-          "teamId": "masc-a",
-          "fcbqTeamId": "5f55017e-893e-4323-8b41-b58323ea8f73",
-          "matchCallUuid": "2c53c6d0-96d3-4af9-a807-944352a25cbe",
-          "competition": "1A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 20.3,
-          "pts": 11,
-          "t2c": 4,
-          "t2i": null,
-          "t3c": 1,
-          "t3i": null,
-          "tlc": 0,
-          "tli": 0,
-          "pf": 2,
-          "val": 10,
-          "pm": 1,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
-        }
-      ],
-      "source": "fcbq-player-game-log"
-    },
-    "jordi-gensana": {
-      "playerId": "jordi-gensana",
-      "fcbqName": "JORDI GENSANA PEDRA",
-      "fcbqPersonId": "008dc246-98d1-11e9-a2a5-0216824770c2",
-      "teamId": "masc-b",
-      "games": [
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "AGROLLOBERA PALAU D'ANGLESOLA",
-          "teamId": "masc-b",
-          "fcbqTeamId": "c057eeae-3aae-4e33-b2ab-54fabb2700ae",
-          "matchCallUuid": "c4fe67b2-72dd-4506-a41a-f461d8b0fc77",
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 25.6,
-          "pts": 14,
-          "t2c": 6,
-          "t2i": null,
-          "t3c": 0,
-          "t3i": null,
-          "tlc": 2,
-          "tli": 7,
-          "pf": 3,
-          "val": 17,
-          "pm": 11,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
-        }
-      ],
-      "source": "fcbq-player-game-log"
-    },
-    "joan-barri": {
-      "playerId": "joan-barri",
-      "fcbqName": "JOAN BARRI CASTELL",
-      "fcbqPersonId": "010851e9-98d1-11e9-a2a5-0216824770c2",
-      "teamId": "masc-b",
-      "games": [
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "AGROLLOBERA PALAU D'ANGLESOLA",
-          "teamId": "masc-b",
-          "fcbqTeamId": "c057eeae-3aae-4e33-b2ab-54fabb2700ae",
-          "matchCallUuid": "c4fe67b2-72dd-4506-a41a-f461d8b0fc77",
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 22.9,
-          "pts": 6,
-          "t2c": 3,
-          "t2i": null,
-          "t3c": 0,
-          "t3i": null,
-          "tlc": 0,
-          "tli": 0,
-          "pf": 0,
-          "val": 10,
-          "pm": 4,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
-        }
-      ],
-      "source": "fcbq-player-game-log"
-    },
-    "oriol-bringue": {
-      "playerId": "oriol-bringue",
-      "fcbqName": "ORIOL BRINGUÉ QUILES",
-      "fcbqPersonId": "fffb0b42-98d0-11e9-a2a5-0216824770c2",
-      "teamId": "masc-b",
-      "games": [
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "AGROLLOBERA PALAU D'ANGLESOLA",
-          "teamId": "masc-b",
-          "fcbqTeamId": "c057eeae-3aae-4e33-b2ab-54fabb2700ae",
-          "matchCallUuid": "c4fe67b2-72dd-4506-a41a-f461d8b0fc77",
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 25.9,
-          "pts": 2,
-          "t2c": 1,
-          "t2i": null,
-          "t3c": 0,
-          "t3i": null,
-          "tlc": 0,
-          "tli": 0,
-          "pf": 1,
-          "val": 22,
-          "pm": 21,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
-        }
-      ],
-      "source": "fcbq-player-game-log"
-    },
-    "isaac-osei": {
-      "playerId": "isaac-osei",
-      "fcbqName": "ISAAC OSEI",
-      "fcbqPersonId": "e68e64dd-1df9-4ab2-a9b6-c4817e6ef9f2",
-      "teamId": "masc-b",
-      "games": [
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "AGROLLOBERA PALAU D'ANGLESOLA",
-          "teamId": "masc-b",
-          "fcbqTeamId": "c057eeae-3aae-4e33-b2ab-54fabb2700ae",
-          "matchCallUuid": "c4fe67b2-72dd-4506-a41a-f461d8b0fc77",
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 22.4,
-          "pts": 15,
-          "t2c": 5,
-          "t2i": null,
-          "t3c": 0,
-          "t3i": null,
-          "tlc": 5,
-          "tli": 6,
-          "pf": 3,
-          "val": 22,
-          "pm": 11,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
-        }
-      ],
-      "source": "fcbq-player-game-log"
-    },
-    "francisco-romero": {
-      "playerId": "francisco-romero",
-      "fcbqName": "FRANCISCO ROMERO GOMEZ",
-      "fcbqPersonId": "fea8676c-98d0-11e9-a2a5-0216824770c2",
-      "teamId": "masc-b",
-      "games": [
-        {
-          "date": "2026-10-03",
-          "round": null,
-          "jornada": null,
-          "opponent": "AGROLLOBERA PALAU D'ANGLESOLA",
-          "teamId": "masc-b",
-          "fcbqTeamId": "c057eeae-3aae-4e33-b2ab-54fabb2700ae",
-          "matchCallUuid": "c4fe67b2-72dd-4506-a41a-f461d8b0fc77",
-          "competition": "2A. TERRITORIAL SÈNIOR MASCULÍ",
-          "min": 26.7,
-          "pts": 5,
-          "t2c": 1,
-          "t2i": null,
-          "t3c": 1,
-          "t3i": null,
-          "tlc": 0,
-          "tli": 0,
-          "pf": 1,
-          "val": 13,
-          "pm": 9,
-          "note": "Box score FCBQ (partit). VAL fantasy = PTS − FC − (TLI−TLC) + PM."
-        }
-      ],
-      "source": "fcbq-player-game-log"
     }
-  },
-  "ingest": {
-    "ok": true,
-    "source": "msstats-player-games",
-    "appended": 17,
-    "unmapped": [],
-    "unmatched": [],
-    "offRoster": [
-      {
-        "name": "MIQUEL RÚBIES PACH",
-        "playerId": "miquel-rubies",
-        "teamId": "masc-b",
-        "rosterTeamIds": [
-          "masc-a"
-        ],
-        "games": 1
-      },
-      {
-        "name": "SANTI SANSALONI QUELIZ",
-        "playerId": "santi-sansaloni",
-        "teamId": "masc-b",
-        "rosterTeamIds": [
-          "masc-a"
-        ],
-        "games": 1
-      }
-    ],
-    "absent": [],
-    "gaps": [],
-    "errors": [],
-    "unavailable": [],
-    "teams": 4,
-    "at": "2026-10-08T14:08:26.646Z"
   }
 }
