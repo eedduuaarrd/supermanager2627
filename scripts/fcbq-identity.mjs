@@ -21,6 +21,22 @@ export const BASE_IDS = {
   "GERARD SOLDEVILA CASAS": "gerard-soldevila",
   "ROGER COMPANYS SOLA": "roger-companys",
   "XAVIER BLANCH SIRERA": "xavier-blanch",
+  // Teixidó A — names as msstats returns them (accents stripped by normName):
+  // JOAN BOLADERES NOGUEROLA, DAVID OLTRA CARRANZA, MIQUEL RÚBIES PACH,
+  // SANTI SANSALONI QUELIZ. Rúbies/Sansaloni also appear for Lo Sifonet B;
+  // the roster only has them as masc-a, so those B games are off-roster.
+  "JOAN BOLADERES NOGUEROLA": "joan-boladeres",
+  "DAVID OLTRA CARRANZA": "david-oltra",
+  "MIQUEL RUBIES PACH": "miquel-rubies",
+  "SANTI SANSALONI QUELIZ": "santi-sansaloni",
+  // Lo Sifonet B — JORDI GENSANA PEDRA, JOAN BARRI CASTELL,
+  // ORIOL BRINGUÉ QUILES, ISAAC OSEI, FRANCISCO ROMERO GOMEZ.
+  // "D.F." stays unmapped: msstats restricts that personal log (HTTP 405).
+  "JORDI GENSANA PEDRA": "jordi-gensana",
+  "JOAN BARRI CASTELL": "joan-barri",
+  "ORIOL BRINGUE QUILES": "oriol-bringue",
+  "ISAAC OSEI": "isaac-osei",
+  "FRANCISCO ROMERO GOMEZ": "francisco-romero",
   "ARES BUNOL PERELLO": "ares-bunol",
   "JULIA PLA PLA": "julia-pla",
   "ANDREA PERAT GRACIA": "andrea-perat",
@@ -63,4 +79,25 @@ export function fantasyIdFor(name, fcbqTeamId) {
   const base = BASE_IDS[normName(name)];
   if (!base) return null;
   return { playerId: fantasyId(base, meta.slug), ...meta };
+}
+
+/**
+ * Fantasy roster (src/data/roster.ts) → Map<playerId, teamIds[]>.
+ * Only player entries carry `teamIds`; club-team objects are skipped.
+ * Plain text parse so .mjs scripts don't need a TS loader.
+ */
+export function parseRosterTeams(src) {
+  const roster = new Map();
+  const re = /^\s+id: "([^"]+)",$/gm;
+  const starts = [];
+  let m;
+  while ((m = re.exec(src))) starts.push({ id: m[1], at: m.index });
+  for (let i = 0; i < starts.length; i++) {
+    const block = src.slice(starts[i].at, starts[i + 1]?.at ?? src.length);
+    const tm = /teamIds:\s*\[([^\]]*)\]/.exec(block);
+    if (!tm) continue;
+    const teamIds = [...tm[1].matchAll(/"([^"]+)"/g)].map((x) => x[1]);
+    if (teamIds.length) roster.set(starts[i].id, teamIds);
+  }
+  return roster;
 }

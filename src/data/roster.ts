@@ -8,7 +8,7 @@ import marketPricesJson from "@/data/market-prices.json";
  * Fonts (basquetcatala.cat Plantilla live 2026-09-28, Chrome CDP + reCAPTCHA):
  * - TEIXIDÓ ASSOCIATS CONSELLERS, SLU CB BALAGUER A
  *   https://www.basquetcatala.cat/estadistica/equip/5f55017e-893e-4323-8b41-b58323ea8f73
- * - LO SIFONET CB BALAGUER B (sense estadístiques encara)
+ * - LO SIFONET CB BALAGUER B (plantilla parcial J2 Agrollobera)
  *   https://www.basquetcatala.cat/estadistica/equip/c057eeae-3aae-4e33-b2ab-54fabb2700ae
  * - CUDOS CONSULTORS CB BALAGUER A
  *   https://www.basquetcatala.cat/estadistica/equip/839e2243-48dc-4459-aec5-a2dadeb3ad53
@@ -29,7 +29,7 @@ import marketPricesJson from "@/data/market-prices.json";
  *   budget column = efectiu (cash); buy/sell al preu actual.
  *   8×10k = 80k < 100k: hi ha marge per completar la plantilla de 8.
  *
- * Regles: plantilla 8, pressupost 100.000 € (mercat multi-equip, 29 entrades).
+ * Regles: plantilla 8, pressupost 100.000 € (mercat multi-equip, 34 entrades).
  */
 
 export interface TeamInfo {
@@ -57,7 +57,7 @@ export const TEAMS: Record<TeamId, TeamInfo> = {
     fullName: "LO SIFONET CB BALAGUER B",
     competition: "2A Territorial Senior Masculí",
     fcbqId: "c057eeae-3aae-4e33-b2ab-54fabb2700ae",
-    rosterAvailable: false,
+    rosterAvailable: true,
   },
   "fem-a": {
     id: "fem-a",
@@ -226,6 +226,34 @@ export const ROSTER_SEED: Player[] = [
     photoUrl: "/players/roger-companys.jpg",
   },
   {
+    id: "santi-sansaloni",
+    position: "B",
+    name: "Santi Sansaloni Queliz",
+    number: 7,
+    pts: 4,
+    avgVal: avgFromVal(0),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "masc-a",
+    teamIds: ["masc-a"],
+    photoUrl: null,
+  },
+  {
+    id: "miquel-rubies",
+    position: "A",
+    name: "Miquel Rúbies Pach",
+    number: 14,
+    pts: 2,
+    avgVal: avgFromVal(-4),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "masc-a",
+    teamIds: ["masc-a"],
+    photoUrl: null,
+  },
+  {
     id: "xavier-blanch",
     position: "A",
     name: "Xavier Blanch Sirera",
@@ -238,6 +266,106 @@ export const ROSTER_SEED: Player[] = [
     teamId: "masc-a",
     teamIds: ["masc-a"],
     photoUrl: "/players/xavier-blanch.jpg",
+  },
+  {
+    id: "joan-boladeres",
+    position: "P",
+    name: "Joan Boladeres Noguerola",
+    number: 23,
+    pts: 11,
+    avgVal: avgFromVal(24),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "masc-a",
+    teamIds: ["masc-a"],
+    photoUrl: "/players/joan-boladeres.jpg",
+  },
+  {
+    id: "david-oltra",
+    position: "P",
+    name: "David Oltra Carranza",
+    number: 44,
+    pts: 11,
+    avgVal: avgFromVal(19),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "masc-a",
+    teamIds: ["masc-a"],
+    photoUrl: "/players/david-oltra.jpg",
+  },
+
+  // —— Lo Sifonet CB Balaguer B (masculí) ——
+  {
+    id: "isaac-osei",
+    position: "P",
+    name: "Isaac Osei",
+    number: 20,
+    pts: 15,
+    avgVal: avgFromVal(22),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "masc-b",
+    teamIds: ["masc-b"],
+    photoUrl: "/players/isaac-osei.jpg",
+  },
+  {
+    id: "jordi-gensana",
+    position: "P",
+    name: "Jordi Gensana Pedra",
+    number: 23,
+    pts: 14,
+    avgVal: avgFromVal(17),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "masc-b",
+    teamIds: ["masc-b"],
+    photoUrl: "/players/jordi-gensana.jpg",
+  },
+  {
+    id: "joan-barri",
+    position: "A",
+    name: "Joan Barri Castell",
+    number: 27,
+    pts: 6,
+    avgVal: avgFromVal(10),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "masc-b",
+    teamIds: ["masc-b"],
+    photoUrl: "/players/joan-barri.jpg",
+  },
+  {
+    id: "francisco-romero",
+    position: "B",
+    name: "Francisco Romero Gomez",
+    number: 70,
+    pts: 5,
+    avgVal: avgFromVal(13),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "masc-b",
+    teamIds: ["masc-b"],
+    photoUrl: "/players/francisco-romero.jpg",
+  },
+  {
+    id: "oriol-bringue",
+    position: "A",
+    name: "Oriol Bringué Quiles",
+    number: 11,
+    pts: 2,
+    avgVal: avgFromVal(22),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "masc-b",
+    teamIds: ["masc-b"],
+    photoUrl: "/players/oriol-bringue.jpg",
   },
   // —— Cudos Consultors CB Balaguer A (femení) ——
   {

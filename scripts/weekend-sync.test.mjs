@@ -3,10 +3,13 @@ import test from "node:test";
 import { buildFromRosters } from "./refresh-fcbq-stats.mjs";
 import {
   coverageGaps,
+  isNotPlayedLog,
   isRestrictedPlayerStats,
   mergeTeamLogs,
   resolvePlayerLog,
 } from "./fcbq-boxscores.mjs";
+import { fantasyIdFor, parseRosterTeams } from "./fcbq-identity.mjs";
+import { readFileSync } from "node:fs";
 import {
   applyAssignments,
   decideWeekendAdvance,
@@ -697,12 +700,172 @@ test("restricted Lo Sifonet player D.F. is ignored and does not fail the side", 
   const merged = mergeTeamLogs(
     { players: {} },
     [{ fcbqTeamId: SIFONET, players: kept }],
+    { roster: new Map([["miquel-rubies", ["masc-a"]]]) },
   );
   assert.equal(
     merged.unmapped.some((name) => name === "D.F."),
     false,
   );
-  assert.equal(merged.unmapped.includes("MIQUEL RÚBIES PACH"), true);
+  assert.equal(merged.unmatched.length, 0);
+  // Rúbies is a Teixidó A fantasy player; his Lo Sifonet B game is off-roster.
+  assert.deepEqual(
+    merged.offRoster.map((o) => [o.playerId, o.teamId]),
+    [["miquel-rubies", "masc-b"]],
+  );
+  assert.equal(merged.players["miquel-rubies"], undefined);
+});
+
+const boxLog = (date, uuid, pts, seconds = 600) => ({
+  date,
+  matchCallUuid: uuid,
+  opponent: { name: "Rival" },
+  accumulated: { pts, t2m: 0, t3m: 0, ftm: 0, fta: 0, fc: 0 },
+  computed: { seconds, onCourtPlusMinus: 0 },
+});
+
+test("the 10 Teixidó A / Lo Sifonet B box-score names map to their roster ids", () => {
+  const cases = [
+    ["XAVIER BLANCH SIRERA", MASC, "xavier-blanch"],
+    ["JOAN BOLADERES NOGUEROLA", MASC, "joan-boladeres"],
+    ["DAVID OLTRA CARRANZA", MASC, "david-oltra"],
+    ["MIQUEL RÚBIES PACH", MASC, "miquel-rubies"],
+    ["SANTI SANSALONI QUELIZ", MASC, "santi-sansaloni"],
+    ["JORDI GENSANA PEDRA", SIFONET, "jordi-gensana"],
+    ["JOAN BARRI CASTELL", SIFONET, "joan-barri"],
+    ["ORIOL BRINGUÉ QUILES", SIFONET, "oriol-bringue"],
+    ["ISAAC OSEI", SIFONET, "isaac-osei"],
+    ["FRANCISCO ROMERO GOMEZ", SIFONET, "francisco-romero"],
+  ];
+  for (const [name, team, id] of cases) {
+    assert.equal(fantasyIdFor(name, team)?.playerId, id, name);
+  }
+  assert.equal(fantasyIdFor("D.F.", SIFONET), null);
+});
+
+test("roster.ts parses into player ids with their club sides", () => {
+  const roster = parseRosterTeams(
+    readFileSync(new URL("../src/data/roster.ts", import.meta.url), "utf8"),
+  );
+  assert.deepEqual(roster.get("hector-lozano"), ["masc-a"]);
+  assert.deepEqual(roster.get("julia-pla__farratges-b"), ["fem-b"]);
+  assert.equal(roster.has("masc-a"), false);
+  for (const id of [
+    "xavier-blanch",
+    "joan-boladeres",
+    "david-oltra",
+    "miquel-rubies",
+    "santi-sansaloni",
+    "jordi-gensana",
+    "joan-barri",
+    "oriol-bringue",
+    "isaac-osei",
+    "francisco-romero",
+  ]) {
+    assert.ok(roster.has(id), `${id} missing from roster.ts`);
+  }
+});
+
+test("a federation player with games and no identity is reported unmatched", () => {
+  const merged = mergeTeamLogs(
+    { players: {} },
+    [
+      {
+        fcbqTeamId: MASC,
+        players: [
+          { name: "NOU FITXATGE PEREZ", gamesPlayed: 1, games: [boxLog("2026-10-10", "m1", 8)] },
+          // bench call-up with 0 seconds is not a game: never unmatched
+          { name: "BANQUETA SENSE MINUTS", gamesPlayed: 0, games: [boxLog("2026-10-10", "m1", 0, 0)] },
+          { name: "SENSE PARTITS", gamesPlayed: 0, games: [] },
+          { name: "MARC ESCODA ANGERRI", gamesPlayed: 1, games: [boxLog("2026-10-10", "m1", 4)] },
+        ],
+      },
+    ],
+    { roster: new Map([["marc-escoda", ["masc-a"]]]) },
+  );
+  assert.deepEqual(
+    merged.unmatched.map((u) => [u.name, u.reason, u.games]),
+    [["NOU FITXATGE PEREZ", "no-identity", 1]],
+  );
+  assert.equal(merged.players["marc-escoda"].games.length, 1);
+  assert.equal(coverageGaps(merged.players, merged.expectations).length, 0);
+});
+
+test("a mapped id missing from roster.ts is unmatched, not silently stored", () => {
+  const merged = mergeTeamLogs(
+    { players: {} },
+    [
+      {
+        fcbqTeamId: MASC,
+        players: [
+          { name: "JOAN BOLADERES NOGUEROLA", gamesPlayed: 1, games: [boxLog("2026-10-10", "m1", 11)] },
+        ],
+      },
+    ],
+    { roster: new Map([["marc-escoda", ["masc-a"]]]) },
+  );
+  assert.equal(merged.unmatched.length, 1);
+  assert.equal(merged.unmatched[0].reason, "not-in-roster");
+  assert.equal(merged.unmatched[0].playerId, "joan-boladeres");
+  assert.equal(merged.players["joan-boladeres"], undefined);
+});
+
+test("a 0-second call-up is not stored as a game (PJ does not count it)", () => {
+  assert.equal(isNotPlayedLog(boxLog("2026-09-27", "m0", 0, 0)), true);
+  assert.equal(isNotPlayedLog(boxLog("2026-09-27", "m0", 0, 30)), false);
+  assert.equal(isNotPlayedLog(boxLog("2026-09-27", "m0", 2, 0)), false);
+  const existing = {
+    players: {
+      "david-oltra": {
+        playerId: "david-oltra",
+        teamId: "masc-a",
+        games: [
+          {
+            date: "2026-10-03",
+            round: 2,
+            jornada: 2,
+            teamId: "masc-a",
+            matchCallUuid: "m2",
+            pts: 11,
+            pf: 2,
+            tlc: 5,
+            tli: 8,
+            pm: 13,
+            val: 19,
+          },
+        ],
+      },
+    },
+  };
+  const merged = mergeTeamLogs(
+    existing,
+    [
+      {
+        fcbqTeamId: MASC,
+        players: [
+          {
+            name: "DAVID OLTRA CARRANZA",
+            gamesPlayed: 1,
+            games: [
+              boxLog("2026-09-27", "m0", 0, 0),
+              {
+                date: "2026-10-03",
+                matchCallUuid: "m2",
+                accumulated: { pts: 11, t2m: 3, t3m: 0, ftm: 5, fta: 8, fc: 2 },
+                computed: { seconds: 787, onCourtPlusMinus: 13 },
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    { roster: new Map([["david-oltra", ["masc-a"]]]) },
+  );
+  const games = merged.players["david-oltra"].games;
+  assert.equal(merged.appended, 0);
+  assert.equal(games.length, 1);
+  assert.equal(games[0].jornada, 2);
+  assert.equal(games[0].val, 19);
+  assert.equal(coverageGaps(merged.players, merged.expectations).length, 0);
 });
 
 test("PJ>1 plantilla averages do not append a game row", () => {

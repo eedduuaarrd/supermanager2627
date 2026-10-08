@@ -196,6 +196,27 @@ function ingestIsFresh(startedMs) {
   }
 }
 
+/** Surface identity misses from this run's ingest in the weekend-sync log. */
+function logUnmatchedPlayers(startedMs) {
+  try {
+    const ingest = loadStats().ingest;
+    const at = Date.parse(ingest?.at ?? "");
+    if (!Number.isFinite(at) || at < startedMs - 5000) return;
+    const unmatched = Array.isArray(ingest.unmatched) ? ingest.unmatched : [];
+    if (unmatched.length) {
+      log(
+        `!!! UNMATCHED FCBQ PLAYERS (${unmatched.length}) — no puntuaran fins que s'afegeixin a fcbq-identity/roster: ${unmatched.join(" | ")}`,
+      );
+    }
+    const offRoster = Array.isArray(ingest.offRoster) ? ingest.offRoster : [];
+    for (const o of offRoster) {
+      log(`off-roster (ignored): ${o.name} ${o.games} game(s) for ${o.teamId}; roster ${o.playerId}=${(o.rosterTeamIds ?? []).join(",")}`);
+    }
+  } catch {
+    // stats file unreadable: the ingest FAIL line above already says so
+  }
+}
+
 function refreshFixtures(round) {
   const fetchArgs = [];
   let useBrowser = false;
@@ -308,6 +329,7 @@ async function main() {
       ingestOk = false;
       log(`stats ingest FAIL: ${err.message}`);
     }
+    logUnmatchedPlayers(startedMs);
   }
 
   let fixturesFile = existsSync(FIXTURES)
