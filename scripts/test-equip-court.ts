@@ -690,6 +690,44 @@ async function main() {
   assert.equal(Object.hasOwn(noSheet, "sat"), false);
   console.log("OK '-' until the match ends, then 0 if they did not play");
 
+  // Same source as the player page: a jornada-tagged game shows before any
+  // score row or fixture result exists; lineup captain doubles it.
+  const fromStats = pointsForInProgressCourt({
+    round: 3,
+    playerIds: ["cap", "other", "dnp", "none"],
+    scores: [],
+    lineupCaptainId: "cap",
+    jornadaValOf: (id) => ({ cap: 7, other: -2, dnp: 0 } as Record<string, number>)[id] ?? null,
+    teamOf: () => "masc-a",
+    matches: [],
+  });
+  assert.deepEqual(fromStats, { cap: 14, other: -2, dnp: 0 });
+  const storedWins = pointsForInProgressCourt({
+    round: 3,
+    playerIds: ["cap"],
+    scores: [{ playerId: "cap", val: 5, points: 10 }],
+    captainId: "cap",
+    jornadaValOf: () => 99,
+    teamOf: () => "masc-a",
+    matches: [],
+  });
+  assert.equal(storedWins.cap, 10);
+  const provisionalChip = withCurrentJornadaChip(
+    [{ round: 2, points: 30, cumulative: 50, rank: 1 }],
+    3,
+    true,
+    11.25,
+  );
+  assert.deepEqual(provisionalChip[1], {
+    round: 3,
+    points: 11.3,
+    cumulative: 61.3,
+    rank: null,
+    scored: true,
+  });
+  assert.equal(withCurrentJornadaChip([], 3, true, null)[0].scored, false);
+  console.log("OK open jornada court + pill read the player-page jornada stats");
+
   const builderSrc = fs.readFileSync(
     path.join(root, "src/components/lineup-builder.tsx"),
     "utf8",

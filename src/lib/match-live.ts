@@ -24,7 +24,11 @@ import {
   buildCourtMatchSheets,
   pointsForInProgressCourt,
 } from "@/lib/equip-court";
-import { fantasyStatFromGame, type PlayerGameStat } from "@/lib/player-stats";
+import {
+  fantasyStatFromGame,
+  getPlayerGameForRound,
+  type PlayerGameStat,
+} from "@/lib/player-stats";
 import { PUSH_TITLE } from "@/lib/push-policy";
 import { deliverToAll, ensureVapid, type PushMessage } from "@/lib/push";
 import { getRoundStatus } from "@/lib/rounds";
@@ -512,6 +516,7 @@ export function inProgressCourtPointsForTeam(
   teamId: string,
   round: number,
   playerIds: string[],
+  lineupCaptainId: string | null = null,
 ): Record<string, number> {
   const stored = readRoundScoreRow(teamId, round);
   const fixtures = loadFixtures();
@@ -521,6 +526,12 @@ export function inProgressCourtPointsForTeam(
     playerIds,
     scores: stored.scores,
     captainId: stored.captainId,
+    lineupCaptainId,
+    // Same source as the player page: that player's game tagged to this jornada.
+    jornadaValOf: (playerId) => {
+      const game = getPlayerGameForRound(playerId, round);
+      return game ? fantasyStatFromGame(game).points : null;
+    },
     teamOf: (playerId) => getPlayer(playerId)?.teamId ?? null,
     matches: buildCourtMatchSheets({
       round,

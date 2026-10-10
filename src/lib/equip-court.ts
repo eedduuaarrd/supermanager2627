@@ -147,8 +147,17 @@ export function pointsForInProgressCourt(input: {
   captainId?: string | null;
   teamOf: (playerId: string) => string | null;
   matches: CourtMatchSheet[];
+  /**
+   * Same per-player jornada figure the player page shows (raw VAL of that
+   * player's game tagged to this jornada, 0 for a DNP row), or null when the
+   * player has no game for the jornada yet. Captain ×2 is applied here.
+   */
+  jornadaValOf?: (playerId: string) => number | null;
+  /** Lineup captain, used when no score row exists yet. */
+  lineupCaptainId?: string | null;
 }): Record<string, number> {
-  const captainId = input.captainId ? canon(input.captainId) : null;
+  const capRaw = input.captainId ?? input.lineupCaptainId ?? null;
+  const captainId = capRaw ? canon(capRaw) : null;
   const out: Record<string, number> = {};
   for (const score of input.scores) {
     const id = canon(score.playerId);
@@ -159,6 +168,11 @@ export function pointsForInProgressCourt(input: {
   for (const playerId of input.playerIds) {
     const id = canon(playerId);
     if (id in out) continue;
+    const val = input.jornadaValOf?.(id) ?? null;
+    if (typeof val === "number" && Number.isFinite(val)) {
+      out[id] = id === captainId && CAPTAIN_MULTIPLIER > 0 ? val * CAPTAIN_MULTIPLIER : val;
+      continue;
+    }
     const teamId = input.teamOf(id);
     if (!teamId) continue;
     const matches = input.matches.filter(
@@ -238,6 +252,8 @@ export function withCurrentJornadaChip(
   rows: readonly JornadaChipPoints[],
   currentRound: number,
   pinCurrent: boolean,
+  /** Provisional open-jornada total (sum of the court numbers), not stored. */
+  provisionalPoints: number | null = null,
 ): JornadaChipPoints[] {
   const ordered = [...rows].sort((a, b) => a.round - b.round);
   if (!pinCurrent || !Number.isInteger(currentRound) || currentRound < 1) {
@@ -245,12 +261,16 @@ export function withCurrentJornadaChip(
   }
   if (ordered.some((row) => row.round === currentRound)) return ordered;
   const last = ordered[ordered.length - 1];
+  const provisional =
+    typeof provisionalPoints === "number" && Number.isFinite(provisionalPoints)
+      ? Math.round(provisionalPoints * 10) / 10
+      : null;
   const chip: JornadaChipPoints = {
     round: currentRound,
-    points: 0,
-    cumulative: last?.cumulative ?? 0,
+    points: provisional ?? 0,
+    cumulative: (last?.cumulative ?? 0) + (provisional ?? 0),
     rank: null,
-    scored: false,
+    scored: provisional != null,
   };
   return [...ordered, chip].sort((a, b) => a.round - b.round);
 }

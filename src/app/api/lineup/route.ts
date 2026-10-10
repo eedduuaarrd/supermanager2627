@@ -119,7 +119,12 @@ export async function GET() {
     budget: row.budget ?? INITIAL_BUDGET,
     teamId,
     lineup,
-    playedVals: inProgressCourtPointsForTeam(teamId, round, lineup.playerIds),
+    playedVals: inProgressCourtPointsForTeam(
+      teamId,
+      round,
+      lineup.playerIds,
+      lineup.captainId,
+    ),
   });
 }
 
