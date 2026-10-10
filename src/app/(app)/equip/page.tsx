@@ -61,6 +61,14 @@ function EquipContent() {
     };
   }, [activeTeamId, lineupLocked, reload, round, roundStatus]);
 
+  // Open jornada: the pill total is the sum of the same court numbers.
+  const provisionalValues = lineup.playerIds
+    .map((id) => playedVals[id])
+    .filter((v): v is number => typeof v === "number" && Number.isFinite(v));
+  const provisionalTotal =
+    roundStatus === "open" && provisionalValues.length > 0
+      ? provisionalValues.reduce((a, b) => a + b, 0)
+      : null;
   const readOnly = lineupLocked || transfer?.windowOpen === false;
   const court = resolveEquipCourt({
     lineupLocked,
@@ -81,7 +89,10 @@ function EquipContent() {
         </p>
         <TeamSwitcher />
       </div>
-      <JornadaPointsHistory onPastCourt={setPast} />
+      <JornadaPointsHistory
+        provisionalPoints={provisionalTotal}
+        onPastCourt={setPast}
+      />
       <div className="min-h-0 flex-1">
         <LineupBuilder
           key={past ? `jornada-${past.round}` : "current"}

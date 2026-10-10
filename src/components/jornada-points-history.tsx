@@ -28,7 +28,10 @@ type HistoryRow = {
 
 export function JornadaPointsHistory({
   onPastCourt,
+  provisionalPoints = null,
 }: {
+  /** Open jornada total from the court numbers (not stored); null keeps "-"/0. */
+  provisionalPoints?: number | null;
   /** Selected past jornada, or null when the court should show the current view. */
   onPastCourt?: (court: PastCourtView | null) => void;
 }) {
@@ -59,6 +62,7 @@ export function JornadaPointsHistory({
     })),
     round,
     pinCurrent,
+    provisionalPoints,
   );
 
   useEffect(() => {
