@@ -54,6 +54,10 @@ export const BASE_IDS = {
   "GINA BETBESE SANCHEZ": "gina-betbese",
   "GINA TRILLA PINIES": "gina-trilla",
   "JANA ALARCON SOLANES": "jana-alarcon",
+  // Cudos A, debut J3 (10/10/2026)
+  "MARTINA HERMOSO GESA": "martina-hermoso",
+  "MARTINA BELLART SEGARRA": "martina-bellart",
+  "MARIAMA BALDE BALDE": "mariama-balde",
 };
 
 const DUAL_BASES = new Set([
@@ -63,6 +67,9 @@ const DUAL_BASES = new Set([
   // Teixidó A + Lo Sifonet B (since J3): miquel-rubies__teixido-a / __sifonet-b
   "miquel-rubies",
   "santi-sansaloni",
+  // Farratges B + Cudos A (since J3): __farratges-b / __cudos-a
+  "jana-roldan",
+  "xenia-andreu",
 ]);
 
 /**
@@ -73,6 +80,8 @@ const DUAL_BASES = new Set([
 export const RENAMED_IDS = {
   "miquel-rubies": "miquel-rubies__teixido-a",
   "santi-sansaloni": "santi-sansaloni__teixido-a",
+  "jana-roldan": "jana-roldan__farratges-b",
+  "xenia-andreu": "xenia-andreu__farratges-b",
 };
 
 export function normName(s) {

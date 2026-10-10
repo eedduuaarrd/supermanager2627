@@ -1297,3 +1297,19 @@ test("a new stored game moves that price and a missing box does not", () => {
   assert.equal(quiet.price, 10000);
   assert.equal(quiet.pricedGames, 1);
 });
+
+test("J3 Cudos A: new players map and Jana/Xenia are dual-team (Farratges B primary)", async () => {
+  const { fantasyIdFor, RENAMED_IDS } = await import("./fcbq-identity.mjs");
+  const fantasyId = (n, t) => fantasyIdFor(n, t)?.playerId;
+  const CUDOS_A = "839e2243-48dc-4459-aec5-a2dadeb3ad53";
+  const FARR_B = "a5c75f3f-ca35-4553-9eb6-a29780eb2007";
+  assert.equal(fantasyId("MARTINA HERMOSO GESA", CUDOS_A), "martina-hermoso");
+  assert.equal(fantasyId("MARTINA BELLART SEGARRA", CUDOS_A), "martina-bellart");
+  assert.equal(fantasyId("MARIAMA BALDE BALDE", CUDOS_A), "mariama-balde");
+  assert.equal(fantasyId("JANA ROLDAN ARANDILLA", CUDOS_A), "jana-roldan__cudos-a");
+  assert.equal(fantasyId("JANA ROLDAN ARANDILLA", FARR_B), "jana-roldan__farratges-b");
+  assert.equal(fantasyId("XENIA ANDREU MONELL", CUDOS_A), "xenia-andreu__cudos-a");
+  assert.equal(fantasyId("XENIA ANDREU MONELL", FARR_B), "xenia-andreu__farratges-b");
+  assert.equal(RENAMED_IDS["jana-roldan"], "jana-roldan__farratges-b");
+  assert.equal(RENAMED_IDS["xenia-andreu"], "xenia-andreu__farratges-b");
+});

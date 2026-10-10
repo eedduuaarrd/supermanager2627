@@ -371,13 +371,18 @@ async function main() {
     fatal.length === 0 &&
     teamLogs.length + unavailable.length === CLUB_TEAMS.length &&
     merged.expectations.length > 0 &&
-    gaps.length === 0 &&
-    unmatched.length === 0;
+    gaps.length === 0;
+  // Unmatched FCBQ players (no identity / not in roster) are logged loudly
+  // below and recorded in ingest.unmatched, but do not fail the ingest: they
+  // only lose their own points until added, and must not block the weekend
+  // sync / Sunday close. Real fetch errors and coverage gaps still fail.
+  const identityComplete = unmatched.length === 0;
 
   writeStats(existing, {
     players: merged.players,
     ingest: {
       ok,
+      identityComplete,
       appended: merged.appended,
       unmapped: merged.unmapped,
       unmatched,
@@ -391,7 +396,7 @@ async function main() {
   });
 
   console.log(
-    `Wrote ${OUT}: appended ${merged.appended}, coverage gaps ${gaps.length}, teams ${teamLogs.length}/${CLUB_TEAMS.length}, ok=${ok}`,
+    `Wrote ${OUT}: appended ${merged.appended}, coverage gaps ${gaps.length}, teams ${teamLogs.length}/${CLUB_TEAMS.length}, ok=${ok}${identityComplete ? "" : ", UNMATCHED " + unmatched.length}`,
   );
   if (unavailable.length) {
     console.warn("No season stats (404), not blocking:", unavailable.join(" | "));
