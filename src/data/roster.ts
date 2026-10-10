@@ -29,7 +29,7 @@ import marketPricesJson from "@/data/market-prices.json";
  *   budget column = efectiu (cash); buy/sell al preu actual.
  *   8×10k = 80k < 100k: hi ha marge per completar la plantilla de 8.
  *
- * Regles: plantilla 8, pressupost 100.000 € (mercat multi-equip, 41 entrades).
+ * Regles: plantilla 8, pressupost 100.000 € (mercat multi-equip, 46 entrades).
  */
 
 export interface TeamInfo {
@@ -432,6 +432,51 @@ export const ROSTER_SEED: Player[] = [
     note: "També al mercat com a julia-pla__farratges-b (Farratges La Noguera CB Balaguer B).",
   },
   {
+    id: "martina-hermoso",
+    position: "A",
+    name: "Martina Hermoso Gesa",
+    number: 18,
+    pts: 0,
+    avgVal: avgFromVal(0),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "fem-a",
+    teamIds: ["fem-a"],
+    photoUrl: null,
+    note: "Debut a la J3 (10/10/2026). Posició provisional (estimada per estadística).",
+  },
+  {
+    id: "martina-bellart",
+    position: "B",
+    name: "Martina Bellart Segarra",
+    number: 22,
+    pts: 0,
+    avgVal: avgFromVal(0),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "fem-a",
+    teamIds: ["fem-a"],
+    photoUrl: null,
+    note: "Debut a la J3 (10/10/2026). Posició provisional (estimada per estadística).",
+  },
+  {
+    id: "mariama-balde",
+    position: "P",
+    name: "Mariama Balde Balde",
+    number: 12,
+    pts: 0,
+    avgVal: avgFromVal(0),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "fem-a",
+    teamIds: ["fem-a"],
+    photoUrl: null,
+    note: "Debut a la J3 (10/10/2026). Posició provisional (estimada per estadística).",
+  },
+  {
     id: "andrea-perat",
     position: "A",
     name: "Andrea Perat Gracia",
@@ -577,7 +622,7 @@ export const ROSTER_SEED: Player[] = [
     note: "També al mercat com a julia-pla__cudos-a (Cudos Consultors CB Balaguer A).",
   },
   {
-    id: "jana-roldan",
+    id: "jana-roldan__farratges-b",
     position: "A",
     name: "Jana Roldan Arandilla",
     number: 8,
@@ -589,6 +634,22 @@ export const ROSTER_SEED: Player[] = [
     teamId: "fem-b",
     teamIds: ["fem-b"],
     photoUrl: "/players/jana-roldan.jpg",
+    note: "També al mercat com a jana-roldan__cudos-a (Cudos CB Balaguer A).",
+  },
+  {
+    id: "jana-roldan__cudos-a",
+    position: "A",
+    name: "Jana Roldan Arandilla",
+    number: 23,
+    pts: 0,
+    avgVal: avgFromVal(0),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "fem-a",
+    teamIds: ["fem-a"],
+    photoUrl: "/players/jana-roldan.jpg",
+    note: "També al mercat com a jana-roldan__farratges-b (Farratges La Noguera CB Balaguer B).",
   },
   {
     id: "nuria-jimenez",
@@ -634,7 +695,7 @@ export const ROSTER_SEED: Player[] = [
     photoUrl: "/players/abril-gracia.jpg",
   },
   {
-    id: "xenia-andreu",
+    id: "xenia-andreu__farratges-b",
     position: "P",
     name: "Xenia Andreu Monell",
     number: 93,
@@ -646,6 +707,22 @@ export const ROSTER_SEED: Player[] = [
     teamId: "fem-b",
     teamIds: ["fem-b"],
     photoUrl: "/players/xenia-andreu.jpg",
+    note: "També al mercat com a xenia-andreu__cudos-a (Cudos CB Balaguer A).",
+  },
+  {
+    id: "xenia-andreu__cudos-a",
+    position: "P",
+    name: "Xenia Andreu Monell",
+    number: 93,
+    pts: 0,
+    avgVal: avgFromVal(0),
+    price: seedPrice(),
+    prevPrice: INITIAL_PRICE,
+    source: "fcbq",
+    teamId: "fem-a",
+    teamIds: ["fem-a"],
+    photoUrl: "/players/xenia-andreu.jpg",
+    note: "També al mercat com a xenia-andreu__farratges-b (Farratges La Noguera CB Balaguer B).",
   },
   {
     id: "gina-betbese",
@@ -794,6 +871,9 @@ export const LEGACY_PLAYER_ID_MAP: Record<string, string> = {
   "ada-dorienie": "ada-domene",
   // Dual-team since J3 (Teixidó A + Lo Sifonet B): plain id = primary (Teixidó A).
   "miquel-rubies": "miquel-rubies__teixido-a",
+  // Dual-team since J3 (Farratges B + Cudos A): plain id = primary (Farratges B).
+  "jana-roldan": "jana-roldan__farratges-b",
+  "xenia-andreu": "xenia-andreu__farratges-b",
   "santi-sansaloni": "santi-sansaloni__teixido-a",
 };
 
