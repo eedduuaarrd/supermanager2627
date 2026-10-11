@@ -105,7 +105,14 @@ export default async function JugadorPage({
   const detail = buildPlayerDetail(id);
   if (!detail) notFound();
 
-  const { player, games, summary, meta } = detail;
+  const { player, games: rawGames, summary, meta } = detail;
+  // Newest first: highest jornada on top, then latest date.
+  const games = [...rawGames].sort((a, b) => {
+    const ja = gameJornada(a) ?? -1;
+    const jb = gameJornada(b) ?? -1;
+    if (ja !== jb) return jb - ja;
+    return (dateForGame(b) ?? "").localeCompare(dateForGame(a) ?? "");
+  });
   const back = backNav(from);
   // Dual-team fantasy ids use this variant's teamId → that side's FCBQ schedule.
   const nextMatch = nextMatchForTeamId(player.teamId);
