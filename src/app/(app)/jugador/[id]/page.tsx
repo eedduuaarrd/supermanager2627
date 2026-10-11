@@ -22,8 +22,14 @@ function fmt(n: number | null | undefined, digits = 0) {
   return digits > 0 ? n.toFixed(digits) : String(Math.round(n * 10) / 10);
 }
 
+/**
+ * Field goals: FCBQ/msstats records made shots reliably but not misses
+ * (attempts are often null, or just equal to made). Show "made/att" only when
+ * real misses are recorded; otherwise just the made count — never a fake "x/x".
+ */
 function shooting(made?: number | null, att?: number | null) {
-  if (made == null || att == null) return "—";
+  if (made == null) return "—";
+  if (att == null || att <= made) return String(made);
   return `${made}/${att}`;
 }
 
