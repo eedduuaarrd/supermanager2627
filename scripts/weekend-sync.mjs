@@ -42,6 +42,8 @@
  *   --skip-fixtures      skip fixtures fetch
  *   --skip-score         refresh+lock only
  *   --skip-prices        skip market price tick
+ *   --as-of <ISO>        decide day/week as of this instant (rerun of a missed
+ *                        close); also env WEEKEND_SYNC_AS_OF. Default: run start.
  *   --dry-run            print plan
  */
 import { spawnSync } from "node:child_process";
@@ -60,6 +62,7 @@ import {
   decideWeekendAdvance,
   idealRoundToLock,
   isMadridSunday,
+  resolveRunNow,
   shouldUpdateMarketPrices,
   weekendSyncShouldFail,
 } from "./fcbq-weekend-guard.mjs";
@@ -77,6 +80,19 @@ const skipFixtures = args.includes("--skip-fixtures");
 const skipScore = args.includes("--skip-score");
 const skipPrices = args.includes("--skip-prices");
 const dryRun = args.includes("--dry-run");
+
+/**
+ * One clock for the whole run. The Sunday 23:59 timer plus slow fetches can
+ * cross midnight; every day/week decision must use the run start (or an
+ * explicit --as-of / WEEKEND_SYNC_AS_OF for a rerun), never a later new Date().
+ */
+const RUN_NOW = resolveRunNow(args);
+const RUN_STARTED_MS = Date.now();
+/** Hard cap so retries can never run far past the timer instant. */
+const RUN_BUDGET_MS = 10 * 60 * 1000;
+function remainingBudgetMs() {
+  return RUN_BUDGET_MS - (Date.now() - RUN_STARTED_MS);
+}
 
 const APP_URL = (process.env.APP_URL || "http://127.0.0.1:4317").replace(
   /\/$/,
@@ -156,7 +172,11 @@ function rememberScoredWeek(key) {
 }
 
 function runNode(script, scriptArgs = [], extraEnv = {}, options = {}) {
-  const timeoutMs = options.timeoutMs;
+  const left = remainingBudgetMs();
+  if (left < 5_000) {
+    throw new Error(`${script} skipped: run budget (${RUN_BUDGET_MS / 60000} min) exhausted`);
+  }
+  const timeoutMs = Math.min(options.timeoutMs ?? left, left);
   const r = spawnSync(process.execPath, [join(root, script), ...scriptArgs], {
     stdio: "inherit",
     cwd: root,
@@ -267,7 +287,7 @@ function refreshFixtures(round) {
       file.teams.push({ ...t, fixtures: [] });
     }
   }
-  const week = tagJornadaWeek(file, round);
+  const week = tagJornadaWeek(file, round, RUN_NOW);
   writeFileSync(FIXTURES, JSON.stringify(file, null, 2) + "\n");
   log(`fixtures tagged jornada ${round} for Madrid week ${week.from}→${week.to}`);
   return { file, ok };
@@ -303,7 +323,7 @@ async function postAdmin(action, extra = {}) {
 
 async function main() {
   const startedMs = Date.now();
-  log("weekend-sync start");
+  log(`weekend-sync start as-of=${RUN_NOW.toISOString()}`);
   const round = currentRound();
   log(`current fantasy jornada=${round}`);
 
@@ -347,7 +367,7 @@ async function main() {
     round,
     fixturesFile,
     stats,
-    now: new Date(),
+    now: RUN_NOW,
     scoredWeekKey: scoredWeekKey(),
     ingestOk: dryRun ? true : ingestOk,
     fixturesOk: dryRun ? true : fixturesOk,
@@ -366,7 +386,7 @@ async function main() {
       : "lineup_lock_at=null (no published tip-offs — lineup stays open)",
   );
 
-  const sunday = isMadridSunday(new Date());
+  const sunday = isMadridSunday(RUN_NOW);
   if (dryRun) {
     const previewTarget = idealRoundToLock({
       isSunday: sunday,
@@ -486,7 +506,7 @@ async function main() {
   const nextRound = currentRound();
   if (!skipFixtures) {
     fixturesFile = JSON.parse(readFileSync(FIXTURES, "utf8"));
-    tagJornadaWeek(fixturesFile, nextRound);
+    tagJornadaWeek(fixturesFile, nextRound, RUN_NOW);
     writeFileSync(FIXTURES, JSON.stringify(fixturesFile, null, 2) + "\n");
   }
   const nextLock = computeLockAt(

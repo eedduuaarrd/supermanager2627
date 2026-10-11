@@ -1313,3 +1313,22 @@ test("J3 Cudos A: new players map and Jana/Xenia are dual-team (Farratges B prim
   assert.equal(RENAMED_IDS["jana-roldan"], "jana-roldan__farratges-b");
   assert.equal(RENAMED_IDS["xenia-andreu"], "xenia-andreu__farratges-b");
 });
+
+test("run clock: --as-of / env override; Sunday 23:59 decision survives midnight", async () => {
+  const { resolveRunNow, isMadridSunday, decideWeekendAdvance } = await import("./fcbq-weekend-guard.mjs");
+  const real = new Date("2026-10-11T22:00:47Z"); // 00:00 Monday Madrid
+  assert.equal(resolveRunNow([], {}, real), real);
+  const asOf = resolveRunNow(["--as-of", "2026-10-11T21:59:30Z"], {}, real);
+  assert.equal(asOf.toISOString(), "2026-10-11T21:59:30.000Z");
+  assert.equal(resolveRunNow([], { WEEKEND_SYNC_AS_OF: "2026-10-11T21:59:30Z" }, real).toISOString(), "2026-10-11T21:59:30.000Z");
+  assert.throws(() => resolveRunNow(["--as-of", "nope"], {}, real));
+  assert.equal(isMadridSunday(real), false);
+  assert.equal(isMadridSunday(asOf), true);
+  const fixturesFile = { teams: [{ teamId: "masc-a", fixtures: [{ date: "2026-10-10", tipOff: "2026-10-10T18:00:00+02:00", jornada: 3 }] }] };
+  const stats = { players: {} };
+  const late = decideWeekendAdvance({ round: 3, fixturesFile, stats, now: real, ingestOk: false, fixturesOk: false });
+  const onTime = decideWeekendAdvance({ round: 3, fixturesFile, stats, now: asOf, ingestOk: false, fixturesOk: false });
+  assert.equal(late.week.from, "2026-10-12");
+  assert.equal(onTime.week.from, "2026-10-05");
+  assert.notEqual(onTime.reason, "fixtures-refresh-failed");
+});

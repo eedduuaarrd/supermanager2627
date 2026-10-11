@@ -331,3 +331,16 @@ export function weekendSyncShouldFail({
   if (reason === "already-scored-this-week") return false;
   return !fixturesOk || !ingestOk;
 }
+
+/**
+ * The run's single clock: --as-of <ISO> or WEEKEND_SYNC_AS_OF, else `real`
+ * (captured once at start). Used for every day/week decision.
+ */
+export function resolveRunNow(argv = [], env = process.env, real = new Date()) {
+  const i = argv.indexOf("--as-of");
+  const raw = i >= 0 ? argv[i + 1] : env.WEEKEND_SYNC_AS_OF;
+  if (raw == null || raw === "") return real;
+  const ms = Date.parse(raw);
+  if (!Number.isFinite(ms)) throw new Error(`invalid --as-of / WEEKEND_SYNC_AS_OF: ${raw}`);
+  return new Date(ms);
+}
