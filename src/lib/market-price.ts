@@ -5,13 +5,13 @@
  * not a copy of ACB trademarks, assets, or verbatim rules.
  *
  * Seed: every fantasy id starts at INITIAL_PRICE (10.000 €).
- * On VAL / jornada refresh: theoretical = max(0, avgVal) × €1.000 / VAL point,
+ * On VAL / jornada refresh: theoretical = max(0, avgVal) × €1.500 / VAL point,
  * then clamp ±15% vs previous quote, round to €500, floor ≥ 500.
  * Buy/sell at the current quote. Budget stays 100.000 € (8×10k = 80k
  * leaves headroom under 100k).
  */
 
-export const EUR_PER_VAL = 1_000;
+export const EUR_PER_VAL = 1_500;
 /** Alias used in broker docs / ACB-style single-game tables. */
 export const PRICE_PER_VAL = EUR_PER_VAL;
 export const PRICE_STEP = 500;
@@ -23,7 +23,7 @@ export const PRICE_CLAMP_PCT = 0.15;
 
 /** Catalan footnote for player page / Compte. */
 export const MARKET_PRICE_FOOTNOTE_CA =
-  "Sortida 10.000 €; després preu teòric = mitjana VAL de temporada × 1.000 €, limitat a ±15% vs el preu anterior (mín. 500 €). Compres i vendes al preu actual.";
+  "Sortida 10.000 €; després preu teòric = mitjana VAL de temporada × 1.500 €, limitat a ±15% vs el preu anterior (mín. 500 €). Compres i vendes al preu actual.";
 
 export const BUY_SELL_RULE_CA = "Compra i venda al preu de mercat actual.";
 

@@ -1,12 +1,12 @@
 /**
  * Keep in sync with src/lib/market-price.ts
  * Seed: every id at INITIAL_PRICE 10000 (prevPrice = 10000).
- * Refresh: theoretical = max(0, avgVal) × 1000; clamp ±15% vs prev;
+ * Refresh: theoretical = max(0, avgVal) × 1500; clamp ±15% vs prev;
  * round €500; floor MIN_PRICE 500 € (never 0 €).
  * Skip re-tick when pricedGames >= current gamesPlayed (unless force).
  */
 
-export const EUR_PER_VAL = 1_000;
+export const EUR_PER_VAL = 1_500;
 export const PRICE_PER_VAL = EUR_PER_VAL;
 export const PRICE_STEP = 500;
 export const INITIAL_PRICE = 10_000;

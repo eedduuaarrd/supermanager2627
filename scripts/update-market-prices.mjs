@@ -9,7 +9,7 @@
  *   node scripts/update-market-prices.mjs --force   # tick even without new games
  *
  * Seed sets price = prevPrice = 10000 (no fake ↑↓). First refresh after seed
- * uses 10000 as prev for the ±15% clamp toward avgVal × €1000/VAL.
+ * uses 10000 as prev for the ±15% clamp toward avgVal × €1500/VAL.
  * Re-runs with the same game count do NOT move prices (ACB-style).
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
@@ -139,7 +139,7 @@ for (const id of ids) {
 const out = {
   updatedAt: updatedAt.slice(0, 10),
   formula:
-    "seed INITIAL_PRICE 10000; refresh: theoretical = max(0, avgVal) × 1000; clamp ±15% vs prev; round 500; floor MIN_PRICE 500; tick only when gamesPlayed increases",
+    "seed INITIAL_PRICE 10000; refresh: theoretical = max(0, avgVal) × 1500; clamp ±15% vs prev; round 500; floor MIN_PRICE 500; tick only when gamesPlayed increases",
   notes: [
     "Club-scale broker pricing for Supermanager Balaguer.",
     "Every fantasy id seeds at INITIAL_PRICE 10000 (prevPrice = 10000).",
