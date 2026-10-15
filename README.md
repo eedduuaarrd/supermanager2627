@@ -21,9 +21,13 @@ npm run dev                  # http://0.0.0.0:4317
 
 ```bash
 npm ci && npm run build
-# systemd: EnvironmentFile amb SESSION_SECRET, DATA_DIR, ADMIN_TOKEN
+# systemd: EnvironmentFile=/etc/supermanager.env
+# SESSION_SECRET, DATA_DIR, ADMIN_TOKEN
+# SENTRY_DSN i NEXT_PUBLIC_SENTRY_DSN (el mateix DSN)
 npm run start
 ```
+
+Errors a Sentry, sense traces ni session replay. Al VPS les dues variables van a `/etc/supermanager.env` amb el mateix DSN. `NEXT_PUBLIC_SENTRY_DSN` s’incrusta al client durant `npm run build`; `SENTRY_DSN` es llegeix en arrencar el servidor. El DSN no es commiteja.
 
 ## Com jugar
 
