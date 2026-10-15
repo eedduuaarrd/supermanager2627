@@ -22,7 +22,7 @@ export function TeamSwitcher({ className }: { className?: string }) {
       <select
         value={activeTeamId ?? ""}
         onChange={(e) => void switchTeam(e.target.value)}
-        className="max-w-[14rem] appearance-none truncate rounded-sm border border-line bg-panel/90 py-1.5 pl-2.5 pr-7 text-xs font-medium text-bone outline-none focus-visible:ring-1 focus-visible:ring-grana"
+        className="max-w-[14rem] appearance-none truncate rounded-full border-0 bg-panel/90 py-1.5 pl-3 pr-7 text-xs font-semibold text-bone shadow-[var(--shadow)] outline-none focus-visible:ring-2 focus-visible:ring-grana/50"
       >
         {teams.map((t) => (
           <option key={t.id} value={t.id}>

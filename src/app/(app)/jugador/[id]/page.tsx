@@ -198,7 +198,7 @@ export default async function JugadorPage({
         </section>
       )}
 
-      <section className="grid grid-cols-3 gap-2 border border-line bg-panel/70 px-3 py-3">
+      <section className="surface-card grid grid-cols-3 gap-2 bg-panel/88 px-3.5 py-3.5">
         <div>
           <p className="text-[10px] uppercase tracking-[0.14em] text-mute">
             Partits
@@ -242,7 +242,7 @@ export default async function JugadorPage({
         </header>
 
         {games.length === 0 ? (
-          <div className="border border-dashed border-line px-4 py-10 text-center">
+          <div className="surface-inset px-4 py-10 text-center">
             <p className="text-sm text-mute">
               Encara no hi ha partits registrats
             </p>
@@ -252,7 +252,7 @@ export default async function JugadorPage({
             </p>
           </div>
         ) : (
-          <ul className="divide-y divide-line border border-line">
+          <ul className="surface-card divide-y divide-line/60 overflow-hidden bg-panel/88">
             {games.map((g, i) => {
               const opponent = opponentForGame(g);
               const gameDate = dateForGame(g);
@@ -268,7 +268,7 @@ export default async function JugadorPage({
                   pm: g.pm,
                 });
               return (
-                <li key={`${g.teamId}-${i}`} className="bg-panel/40 px-3 py-3">
+                <li key={`${g.teamId}-${i}`} className="px-3.5 py-3.5">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="text-sm font-semibold leading-snug break-words text-bone">
@@ -291,7 +291,7 @@ export default async function JugadorPage({
                     </div>
                   </div>
                   {/* VAL formula row: PTS − PF − missed FT + PM */}
-                  <dl className="mt-3 grid grid-cols-5 gap-1.5 border border-line/70 bg-ink/30 px-2 py-2 text-center">
+                  <dl className="mt-3 grid grid-cols-5 gap-1.5 rounded-[var(--radius-md)] bg-ink/30 px-2 py-2 text-center">
                     <StatCell label="PTS" value={fmt(g.pts)} />
                     <StatCell label="PF" value={fmt(g.pf)} />
                     <StatCell label="TL↓" value={fmt(tlMiss)} />

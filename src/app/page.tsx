@@ -15,13 +15,13 @@ export default async function Home() {
         <div className="flex gap-2">
           <Link
             href="/login"
-            className="inline-flex min-h-11 items-center rounded-sm border border-line px-3 py-2 text-sm text-bone touch-manipulation hover:bg-white/5"
+            className="inline-flex min-h-11 items-center rounded-full border border-line/80 px-4 py-2 text-sm font-semibold text-bone touch-manipulation hover:bg-white/5"
           >
             Entra
           </Link>
           <Link
             href="/register"
-            className="inline-flex min-h-11 items-center rounded-sm bg-grana px-3 py-2 text-sm font-medium text-bone touch-manipulation hover:bg-grana-bright"
+            className="inline-flex min-h-11 items-center rounded-full bg-grana px-4 py-2 text-sm font-semibold text-bone shadow-[var(--shadow)] touch-manipulation hover:bg-grana-bright"
           >
             Registra&apos;t
           </Link>
@@ -44,13 +44,13 @@ export default async function Home() {
         <div className="animate-fade-up-delay mt-8 flex flex-wrap gap-3">
           <Link
             href="/register"
-            className="inline-flex min-h-11 items-center rounded-sm bg-grana px-5 py-3 text-sm font-semibold uppercase tracking-wide text-bone touch-manipulation hover:bg-grana-bright"
+            className="inline-flex min-h-11 items-center rounded-full bg-grana px-5 py-3 text-sm font-semibold uppercase tracking-wide text-bone shadow-[var(--shadow)] touch-manipulation hover:bg-grana-bright"
           >
             Crear compte
           </Link>
           <Link
             href="/login"
-            className="inline-flex min-h-11 items-center rounded-sm border border-line px-5 py-3 text-sm font-semibold uppercase tracking-wide text-bone touch-manipulation hover:bg-white/5"
+            className="inline-flex min-h-11 items-center rounded-full border border-line/80 px-5 py-3 text-sm font-semibold uppercase tracking-wide text-bone touch-manipulation hover:bg-white/5"
           >
             Ja tinc compte
           </Link>

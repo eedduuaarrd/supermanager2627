@@ -385,7 +385,7 @@ export function InstallAppModal() {
         <DialogOverlay className="bg-ink/75 supports-backdrop-filter:backdrop-blur-sm" />
         <DialogPrimitive.Popup
           data-slot="dialog-content"
-          className="fixed top-1/2 left-1/2 z-50 grid max-h-[min(90dvh,40rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-0 overflow-y-auto rounded-xl border border-line bg-ink-soft p-0 text-sm text-bone outline-none ring-1 ring-line duration-100 sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"
+          className="fixed top-1/2 left-1/2 z-50 grid max-h-[min(90dvh,40rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-0 overflow-y-auto rounded-[20px] border-0 bg-ink-soft p-0 text-sm text-bone shadow-[var(--shadow-lift)] outline-none duration-100 sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"
         >
           <DialogClose
             render={

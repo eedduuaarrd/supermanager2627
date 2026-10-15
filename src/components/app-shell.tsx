@@ -37,12 +37,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex h-app min-h-0 w-full flex-col overflow-x-hidden overflow-y-hidden">
       <header
-        className="z-30 shrink-0 border-b border-line bg-ink/90 pt-[env(safe-area-inset-top)] backdrop-blur-md"
+        className="z-30 shrink-0 bg-ink/86 pt-[env(safe-area-inset-top)] backdrop-blur-[16px]"
       >
         <div
           className={cn(
-            "mx-auto flex h-12 min-h-12 w-full items-center px-4",
-            "pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]",
+            "mx-auto flex h-12 min-h-12 w-full items-center px-5",
+            "pl-[max(1.25rem,env(safe-area-inset-left))] pr-[max(1.25rem,env(safe-area-inset-right))]",
             isEquip
               ? "max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl"
               : "max-w-lg md:max-w-xl",
@@ -55,8 +55,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main
         ref={mainRef}
         className={cn(
-          "mx-auto flex w-full min-h-0 flex-1 flex-col",
-          "px-4 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]",
+          "view-enter mx-auto flex w-full min-h-0 flex-1 flex-col",
+          "px-5 pl-[max(1.25rem,env(safe-area-inset-left))] pr-[max(1.25rem,env(safe-area-inset-right))]",
           "pb-[calc(3.75rem+env(safe-area-inset-bottom))]",
           isEquip
             ? "max-w-lg overflow-y-auto overscroll-contain pt-3 md:max-w-xl lg:max-w-2xl xl:max-w-3xl"
@@ -70,7 +70,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <PushPrompt />
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 shrink-0 border-t border-line bg-ink/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md"
+        className="fixed inset-x-0 bottom-0 z-40 shrink-0 border-t border-line/80 bg-panel/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-[16px]"
         aria-label="Navegació principal"
       >
         <ul

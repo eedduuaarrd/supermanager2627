@@ -4,7 +4,7 @@ import { StandingsPanel } from "@/components/standings-panel";
 
 export default function ClassificacioPage() {
   return (
-    <div className="space-y-2">
+    <div className="view-enter space-y-3">
       <h1 className="font-display text-3xl tracking-wide text-bone">
         Classificació
       </h1>

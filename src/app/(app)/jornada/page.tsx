@@ -267,7 +267,7 @@ function JornadaContent() {
             <Input
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              className="h-11 border-line bg-panel text-bone"
+              className="h-11 bg-panel text-bone shadow-[var(--shadow)]"
               placeholder="Nom de l'equip"
               required
               minLength={2}
@@ -278,7 +278,7 @@ function JornadaContent() {
               <Button
                 type="submit"
                 disabled={pending || atLimit}
-                className="hub-cta h-12 flex-1 bg-grana text-sm font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
+                className="hub-cta h-12 flex-1 rounded-full bg-grana text-sm font-semibold uppercase tracking-wide text-bone shadow-[var(--shadow)] hover:bg-grana-bright"
               >
                 {hasTeams ? "Crear" : "Nou equip"}
               </Button>
@@ -290,7 +290,7 @@ function JornadaContent() {
                     setNewName("");
                     setError(null);
                   }}
-                  className="h-12 border border-line bg-transparent text-mute hover:bg-white/5"
+                  className="h-12 rounded-full border border-line/80 bg-transparent text-mute hover:bg-white/5"
                 >
                   Cancel·la
                 </Button>
@@ -307,7 +307,7 @@ function JornadaContent() {
         <Link
           href={cta.href}
           className={cn(
-            "hub-cta hub-fade-delay inline-flex h-14 w-full items-center justify-center text-base font-semibold uppercase tracking-wide",
+            "hub-cta hub-fade-delay inline-flex h-14 w-full items-center justify-center rounded-full text-base font-semibold uppercase tracking-wide shadow-[var(--shadow)]",
             "bg-grana text-bone hover:bg-grana-bright",
           )}
         >
@@ -321,7 +321,7 @@ function JornadaContent() {
           <p className="text-[11px] uppercase tracking-[0.18em] text-mute">
             Propers partits
           </p>
-          <ul className="space-y-2">
+          <ul className="surface-card space-y-0 overflow-hidden bg-panel/88 px-4 py-1">
             {nextMatches.map((m) => {
               const line =
                 m.matchup ||
@@ -333,9 +333,9 @@ function JornadaContent() {
               return (
                 <li
                   key={m.shortName}
-                  className="flex flex-col gap-0.5 border-b border-line/60 pb-2 last:border-0"
+                  className="flex flex-col gap-0.5 border-b border-line/50 py-3 last:border-0"
                 >
-                  <p className="w-full whitespace-normal text-sm font-medium leading-snug break-words text-bone">
+                  <p className="w-full whitespace-normal text-sm font-semibold leading-snug tracking-[-0.01em] break-words text-bone">
                     {line ?? "Sense proper partit al calendari FCBQ"}
                   </p>
                   <p className="text-xs tabular-nums text-mute">

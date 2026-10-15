@@ -46,15 +46,15 @@ export function StandingsPanel() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
+      <div className="inline-flex rounded-xl bg-panel-2/90 p-[3px] shadow-[var(--shadow)]">
         <Button
           type="button"
           size="sm"
           onClick={() => setScope("general")}
           className={
             scope === "general"
-              ? "bg-grana text-bone hover:bg-grana-bright"
-              : "bg-transparent text-mute hover:bg-white/10 hover:text-bone"
+              ? "bg-panel text-bone shadow-[0_1px_3px_rgb(0_0_0/0.28)] hover:bg-panel"
+              : "bg-transparent text-mute hover:bg-white/5 hover:text-bone"
           }
         >
           General
@@ -65,16 +65,16 @@ export function StandingsPanel() {
           onClick={() => setScope("jornada")}
           className={
             scope === "jornada"
-              ? "bg-grana text-bone hover:bg-grana-bright"
-              : "bg-transparent text-mute hover:bg-white/10 hover:text-bone"
+              ? "bg-panel text-bone shadow-[0_1px_3px_rgb(0_0_0/0.28)] hover:bg-panel"
+              : "bg-transparent text-mute hover:bg-white/5 hover:text-bone"
           }
         >
           Jornada
         </Button>
       </div>
 
-      <section className="border border-line bg-panel/90">
-        <header className="flex items-center gap-2 border-b border-line px-4 py-3">
+      <section className="surface-card overflow-hidden bg-panel/92">
+        <header className="flex items-center gap-2 border-b border-line/70 px-4 py-3.5">
           <Trophy className="size-4 text-grana-bright" />
           <h2 className="font-display text-xl text-bone">
             {scope === "general"
@@ -102,7 +102,7 @@ export function StandingsPanel() {
               <li
                 key={row.teamId}
                 className={cn(
-                  "flex items-center gap-3 border-b border-line px-4 py-3 last:border-b-0",
+                  "flex items-center gap-3 border-b border-line/60 px-4 py-3.5 last:border-b-0",
                   row.isYou && "bg-grana/10",
                 )}
               >
@@ -110,13 +110,15 @@ export function StandingsPanel() {
                   {row.rank}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-bone">
+                  <p className="truncate text-sm font-semibold tracking-[-0.01em] text-bone">
                     {row.teamName}
                     {row.isYou ? " · tu" : ""}
                   </p>
                   <p className="truncate text-xs text-mute">{row.displayName}</p>
                 </div>
-                <span className="font-display text-xl text-bone">{row.points}</span>
+                <span className="font-display text-xl tabular-nums text-bone">
+                  {row.points}
+                </span>
               </li>
             ))}
           </ol>

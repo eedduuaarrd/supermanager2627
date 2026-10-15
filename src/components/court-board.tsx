@@ -109,7 +109,7 @@ export function CourtBoard({
   return (
     <div
       className={cn(
-        "court-board relative overflow-hidden border border-line",
+        "court-board relative overflow-hidden rounded-[var(--radius-lg)] border-0 shadow-[var(--shadow-lift)]",
         fillHeight && "flex h-full min-h-0 w-full items-center justify-center",
       )}
     >

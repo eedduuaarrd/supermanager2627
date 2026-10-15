@@ -247,7 +247,7 @@ export function LineupBuilder({
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-2">
-      <div className="flex shrink-0 items-baseline justify-between gap-2 px-0.5 text-xs text-mute">
+      <div className="budget-strip flex shrink-0 items-baseline justify-between gap-2 bg-panel/88 px-3.5 py-2.5 text-xs text-mute backdrop-blur-md">
         <p className="min-w-0 tabular-nums" aria-label="Pressupost i places">
           <span className={filled === LINEUP_SIZE ? "text-bone/80" : undefined}>
             {filled}/{LINEUP_SIZE}
@@ -300,7 +300,7 @@ export function LineupBuilder({
       </section>
 
       {showHarshValidation && (
-        <div className="flex shrink-0 gap-2 px-0.5 py-1 text-xs text-amber-100/90">
+        <div className="flex shrink-0 gap-2 rounded-[var(--radius-md)] border border-amber-500/30 bg-amber-500/10 px-3.5 py-2.5 text-xs text-amber-100">
           <AlertCircle className="mt-0.5 size-3.5 shrink-0" />
           <ul className="space-y-0.5">
             {validation.issues
@@ -318,7 +318,7 @@ export function LineupBuilder({
       {((localError && !editsLocked) || (error && saveStatus === "error")) && (
         <div
           role="alert"
-          className="flex shrink-0 gap-2 border border-red-500/35 bg-red-500/10 px-3 py-2 text-xs text-red-100"
+          className="flex shrink-0 gap-2 rounded-[var(--radius-md)] border border-red-500/40 bg-red-500/10 px-3.5 py-2.5 text-xs text-red-100"
         >
           <AlertCircle className="mt-0.5 size-3.5 shrink-0" />
           <p>{(!editsLocked && localError) || error}</p>
@@ -351,7 +351,7 @@ export function LineupBuilder({
             role="dialog"
             aria-modal="true"
             aria-label={`Accions per a ${selectedPlayer.name}`}
-            className="fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] z-50 border-t border-line bg-ink/95 px-4 py-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] backdrop-blur-md"
+            className="fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] z-50 rounded-t-[20px] border-0 bg-panel/95 px-4 py-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] shadow-[0_-8px_30px_rgba(0,0,0,0.45)] backdrop-blur-[16px]"
           >
             <div className="mx-auto flex w-full max-w-lg items-center gap-2.5 md:max-w-xl lg:max-w-2xl">
               <Link
@@ -380,7 +380,7 @@ export function LineupBuilder({
                     className={
                       lineup.captainId === selectedPlayer.id
                         ? "h-11 min-h-11 shrink-0 touch-manipulation bg-grana text-bone hover:bg-grana-bright"
-                        : "h-11 min-h-11 shrink-0 touch-manipulation border border-line bg-panel-2 text-bone hover:bg-white/10"
+                        : "h-11 min-h-11 shrink-0 touch-manipulation border border-line/80 bg-panel-2 text-bone shadow-[var(--shadow)] hover:bg-white/10"
                     }
                   >
                     <Crown className="size-4" /> Capità
