@@ -53,7 +53,7 @@ export default function LoginPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-11 min-h-11 border-line bg-panel text-bone"
+            className="h-11 min-h-11 bg-panel text-bone shadow-[var(--shadow)]"
           />
         </div>
         <div>
@@ -66,18 +66,18 @@ export default function LoginPage() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-11 min-h-11 border-line bg-panel text-bone"
+            className="h-11 min-h-11 bg-panel text-bone shadow-[var(--shadow)]"
           />
         </div>
         {error && (
-          <p className="rounded-sm border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-200">
+          <p className="rounded-[var(--radius-md)] border border-red-500/40 bg-red-500/10 px-3.5 py-2.5 text-sm font-semibold text-red-200">
             {error}
           </p>
         )}
         <Button
           type="submit"
           disabled={pending}
-          className="h-11 min-h-11 w-full touch-manipulation bg-grana font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
+          className="h-11 min-h-11 w-full touch-manipulation bg-grana font-semibold uppercase tracking-wide text-bone shadow-[var(--shadow)] hover:bg-grana-bright"
         >
           {pending ? "Entrant…" : "Entrar"}
         </Button>

@@ -40,7 +40,7 @@ export function ValorBlock({
   return (
     <section
       className={cn(
-        "border border-line bg-panel/80 px-4 py-5 text-center",
+        "surface-card bg-panel/88 px-[18px] py-5 text-center",
         className,
       )}
       aria-label="Valor de mercat"

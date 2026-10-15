@@ -81,9 +81,9 @@ export function MarketSheet({
         aria-label="Tancar mercat"
         onClick={onClose}
       />
-      <div className="market-sheet relative z-10 mx-auto flex max-h-[min(85dvh,36rem)] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl border border-line border-b-0 bg-ink shadow-[0_-12px_40px_rgba(0,0,0,0.45)] md:max-w-xl lg:max-w-2xl">
-        <div className="flex shrink-0 flex-col items-center px-4 pt-2.5 pb-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
-          <div className="mb-2.5 h-1 w-10 rounded-full bg-white/25" aria-hidden />
+      <div className="market-sheet relative z-10 mx-auto flex max-h-[min(85dvh,36rem)] w-full max-w-lg flex-col overflow-hidden rounded-t-[20px] border-0 bg-panel shadow-[0_-8px_30px_rgba(0,0,0,0.45)] md:max-w-xl lg:max-w-2xl">
+        <div className="flex shrink-0 flex-col items-center px-5 pt-2.5 pb-3 pl-[max(1.25rem,env(safe-area-inset-left))] pr-[max(1.25rem,env(safe-area-inset-right))]">
+          <div className="mb-2.5 h-[5px] w-9 rounded-full bg-line" aria-hidden />
           <div className="flex w-full items-start justify-between gap-3">
             <div className="min-w-0">
               <h2 className="font-display text-xl tracking-wide text-bone">
@@ -114,8 +114,8 @@ export function MarketSheet({
             </div>
           ) : (
             sections.map(({ teamId, players }) => (
-              <section key={teamId} className="border-t border-line">
-                <header className="sticky top-0 z-[1] bg-ink/95 px-4 py-2.5 backdrop-blur-md">
+              <section key={teamId} className="border-t border-line/60">
+                <header className="sticky top-0 z-[1] bg-panel/95 px-4 py-2.5 backdrop-blur-md">
                   <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-grana-bright">
                     {TEAMS[teamId].label}
                   </h3>

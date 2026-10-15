@@ -65,7 +65,7 @@ export function TeamManager() {
   }
 
   return (
-    <section className="border border-line/90 bg-panel/55 px-4 py-4 backdrop-blur-[2px]">
+    <section className="surface-card bg-panel/70 px-[18px] py-[18px] backdrop-blur-[2px]">
       <div className="flex items-end justify-between gap-3">
         <div>
           <h2 className="font-display text-xl tracking-wide text-bone">
@@ -80,7 +80,7 @@ export function TeamManager() {
             type="button"
             disabled={atLimit}
             onClick={() => setCreateOpen(true)}
-            className="h-9 shrink-0 border border-line bg-panel-2 px-3 text-xs font-semibold uppercase tracking-wide text-bone hover:bg-white/10 disabled:opacity-50"
+            className="h-9 shrink-0 bg-panel-2 px-3 text-xs font-semibold uppercase tracking-wide text-bone shadow-[var(--shadow)] hover:bg-white/10 disabled:opacity-50"
           >
             <Plus className="size-3.5" /> Nou equip
           </Button>
@@ -88,14 +88,14 @@ export function TeamManager() {
       </div>
 
       {empty && !createOpen && (
-        <div className="mt-4 border border-dashed border-line px-3 py-5 text-center">
+        <div className="surface-inset mt-4 px-3.5 py-5 text-center">
           <p className="text-sm text-mute">
             Crea el teu primer equip fantasy per jugar la jornada.
           </p>
           <Button
             type="button"
             onClick={() => setCreateOpen(true)}
-            className="mt-3 h-10 w-full bg-grana text-sm font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright"
+            className="mt-3 h-10 w-full bg-grana text-sm font-semibold uppercase tracking-wide text-bone shadow-[var(--shadow)] hover:bg-grana-bright"
           >
             <Plus className="size-4" /> Nou equip
           </Button>
@@ -111,8 +111,10 @@ export function TeamManager() {
               <li
                 key={t.id}
                 className={cn(
-                  "border border-line px-3 py-2 transition-colors",
-                  active ? "bg-grana/15" : "bg-panel-2/30 hover:bg-panel-2/55",
+                  "rounded-[var(--radius-md)] px-3.5 py-2.5 transition-colors",
+                  active
+                    ? "bg-grana/15 shadow-[var(--shadow)]"
+                    : "bg-panel-2/40 hover:bg-panel-2/60",
                 )}
               >
                 {isRenaming ? (
@@ -126,14 +128,14 @@ export function TeamManager() {
                     <Input
                       value={renameValue}
                       onChange={(e) => setRenameValue(e.target.value)}
-                      className="h-9 border-line bg-panel text-bone"
+                      className="h-9 bg-panel text-bone shadow-[var(--shadow)]"
                       autoFocus
                       maxLength={40}
                     />
                     <Button
                       type="submit"
                       disabled={pending}
-                      className="h-9 bg-grana text-bone hover:bg-grana-bright"
+                      className="h-9 bg-grana text-bone shadow-[var(--shadow)] hover:bg-grana-bright"
                     >
                       Desa
                     </Button>
@@ -143,7 +145,7 @@ export function TeamManager() {
                         setRenamingId(null);
                         setRenameValue("");
                       }}
-                      className="h-9 border border-line bg-transparent text-mute hover:bg-white/5"
+                      className="h-9 rounded-full border border-line/80 bg-transparent text-mute hover:bg-white/5"
                     >
                       Cancel·la
                     </Button>
@@ -166,7 +168,7 @@ export function TeamManager() {
                         setRenamingId(t.id);
                         setRenameValue(t.name);
                       }}
-                      className="rounded-sm p-1.5 text-mute hover:bg-white/5 hover:text-bone"
+                      className="rounded-full p-1.5 text-mute hover:bg-white/5 hover:text-bone"
                     >
                       <Pencil className="size-3.5" />
                     </button>
@@ -175,7 +177,7 @@ export function TeamManager() {
                         type="button"
                         aria-label="Eliminar equip"
                         onClick={() => onDelete(t.id)}
-                        className="rounded-sm p-1.5 text-mute hover:bg-white/5 hover:text-red-300"
+                        className="rounded-full p-1.5 text-mute hover:bg-white/5 hover:text-red-300"
                       >
                         <Trash2 className="size-3.5" />
                       </button>
@@ -199,7 +201,7 @@ export function TeamManager() {
           <Input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            className="h-10 border-line bg-panel text-bone"
+            className="h-10 bg-panel text-bone shadow-[var(--shadow)]"
             placeholder="Ex. Grana B"
             required
             minLength={2}
@@ -210,7 +212,7 @@ export function TeamManager() {
             <Button
               type="submit"
               disabled={pending || atLimit}
-              className="h-10 flex-1 bg-grana text-bone hover:bg-grana-bright"
+              className="h-10 flex-1 bg-grana text-bone shadow-[var(--shadow)] hover:bg-grana-bright"
             >
               Crear equip
             </Button>
@@ -221,7 +223,7 @@ export function TeamManager() {
                 setNewName("");
                 setError(null);
               }}
-              className="h-10 border border-line bg-transparent text-mute hover:bg-white/5"
+              className="h-10 rounded-full border border-line/80 bg-transparent text-mute hover:bg-white/5"
             >
               Cancel·la
             </Button>

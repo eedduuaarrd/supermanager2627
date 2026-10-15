@@ -49,6 +49,7 @@
   --color-grana-bright: var(--grana-bright);
   --color-bone: var(--bone);
   --color-mute: var(--mute);
+  --shadow-soft: var(--shadow);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -90,7 +91,10 @@
   --chart-3: #6b7c8f;
   --chart-4: #9b2030;
   --chart-5: #3d4654;
-  --radius: 0.35rem;
+  /* MitjaPart2-inspired density: soft radii + shadow (colors unchanged) */
+  --radius: 1.125rem;
+  --shadow: 0 2px 8px rgb(0 0 0 / 28%);
+  --shadow-lift: 0 8px 28px rgb(0 0 0 / 35%);
   --sidebar: #12151a;
   --sidebar-foreground: #ece8e1;
   --sidebar-primary: #9b2030;
@@ -112,7 +116,9 @@
     text-size-adjust: 100%;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    -webkit-font-smoothing: antialiased;
+    touch-action: manipulation;
     overflow-x: hidden;
     overscroll-behavior-x: none;
   }
@@ -126,8 +132,19 @@
 @layer utilities {
   .font-display {
     font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
+  }
+
+  .surface-card {
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--panel) 92%, transparent);
+    box-shadow: var(--shadow);
+  }
+
+  .surface-inset {
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--ink) 55%, var(--panel));
   }
 
   .h-app {
@@ -207,7 +224,9 @@ body.h-app {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hub-badge {
+  .hub-badge,
+  .view-enter,
+  .market-sheet {
     animation: none !important;
   }
   .hub-cta:active {
@@ -255,18 +274,38 @@ body.h-app {
     linear-gradient(180deg, #a07850 0%, #745538 50%, #4e3a28 100%);
 }
 
+.budget-strip {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lift);
+}
+
 .market-sheet {
-  animation: market-sheet-up 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: market-sheet-up 0.36s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes market-sheet-up {
   from {
     opacity: 0.6;
-    transform: translateY(18%);
+    transform: translateY(100%);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+.view-enter {
+  animation: slide-forward 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes slide-forward {
+  from {
+    opacity: 0.35;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 

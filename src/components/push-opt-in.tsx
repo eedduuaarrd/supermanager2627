@@ -66,7 +66,7 @@ export function PushOptIn() {
   }
 
   return (
-    <section className="border border-line bg-panel/80 px-4 py-4">
+    <section className="surface-card bg-panel/88 px-[18px] py-[18px]">
       <p className="text-[10px] uppercase tracking-[0.18em] text-mute">
         Notificacions
       </p>
@@ -100,7 +100,7 @@ export function PushOptIn() {
           type="button"
           disabled={state === "busy"}
           onClick={() => void enable()}
-          className="mt-3 h-11 w-full bg-grana text-sm font-semibold uppercase tracking-wide text-bone hover:bg-grana-bright disabled:opacity-70"
+          className="mt-3 h-11 w-full bg-grana text-sm font-semibold uppercase tracking-wide text-bone shadow-[var(--shadow)] hover:bg-grana-bright disabled:opacity-70"
         >
           {state === "busy" ? "Activant…" : "Activa les notificacions"}
         </Button>

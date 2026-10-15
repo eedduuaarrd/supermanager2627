@@ -25,7 +25,7 @@ export default function JugadorsPage() {
     if (players.length === 0) {
       return (
         <PageChrome>
-          <div className="border border-dashed border-line px-4 py-14 text-center">
+          <div className="surface-inset px-4 py-14 text-center">
             <p className="text-sm text-bone">
               Encara no hi ha jugadors al mercat.
             </p>
@@ -42,7 +42,7 @@ export default function JugadorsPage() {
   } catch {
     return (
       <PageChrome>
-        <div className="border border-line border-grana/40 bg-grana/10 px-4 py-10 text-center">
+        <div className="rounded-[var(--radius-md)] border border-grana/40 bg-grana/10 px-4 py-10 text-center">
           <p className="text-sm text-bone">
             No s&apos;ha pogut carregar el mercat de jugadors.
           </p>

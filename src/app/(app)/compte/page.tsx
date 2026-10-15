@@ -32,11 +32,13 @@ export default function ComptePage() {
         <p className="mt-2 text-sm text-mute">Dades del teu mànager.</p>
       </section>
 
-      <section className="border border-line bg-panel/80 px-4 py-4">
+      <section className="surface-card bg-panel/88 px-[18px] py-[18px]">
         <p className="text-[10px] uppercase tracking-[0.18em] text-mute">
           Mànager
         </p>
-        <p className="mt-1 font-medium text-bone">{user.displayName}</p>
+        <p className="mt-1 font-medium tracking-[-0.01em] text-bone">
+          {user.displayName}
+        </p>
         <p className="mt-1 text-sm text-mute">Equip actiu: {user.teamName}</p>
         <p className="mt-3 truncate text-xs text-mute">{user.email}</p>
         {user.isAdmin && (
@@ -48,7 +50,7 @@ export default function ComptePage() {
 
       <PushOptIn />
 
-      <section className="border border-line bg-panel/80 px-4 py-3">
+      <section className="surface-card bg-panel/88 px-[18px] py-3.5">
         <p className="text-[10px] uppercase tracking-[0.18em] text-mute">
           Patrimoni
         </p>
@@ -60,7 +62,7 @@ export default function ComptePage() {
         </p>
       </section>
 
-      <section className="border border-line bg-panel/60 px-4 py-4">
+      <section className="surface-card bg-panel/70 px-[18px] py-[18px]">
         <p className="text-[10px] uppercase tracking-[0.18em] text-mute">
           Regles ràpides
         </p>
@@ -84,7 +86,7 @@ export default function ComptePage() {
       <Button
         type="button"
         onClick={() => void logout()}
-        className="h-11 w-full border border-line bg-panel-2 text-bone hover:bg-white/10"
+        className="h-11 w-full bg-panel-2 text-bone shadow-[var(--shadow)] hover:bg-white/10"
       >
         <LogOut className="size-4" /> Surt
       </Button>

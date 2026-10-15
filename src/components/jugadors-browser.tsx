@@ -117,22 +117,21 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
           </span>
           <div className="flex flex-wrap items-center gap-2">
             <div
-              className="inline-flex border border-line bg-panel/50"
+              className="inline-flex rounded-xl bg-panel-2/90 p-[3px] shadow-[var(--shadow)]"
               role="group"
               aria-label="Criteri d'ordenació"
             >
-              {SORT_KEYS.map(({ key, label }, i) => (
+              {SORT_KEYS.map(({ key, label }) => (
                 <button
                   key={key}
                   type="button"
                   aria-pressed={sortKey === key}
                   onClick={() => setSortKey(key)}
                   className={cn(
-                    "h-9 px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors touch-manipulation",
-                    i > 0 && "border-l border-line",
+                    "h-9 rounded-[9px] px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors touch-manipulation",
                     sortKey === key
-                      ? "bg-grana text-bone"
-                      : "text-mute hover:bg-white/[0.04] hover:text-bone",
+                      ? "bg-panel text-bone shadow-[0_1px_3px_rgb(0_0_0/0.28)]"
+                      : "text-mute hover:bg-white/5 hover:text-bone",
                   )}
                 >
                   {label}
@@ -140,7 +139,7 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
               ))}
             </div>
             <div
-              className="inline-flex border border-line bg-panel/50"
+              className="inline-flex rounded-xl bg-panel-2/90 p-[3px] shadow-[var(--shadow)]"
               role="group"
               aria-label="Direcció d'ordenació"
             >
@@ -149,10 +148,10 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
                 aria-pressed={sortDir === "desc"}
                 onClick={() => setSortDir("desc")}
                 className={cn(
-                  "h-9 px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors touch-manipulation",
+                  "h-9 rounded-[9px] px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors touch-manipulation",
                   sortDir === "desc"
-                    ? "bg-grana text-bone"
-                    : "text-mute hover:bg-white/[0.04] hover:text-bone",
+                    ? "bg-panel text-bone shadow-[0_1px_3px_rgb(0_0_0/0.28)]"
+                    : "text-mute hover:bg-white/5 hover:text-bone",
                 )}
               >
                 Més alt
@@ -162,10 +161,10 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
                 aria-pressed={sortDir === "asc"}
                 onClick={() => setSortDir("asc")}
                 className={cn(
-                  "h-9 border-l border-line px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors touch-manipulation",
+                  "h-9 rounded-[9px] px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors touch-manipulation",
                   sortDir === "asc"
-                    ? "bg-grana text-bone"
-                    : "text-mute hover:bg-white/[0.04] hover:text-bone",
+                    ? "bg-panel text-bone shadow-[0_1px_3px_rgb(0_0_0/0.28)]"
+                    : "text-mute hover:bg-white/5 hover:text-bone",
                 )}
               >
                 Més baix
@@ -207,7 +206,7 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
             Posició
           </p>
           <div
-            className="grid grid-cols-4 border border-line bg-panel/50"
+            className="grid grid-cols-4 rounded-xl bg-panel-2/90 p-[3px] shadow-[var(--shadow)]"
             role="group"
             aria-label="Posició"
           >
@@ -250,7 +249,7 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="border border-dashed border-line px-4 py-14 text-center">
+        <div className="surface-inset px-4 py-14 text-center">
           <p className="text-sm text-bone">
             Cap jugador amb aquests filtres.
           </p>
@@ -259,19 +258,19 @@ export function JugadorsBrowser({ players }: { players: JugadorListItem[] }) {
           </p>
           <button
             type="button"
-            className="mt-4 inline-flex min-h-9 items-center border border-line px-3 text-[11px] uppercase tracking-[0.14em] text-grana-bright transition-colors hover:border-grana/60 hover:text-bone touch-manipulation"
+            className="mt-4 inline-flex min-h-9 items-center rounded-full border border-line/80 px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-grana-bright transition-colors hover:bg-white/5 hover:text-bone touch-manipulation"
             onClick={clearFilters}
           >
             Esborra filtres
           </button>
         </div>
       ) : (
-        <ul className="divide-y divide-line">
+        <ul className="surface-card divide-y divide-line/60 overflow-hidden bg-panel/88">
           {filtered.map((p) => (
             <li key={p.id}>
               <Link
                 href={`/jugador/${encodeURIComponent(p.id)}?from=jugadors`}
-                className="group flex items-center gap-3 py-3 transition-colors active:bg-white/[0.04] hover:bg-white/[0.025] touch-manipulation"
+                className="group flex items-center gap-3 px-3.5 py-3.5 transition-colors active:bg-white/[0.04] hover:bg-white/[0.025] touch-manipulation"
               >
                 <PlayerAvatar
                   name={p.name}
@@ -369,10 +368,10 @@ function TeamChip({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "inline-flex h-9 shrink-0 items-center px-3 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors touch-manipulation",
+        "inline-flex h-9 shrink-0 items-center rounded-full px-3.5 text-[11px] font-semibold uppercase tracking-[0.1em] transition-colors touch-manipulation",
         active
-          ? "bg-grana text-bone shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)]"
-          : "border border-line bg-transparent text-mute hover:border-bone/35 hover:text-bone",
+          ? "bg-grana text-bone shadow-[var(--shadow)]"
+          : "bg-panel-2/70 text-mute shadow-[var(--shadow)] hover:text-bone",
       )}
     >
       {label}
@@ -395,11 +394,10 @@ function PosSeg({
       aria-pressed={active}
       onClick={onClick}
       className={cn(
-        "flex h-9 items-center justify-center px-1 text-[10px] font-semibold uppercase tracking-[0.08em] transition-colors touch-manipulation",
-        "border-r border-line last:border-r-0",
+        "flex h-9 items-center justify-center rounded-[9px] px-1 text-[10px] font-semibold uppercase tracking-[0.08em] transition-colors touch-manipulation",
         active
-          ? "bg-grana/20 text-bone"
-          : "text-mute hover:bg-white/[0.04] hover:text-bone",
+          ? "bg-panel text-bone shadow-[0_1px_3px_rgb(0_0_0/0.28)]"
+          : "text-mute hover:bg-white/5 hover:text-bone",
       )}
     >
       {label}

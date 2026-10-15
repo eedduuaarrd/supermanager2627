@@ -76,7 +76,7 @@ export function IdealTeamSheet({
       <DialogPortal>
         <DialogOverlay className="z-[60] bg-ink/80 supports-backdrop-filter:backdrop-blur-sm" />
         <DialogPrimitive.Popup
-          className="fixed top-[max(3.25rem,env(safe-area-inset-top))] right-2 bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-2 z-[60] flex flex-col overflow-hidden rounded-2xl border border-line bg-ink-soft text-bone shadow-[0_24px_70px_rgba(0,0,0,0.55)] outline-none"
+          className="fixed top-[max(3.25rem,env(safe-area-inset-top))] right-2 bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-2 z-[60] flex flex-col overflow-hidden rounded-[20px] border-0 bg-ink-soft text-bone shadow-[var(--shadow-lift)] outline-none"
         >
           <header className="relative shrink-0 border-b border-line px-4 pt-4 pr-12 pb-3">
             <DialogTitle className="font-display text-[22px] tracking-wide text-bone">
@@ -92,7 +92,7 @@ export function IdealTeamSheet({
               </p>
             )}
             <DialogPrimitive.Close
-              className="absolute top-2.5 right-2.5 inline-flex size-8 items-center justify-center rounded-md text-mute hover:bg-ink hover:text-bone"
+              className="absolute top-2.5 right-2.5 inline-flex size-8 items-center justify-center rounded-full text-mute hover:bg-ink hover:text-bone"
               aria-label="Tancar"
             >
               <XIcon className="size-4" />
