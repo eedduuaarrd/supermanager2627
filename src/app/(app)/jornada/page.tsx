@@ -219,7 +219,7 @@ function JornadaContent() {
   }
 
   return (
-    <div className="hub-shell relative flex min-h-0 flex-1 flex-col justify-center gap-8 pb-6">
+    <div className="hub-shell relative flex min-h-full w-full shrink-0 flex-col justify-center gap-8 pb-[calc(1.75rem+env(safe-area-inset-bottom))]">
       {/* 1. Jornada */}
       <header className="hub-fade space-y-2">
         <p className="font-display text-3xl tracking-wide text-bone sm:text-4xl">
@@ -388,7 +388,7 @@ function JornadaContent() {
 
 export default function JornadaPage() {
   return (
-    <BootGate>
+    <BootGate scroll>
       <JornadaContent />
     </BootGate>
   );

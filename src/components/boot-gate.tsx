@@ -6,7 +6,14 @@ import { AlertTriangle, Loader2 } from "lucide-react";
 import type { ReactNode } from "react";
 
 /** Shared loading / boot-error gate for pages that need roster + lineup. */
-export function BootGate({ children }: { children: ReactNode }) {
+export function BootGate({
+  children,
+  scroll = false,
+}: {
+  children: ReactNode;
+  /** Grow with the page so the shell can scroll (Inici). Equip stays height-locked. */
+  scroll?: boolean;
+}) {
   const { ready, bootError, roster } = useManager();
 
   if (!ready) {
@@ -34,6 +41,8 @@ export function BootGate({ children }: { children: ReactNode }) {
       </div>
     );
   }
+
+  if (scroll) return children;
 
   return <div className="flex h-full min-h-0 flex-col">{children}</div>;
 }
