@@ -57,7 +57,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         className={cn(
           "view-enter mx-auto flex w-full min-h-0 flex-1 flex-col",
           "px-5 pl-[max(1.25rem,env(safe-area-inset-left))] pr-[max(1.25rem,env(safe-area-inset-right))]",
-          "pb-[calc(3.75rem+env(safe-area-inset-bottom))]",
+          "pb-[calc(4.75rem+env(safe-area-inset-bottom))]",
           isEquip
             ? "max-w-lg overflow-y-auto overscroll-contain pt-3 md:max-w-xl lg:max-w-2xl xl:max-w-3xl"
             : "max-w-lg overflow-y-auto overscroll-contain pt-2 md:max-w-xl",
