@@ -23,7 +23,7 @@ export async function GET() {
   const lockAt = getLineupLockAt();
   const locked =
     status === "closed" || isLineupLocked(lockAt);
-  const nextMatches = nextMatchesForClub();
+  const nextMatches = nextMatchesForClub(round);
 
   return NextResponse.json({
     round,
