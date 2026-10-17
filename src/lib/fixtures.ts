@@ -54,6 +54,13 @@ export type NextMatch = {
   /** Ready-to-show `{local} vs {visitant}` using FCBQ/full names. */
   matchup: string | null;
   matchCallUuid: string | null;
+  /** Fantasy jornada this row belongs to when known. */
+  jornada: number | null;
+  /** Tip-off has passed or a result/score is present. */
+  played: boolean;
+  result: string | null;
+  teamPoints: number | null;
+  opponentPoints: number | null;
 };
 
 /** Short label → full display name when fixtures.json lacks fullName. */
@@ -228,6 +235,17 @@ function madridToday(now = new Date()): string {
   }).format(now);
 }
 
+function fixtureSortMs(f: ClubFixture): number {
+  const tip = tipOffMs(f);
+  if (tip != null) return tip;
+  const dk = dateKey(f);
+  if (dk) {
+    // Date-only: midday Madrid for display order only (not a lock tip-off).
+    return Date.parse(`${dk}T12:00:00+02:00`);
+  }
+  return Number.POSITIVE_INFINITY;
+}
+
 function pickUpcomingFixture(
   fixtures: ClubFixture[],
   now = new Date(),
@@ -239,26 +257,67 @@ function pickUpcomingFixture(
     .map((f) => {
       const tip = tipOffMs(f);
       const dk = dateKey(f);
-      let sort = tip;
-      if (sort == null && dk) {
-        // Date-only: end-of-day Madrid for display order only (not a lock tip-off).
-        sort = Date.parse(`${dk}T23:59:59+02:00`);
-      }
-      return { f, sort, tip, dk };
+      return { f, sort: fixtureSortMs(f), tip, dk };
     })
     .filter((x) => {
       if (x.tip != null) return x.tip >= nowMs;
       if (x.dk) return x.dk >= today;
       return false;
     })
-    .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
+    .sort((a, b) => a.sort - b.sort);
 
   return upcoming[0]?.f ?? null;
+}
+
+/**
+ * Club-side fixture for the currently open fantasy jornada.
+ * Prefer an explicit `jornada` tag; else earliest fixture on/after that
+ * jornada's Madrid-week start (Monday). Past tip-offs stay until close.
+ */
+export function pickFixtureForOpenJornada(
+  fixtures: ClubFixture[],
+  jornada: number,
+  now = new Date(),
+): ClubFixture | null {
+  const tagged = (fixtures ?? []).filter((f) => f.jornada === jornada);
+  if (tagged.length > 0) {
+    return (
+      [...tagged].sort((a, b) => fixtureSortMs(a) - fixtureSortMs(b))[0] ?? null
+    );
+  }
+
+  const week = madridWeekBounds(now);
+  const eligible = (fixtures ?? [])
+    .filter((f) => {
+      if (typeof f.jornada === "number" && f.jornada !== jornada) return false;
+      const dk = dateKey(f);
+      if (!dk) return false;
+      return dk >= week.from;
+    })
+    .sort((a, b) => fixtureSortMs(a) - fixtureSortMs(b));
+
+  const inWeek = eligible.find((f) => {
+    const dk = dateKey(f);
+    return Boolean(dk && dk <= week.to);
+  });
+  return inWeek ?? eligible[0] ?? null;
+}
+
+function isFixturePlayed(f: ClubFixture | null, now = new Date()): boolean {
+  if (!f) return false;
+  if (typeof f.result === "string" && f.result.trim()) return true;
+  if (typeof f.teamPoints === "number" || typeof f.opponentPoints === "number") {
+    return true;
+  }
+  const tip = tipOffMs(f);
+  if (tip != null && tip < now.getTime()) return true;
+  return false;
 }
 
 function toNextMatch(
   team: ClubTeamFixtures,
   best: ClubFixture | null,
+  now = new Date(),
 ): NextMatch {
   const fullName = teamFullName(team);
   const opponent = best?.opponent ?? null;
@@ -280,20 +339,34 @@ function toNextMatch(
       ? formatMatchupLine(fullName, opponent, home)
       : null,
     matchCallUuid: best?.matchCallUuid ?? null,
+    jornada: typeof best?.jornada === "number" ? best.jornada : null,
+    played: isFixturePlayed(best, now),
+    result: best?.result ?? null,
+    teamPoints: typeof best?.teamPoints === "number" ? best.teamPoints : null,
+    opponentPoints:
+      typeof best?.opponentPoints === "number" ? best.opponentPoints : null,
   };
 }
 
-/** Next match per club team (by tipOff, else by date). Past-only → null opponent. */
+/**
+ * Open-jornada match per club team (one row each).
+ * Keeps played/finished fixtures until Sunday-night close advances the jornada.
+ */
 export function nextMatchesForClub(
+  jornada: number,
   now = new Date(),
   file = loadFixtures(),
 ): NextMatch[] {
   return (file.teams ?? []).map((team) =>
-    toNextMatch(team, pickUpcomingFixture(team.fixtures ?? [], now)),
+    toNextMatch(
+      team,
+      pickFixtureForOpenJornada(team.fixtures ?? [], jornada, now),
+      now,
+    ),
   );
 }
 
-/** Next match for one fantasy club side (`masc-a` / dual-team variant teamId). */
+/** Next upcoming match for one fantasy club side (player pages). */
 export function nextMatchForTeamId(
   teamId: TeamId,
   now = new Date(),
@@ -301,7 +374,7 @@ export function nextMatchForTeamId(
 ): NextMatch | null {
   const team = (file.teams ?? []).find((t) => t.teamId === teamId);
   if (!team) return null;
-  return toNextMatch(team, pickUpcomingFixture(team.fixtures ?? [], now));
+  return toNextMatch(team, pickUpcomingFixture(team.fixtures ?? [], now), now);
 }
 
 type GameFixtureHints = {

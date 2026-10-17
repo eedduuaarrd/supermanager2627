@@ -30,6 +30,10 @@ type NextMatch = {
   date: string | null;
   home: boolean | null;
   matchup?: string | null;
+  played?: boolean;
+  result?: string | null;
+  teamPoints?: number | null;
+  opponentPoints?: number | null;
 };
 
 type RankInfo = {
@@ -65,6 +69,20 @@ function formatMatchWhen(m: NextMatch): string {
     }
   }
   return "Data pendent";
+}
+
+function formatPlayedSuffix(m: NextMatch): string | null {
+  if (!m.played) return null;
+  if (
+    typeof m.teamPoints === "number" &&
+    typeof m.opponentPoints === "number"
+  ) {
+    return `Jugat · ${m.teamPoints}–${m.opponentPoints}`;
+  }
+  if (typeof m.result === "string" && m.result.trim()) {
+    return `Jugat · ${m.result.trim()}`;
+  }
+  return "Jugat";
 }
 
 function lineupComplete(filled: number, hasCaptain: boolean) {
@@ -330,16 +348,26 @@ function JornadaContent() {
                     ? `${m.opponent} vs ${m.fullName || m.shortName}`
                     : `${m.fullName || m.shortName} vs ${m.opponent}`
                   : null);
+              const played = formatPlayedSuffix(m);
               return (
                 <li
                   key={m.shortName}
                   className="flex flex-col gap-0.5 border-b border-line/50 py-3 last:border-0"
                 >
-                  <p className="w-full whitespace-normal text-sm font-semibold leading-snug tracking-[-0.01em] break-words text-bone">
+                  <p
+                    className={cn(
+                      "w-full whitespace-normal text-sm font-semibold leading-snug tracking-[-0.01em] break-words",
+                      m.played ? "text-mute" : "text-bone",
+                    )}
+                  >
                     {line ?? "Sense proper partit al calendari FCBQ"}
                   </p>
                   <p className="text-xs tabular-nums text-mute">
-                    {line ? formatMatchWhen(m) : "—"}
+                    {line
+                      ? played
+                        ? `${formatMatchWhen(m)} · ${played}`
+                        : formatMatchWhen(m)
+                      : "—"}
                   </p>
                 </li>
               );
