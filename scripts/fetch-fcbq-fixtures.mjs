@@ -184,28 +184,109 @@ function mergeOne(prev, f) {
   };
 }
 
-function mergeFixtures(prevList, nextList) {
-  const byKey = new Map();
-  for (const f of prevList ?? []) {
-    byKey.set(fixtureKey(f), { ...f });
+function isPlayedFixture(f) {
+  return f.result != null || f.teamPoints != null;
+}
+
+function normTeamName(s) {
+  return String(s || "")
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function sameOpponentIdentity(a, b) {
+  if (a.opponentId && b.opponentId && a.opponentId === b.opponentId) {
+    return true;
   }
+  const ao = normTeamName(a.opponent);
+  const bo = normTeamName(b.opponent);
+  if (ao && bo && ao === bo) return true;
+  const ah = normTeamName(a.homeTeam);
+  const bh = normTeamName(b.homeTeam);
+  const aa = normTeamName(a.awayTeam);
+  const ba = normTeamName(b.awayTeam);
+  if (ah && bh && aa && ba && ah === bh && aa === ba) return true;
+  return false;
+}
+
+function roundNum(f) {
+  if (typeof f.jornada === "number") return f.jornada;
+  if (typeof f.matchDayNum === "number") return f.matchDayNum;
+  return null;
+}
+
+function roundsCompatible(a, b) {
+  const ra = roundNum(a);
+  const rb = roundNum(b);
+  if (ra == null || rb == null) return true;
+  return ra === rb;
+}
+
+/** Find previous fixture that is the same game (incl. rescheduled). */
+function findPrevMatchIndex(prevEntries, f, used) {
+  if (f.matchCallUuid) {
+    for (let i = 0; i < prevEntries.length; i++) {
+      if (used.has(i)) continue;
+      if (prevEntries[i].matchCallUuid === f.matchCallUuid) return i;
+    }
+  }
+  const key = fixtureKey(f);
+  for (let i = 0; i < prevEntries.length; i++) {
+    if (used.has(i)) continue;
+    if (fixtureKey(prevEntries[i]) === key) return i;
+  }
+  // Same date + home: opponent text often drifts between msstats / calendar.
+  for (let i = 0; i < prevEntries.length; i++) {
+    if (used.has(i)) continue;
+    const v = prevEntries[i];
+    if (v.date === f.date && v.home === f.home) return i;
+  }
+  // Reschedule: date/tipOff changed; identity is opponent + home + round.
+  for (let i = 0; i < prevEntries.length; i++) {
+    if (used.has(i)) continue;
+    const v = prevEntries[i];
+    if (v.home !== f.home) continue;
+    if (!sameOpponentIdentity(v, f)) continue;
+    if (!roundsCompatible(v, f)) continue;
+    return i;
+  }
+  return -1;
+}
+
+/**
+ * Merge a team's freshly fetched fixtures into the previous list.
+ * Only call when that team's fetch succeeded — failed teams must keep
+ * their previous list untouched (see buildFixturesFile).
+ *
+ * Rescheduled games (new date/tipOff) match the old entry by matchCallUuid
+ * or opponent+home+round so jornada and other fields carry over; unplayed
+ * previous entries missing from the new fetch are dropped.
+ */
+export function mergeFixtures(prevList, nextList) {
+  const prevEntries = (prevList ?? []).map((f) => ({ ...f }));
+  const used = new Set();
+  const out = [];
+
   for (const raw of nextList ?? []) {
     const f = normalizeGame(raw);
-    const key = fixtureKey(f);
-    let prev = byKey.get(key);
-    if (!prev) {
-      // Date + home soft match when opponent text drifts between sources.
-      for (const [k, v] of byKey) {
-        if (v.date === f.date && v.home === f.home) {
-          prev = v;
-          byKey.delete(k);
-          break;
-        }
-      }
+    const idx = findPrevMatchIndex(prevEntries, f, used);
+    if (idx >= 0) {
+      used.add(idx);
+      out.push(mergeOne(prevEntries[idx], f));
+    } else {
+      out.push(f);
     }
-    byKey.set(key, mergeOne(prev, f));
   }
-  return [...byKey.values()].sort((a, b) =>
+
+  for (let i = 0; i < prevEntries.length; i++) {
+    if (used.has(i)) continue;
+    if (isPlayedFixture(prevEntries[i])) out.push(prevEntries[i]);
+  }
+
+  return out.sort((a, b) =>
     String(a.date || a.tipOff || "").localeCompare(
       String(b.date || b.tipOff || ""),
     ),
@@ -421,11 +502,17 @@ export function buildFixturesFile({
       (existing.teams ?? []).find((t) => t.fcbqTeamId === meta.fcbqTeamId) ??
       {};
     const payload = payloadsByTeam[meta.fcbqTeamId];
-    const incoming = payload?.games ?? [];
     const { homeNames: _hn, ...publicMeta } = meta;
+    // Failed / missing fetch: keep previous fixtures untouched.
+    if (payload == null) {
+      return {
+        ...publicMeta,
+        fixtures: [...(prev.fixtures ?? [])],
+      };
+    }
     return {
       ...publicMeta,
-      fixtures: mergeFixtures(prev.fixtures, incoming),
+      fixtures: mergeFixtures(prev.fixtures, payload.games ?? []),
     };
   });
 
